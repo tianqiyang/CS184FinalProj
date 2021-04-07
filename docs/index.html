@@ -154,9 +154,9 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<div class="goals_deliverables text-center">
+					<div class="goals_deliverables text-left" style="padding: 0rem 15rem;">
 						<h4 style="padding-top: 3rem">Stage 1</h4>
-						<ul class="text-left" style="padding: 0rem 5rem">
+						<ul style="font-size: 2rem;">
 							<li>
 								Use a particle system to simulate a flock (represent birds by
 								points).
@@ -188,9 +188,8 @@
 								</ul>
 							</li>
 						</ul>
-						<br>
 						<h4 style="padding-top: 3rem">Stage 2</h4>
-						<ul class="text-left" style="padding: 0rem 5rem">
+						<ul style="font-size: 2rem;">
 							<li>
 								Add random trees (represented by bars) to the background.
 							</li>
@@ -215,33 +214,32 @@
 								</ul>
 							</li>
 						</ul>
-						<br>
-						<h4 style="padding-top: 3rem">Stage 3</h4>
-						<ul class="text-left" style="padding: 0rem 5rem">
+						<h4 style="padding-top: 2rem">Stage 3</h4>
+						<ul style="font-size: 2rem;">
 							<li>Create 3D models for the birds and trees.</li>
 						</ul>
-						<br>
-						<h4 style="padding-top: 3rem">Stage 4</h4>
-						<ul class="text-left" style="padding: 0rem 5rem">
+						<h4 style="padding-top: 2rem">Stage 4</h4>
+						<ul style="font-size: 2rem;">
 							<li>
 								Implement environmental lighting with source light from sun.
 								(from project 3-2)
 							</li>
 						</ul>
-						<br>
-						<h4 style="padding-top: 3rem">Stage 5</h4>
-						<ul class="text-left" style="padding: 0rem 5rem">
+						<h4 style="padding-top: 2rem">Stage 5</h4>
+						<ul style="font-size: 2rem;">
 							<li>Render trees and birds with proper textures.</li>
 							<li>Make bird wings flippable. (animation)</li>
 						</ul>
+						<br>
+						<br>
 					</div>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<div class="goals_deliverables text-center">
+					<div class="goals_deliverables text-left"  style="padding: 5rem 12rem">
 						<h4>Questions to answer </h4>
-						<ul>
+						<ul style="font-size: 2rem;">
 							<li>What is the flying behavior of flock? Is there a specific pattern in the movement?</li>
 							<li>How to accelerate the Boids algorithm?</li>
 							<li> How to implement environment lighting to make the scene more realistic?</li>
@@ -251,57 +249,68 @@
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<div class="goals_deliverables text-center">
+					<div class="goals_deliverables text-left" style="padding: 5rem 12rem">
 						<h4>Performance measurement / expected output</h4>
-						<h5>In general, the direct way to judge the performance of our particle system is comparing it
+						<h5 class="text-left">In general, the direct way to judge the performance of our particle system
+							is comparing it
 							with real flock behaviors. Also, we want to make sure the rendering process is fast enough
 							and the interactive simulation session is seamless.</h5>
-						<ul>
-							<li>
-								Stage 1 mainly focuses on the flying behavior of flocks (represented by particles).
-								<ul>
-									<li>Generally, the particles will move following a designated direction (can be
-										directed by mouse). </li>
-									<li>The particles representing the birds should move smoothly with reasonable speeds
-										and dynamically stable distances between particles. </li>
-									<li>The particles should also react reasonably to situations like wind and predator.
-										When there is wind blowing from right to left, the flock should move faster when
-										it directs to left and slower when it directs to right. When there is a predator
-										(can be represented by mouse), particles should move to the opposite direction
-										from where the predator came from with a rapidly increased speed. </li>
-								</ul>
-							</li>
-							<li>
-								For stage 2, we want to make sure the particles(birds) can land on or take off from
-								bars(trees).
-								<ul>
-									<li>The landing and takeoff should be smooth with reasonable acceleration. </li>
-									<li>During landing, the particles should randomly land on the bar with relatively
-										even spacing. When the bar is clicked (tree is shaken), all birds take off
-										again. </li>
-								</ul>
-							</li>
-							<li>
-								For stage 3, we change particles and bars into 3D bird and tree models.
-							</li>
-							<li>
-								For stage 4, we want to see shadows of birds on the ground.
-							</li>
-							<li>
-								For stage 5 (extra expectation), the main idea is to further improve the 3D models for
-								birds and trees by adding textures and details (e.g. leaves) and make wings flippable.
-								<ul>
-									<li>
-										There should be no “candy wrapper“ artifact for wing flipping, and the wings
-										should only be flipping when the bird is flying.
-									</li>
-									<li>
-										It might be hard to simulate the feather textures, but we can texture map 2D
-										textures (e.g. different colors) onto the surfaces of the models.
-									</li>
-								</ul>
-							</li>
-						</ul>
+						<div class="text-left">
+							<ul style="font-size: 2rem;">
+								<li>
+									Stage 1 mainly focuses on the flying behavior of flocks (represented by particles).
+									<ul>
+										<li>Generally, the particles will move following a designated direction (can be
+											directed by mouse). </li>
+										<li>The particles representing the birds should move smoothly with reasonable
+											speeds
+											and dynamically stable distances between particles. </li>
+										<li>The particles should also react reasonably to situations like wind and
+											predator.
+											When there is wind blowing from right to left, the flock should move faster
+											when
+											it directs to left and slower when it directs to right. When there is a
+											predator
+											(can be represented by mouse), particles should move to the opposite
+											direction
+											from where the predator came from with a rapidly increased speed. </li>
+									</ul>
+								</li>
+								<li>
+									For stage 2, we want to make sure the particles(birds) can land on or take off from
+									bars(trees).
+									<ul style="font-size: 2rem;">
+										<li>The landing and takeoff should be smooth with reasonable acceleration. </li>
+										<li>During landing, the particles should randomly land on the bar with
+											relatively
+											even spacing. When the bar is clicked (tree is shaken), all birds take off
+											again. </li>
+									</ul>
+								</li>
+								<li>
+									For stage 3, we change particles and bars into 3D bird and tree models.
+								</li>
+								<li>
+									For stage 4, we want to see shadows of birds on the ground.
+								</li>
+								<li>
+									For stage 5 (extra expectation), the main idea is to further improve the 3D models
+									for
+									birds and trees by adding textures and details (e.g. leaves) and make wings
+									flippable.
+									<ul style="font-size: 2rem;">
+										<li>
+											There should be no “candy wrapper“ artifact for wing flipping, and the wings
+											should only be flipping when the bird is flying.
+										</li>
+										<li>
+											It might be hard to simulate the feather textures, but we can texture map 2D
+											textures (e.g. different colors) onto the surfaces of the models.
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -410,7 +419,7 @@
 			<div class="row"></div>
 			<div class="row bottom-footer text-center-mobile">
 				<div class="col-sm-8">
-					<p>&copy; 2021 All Rights Reserved. Powered by</p>
+					<p>&copy; 2021 All Rights Reserved. Powered by Sainan Chen, Tianqi Yang, Yizhou Chi, Huibo Yang.</p>
 				</div>
 			</div>
 		</div>
