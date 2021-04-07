@@ -516,8 +516,8 @@ section {
 }
 
 .goals_deliverables {
-	margin: 80px 0;
-	padding-bottom: 60px;
+	margin: 40px 0;
+	padding-bottom: 30px;
 	background: white;
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.07);
 }
@@ -561,7 +561,7 @@ section {
 
 .owl-schedule,
 .pricings {
-	margin-top: 100px;
+	margin-top: 10px;
 	margin-bottom: 100px;
 }
 
@@ -569,7 +569,10 @@ section {
 	position: relative;
 	width: 100%;
 }
-
+#resource a{
+	color: yellow;
+	font-size: 2rem;
+}
 .pricings .schedule .box-main,
 .pricings .schedule .box-second {
 	position: relative;
