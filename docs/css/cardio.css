@@ -307,45 +307,45 @@ section {
 	border-left: 30px solid white;
 }
 
-.intro-tables {
+.summary-tables {
 	top: -130px;
 	position: relative;
 }
 
-.intro-table {
+.summary-table {
 	-webkit-background-size: cover;
 	background-size: cover;
 	background-repeat: repeat;
 	background-position: 0% 0%;
 }
 
-.intro-table-first {
+.summary-table-first {
 	background-image: url('../img/table-1.jpg');
 }
 
-.intro-table-hover {
+.summary-table-hover {
 	-webkit-transition: background-image 0.3s ease, background-position 0.3s;
 	transition: background-image 0.3s ease, background-position 0.3s;
 	background-image: url('../img/table-2.jpg');
 }
 
-.intro-table-hover h4 {
+.summary-table-hover h4 {
 	-webkit-transform: translateY(170px);
 	transform: translateY(170px);
 	-webkit-transition: -webkit-transform 0.3s;
 	transition: transform 0.3s;
 }
 
-.intro-table-hover:hover {
+.summary-table-hover:hover {
 	background-image: url('../img/table-2-hover.jpg');
 	background-position: 50% 50%;
 }
 
-.intro-table-third {
+.summary-table-third {
 	background-image: url('../img/table-3.jpg');
 }
 
-.intro-table-hover .expand {
+.summary-table-hover .expand {
 	margin: 30px;
 	margin-top: 120px;
 	opacity: 0;
@@ -356,50 +356,50 @@ section {
 	transform: scale(0.6);
 }
 
-.intro-table-hover:hover h4 {
+.summary-table-hover:hover h4 {
 	-webkit-transform: translateY(0);
 	transform: translateY(0);
 }
 
-.intro-table-hover:hover .expand {
+.summary-table-hover:hover .expand {
 	opacity: 1;
 	-webkit-transform: scale(1);
 	-ms-transform: scale(1);
 	transform: scale(1);
 }
 
-.intro-table-hover .hide-hover {
+.summary-table-hover .hide-hover {
 	-webkit-transition: opacity 0.3s ease;
 	transition: opacity 0.3s ease;
 }
 
-.intro-table-hover:hover .hide-hover {
+.summary-table-hover:hover .hide-hover {
 	opacity: 0;
 }
 
-.intro-tables .intro-table {
+.summary-tables .summary-table {
 	position: relative;
 	width: 100%;
 	height: 300px;
 	margin: 20px 0;
 }
 
-.intro-tables .intro-table .heading {
+.summary-tables .summary-table .heading {
 	margin: 0;
 	padding: 30px;
 }
 
-.intro-tables .intro-table .small-heading {
+.summary-tables .summary-table .small-heading {
 	margin: 0;
 	padding: 0 30px;
 }
 
-.intro-tables .intro-table .bottom {
+.summary-tables .summary-table .bottom {
 	position: absolute;
 	bottom: 0;
 }
 
-.intro-tables .intro-table .owl-schedule .schedule-row {
+.summary-tables .summary-table .owl-schedule .schedule-row {
 	padding: 10px 30px;
 	color: white;
 	transition: all 0.3s ease;
@@ -449,7 +449,7 @@ section {
 	}
 }
 
-.services {
+.description {
 	margin: 40px 0;
 }
 
@@ -497,7 +497,7 @@ section {
 	top: -30px;
 }
 
-.service .description {
+.service .goals_deliverables {
 	width: 80%;
 	margin: 0 auto;
 	opacity: 0;
@@ -508,21 +508,21 @@ section {
 	transform: scale(0);
 }
 
-.service:hover .description {
+.service:hover .goals_deliverables {
 	opacity: 1;
 	-webkit-transform: scale(1);
 	-ms-transform: scale(1);
 	transform: scale(1);
 }
 
-.team {
+.goals_deliverables {
 	margin: 80px 0;
 	padding-bottom: 60px;
 	background: white;
 	box-shadow: 0 2px 3px rgba(0, 0, 0, 0.07);
 }
 
-.team .cover .overlay {
+.goals_deliverables .cover .overlay {
 	height: 250px;
 	padding-top: 60px;
 	opacity: 0;
@@ -531,23 +531,23 @@ section {
 	transition: opacity 0.45s ease;
 }
 
-.team:hover .cover .overlay {
+.goals_deliverables:hover .cover .overlay {
 	opacity: 1;
 }
 
-.team .avatar {
+.goals_deliverables .avatar {
 	position: relative;
 	z-index: 2;
 	margin-top: -60px;
 	border-radius: 50%;
 }
 
-.team .title {
+.goals_deliverables .title {
 	margin: 50px 0;
 }
 /* Pricing */
 
-#pricing {
+#schedule {
 	background: #00a8ff url('../img/pricing1.jpg') no-repeat center center;
 	-webkit-background-size: cover;
 	background-size: cover;
@@ -555,23 +555,23 @@ section {
 	transition: background-image 0.6s linear 0.3s;
 }
 
-.owl-pricing img {
+.owl-schedule img {
 	width: 100%;
 }
 
-.owl-pricing,
+.owl-schedule,
 .pricings {
 	margin-top: 100px;
 	margin-bottom: 100px;
 }
 
-.pricing {
+.schedule {
 	position: relative;
 	width: 100%;
 }
 
-.pricings .pricing .box-main,
-.pricings .pricing .box-second {
+.pricings .schedule .box-main,
+.pricings .schedule .box-second {
 	position: relative;
 	left: 25%;
 	display: inline-block;
@@ -585,16 +585,16 @@ section {
 	backface-visibility: hidden;
 }
 
-.pricings .pricing .box-main {
+.pricings .schedule .box-main {
 	z-index: 10;
 	padding-top: 40px;
 }
 
-.pricings .pricing .box-main:not(.active) {
+.pricings .schedule .box-main:not(.active) {
 	cursor: pointer;
 }
 
-.pricings .pricing .box-main .info-icon {
+.pricings .schedule .box-main .info-icon {
 	font-size: 14px;
 	position: absolute;
 	top: 20px;
@@ -606,24 +606,24 @@ section {
 	transition: opacity 0.3s;
 }
 
-.pricings .pricing .box-main:not(.active) .info-icon {
+.pricings .schedule .box-main:not(.active) .info-icon {
 	opacity: 1;
 	-webkit-transition-delay: 0.2s;
 	transition-delay: 0.2s;
 }
 
-.pricings .pricing .box-main:not(.active):hover {
+.pricings .schedule .box-main:not(.active):hover {
 	background: #afafaf;
 }
 
-.pricings .pricing .box-main.active {
+.pricings .schedule .box-main.active {
 	background: #00a8ff;
 	-webkit-transform: translateX(-99%);
 	-ms-transform: translateX(-99%);
 	transform: translateX(-99%);
 }
 
-.pricings .pricing .box-second {
+.pricings .schedule .box-second {
 	position: absolute;
 	top: 0;
 	right: 0% !important;
@@ -632,17 +632,17 @@ section {
 	background: #afafaf;
 }
 
-.pricings .pricing .box-second.active {
+.pricings .schedule .box-second.active {
 	opacity: 1;
 	background: #00a8ff;
 }
 
-.pricings .pricing.active .box-main,
-.pricings .pricing .box-second {
+.pricings .schedule.active .box-main,
+.pricings .schedule .box-second {
 	background: #00a8ff;
 }
 
-.pricings .pricing .box-main a.btn {
+.pricings .schedule .box-main a.btn {
 	margin-top: 50px;
 }
 
@@ -1063,27 +1063,27 @@ footer .social-footer li:hover a {
 }
 
 @media(max-width: 768px) {
-	.pricing {
+	.schedule {
 		margin-bottom: 30px;
 	}
-	.pricings .pricing .info-icon {
+	.pricings .schedule .info-icon {
 		display: none;
 	}
-	.pricings .pricing .box-main,
-	.pricings .pricing .box-second {
+	.pricings .schedule .box-main,
+	.pricings .schedule .box-second {
 		left: 0;
 		width: 100%;
 		padding: 50px 50px 0;
 		text-align: left;
 		background: #00a8ff;
 	}
-	.pricings .pricing .box-main.active {
+	.pricings .schedule .box-main.active {
 		background: #00a8ff;
 		-webkit-transform: translateX(0%);
 		-ms-transform: translateX(0%);
 		transform: translateX(0%);
 	}
-	.pricings .pricing .box-second {
+	.pricings .schedule .box-second {
 		position: relative;
 		opacity: 1;
 	}
@@ -1105,7 +1105,7 @@ footer .social-footer li:hover a {
 	header .typed-cursor {
 		display: none;
 	}
-	.pricings .pricing .box-second {
+	.pricings .schedule .box-second {
 		padding-top: 0;
 	}
 }

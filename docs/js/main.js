@@ -8,11 +8,11 @@ jQuery(function($) {
 	// Window Load
 	$(window).load(function() {
 		// Preloader
-		$('.intro-tables, .parallax, header').css('opacity', '0');
+		$('.summary-tables, .parallax, header').css('opacity', '0');
 		$('.preloader').addClass('animated fadeOut').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
 			$('.preloader').hide();
 			$('.parallax, header').addClass('animated fadeIn').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
-				$('.intro-tables').addClass('animated fadeInUp').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
+				$('.summary-tables').addClass('animated fadeInUp').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
 			});
 		});
 
@@ -94,13 +94,13 @@ jQuery(function($) {
 	});
 
 	// Pricing Box Click Event
-	$('.pricing .box-main').click(function() {
-		$('.pricing .box-main').removeClass('active');
-		$('.pricing .box-second').removeClass('active');
+	$('.schedule .box-main').click(function() {
+		$('.schedule .box-main').removeClass('active');
+		$('.schedule .box-second').removeClass('active');
 		$(this).addClass('active');
 		$(this).next($('.box-second')).addClass('active');
-		$('#pricing').css("background-image", "url(" + $(this).data('img') + ")");
-		$('#pricing').css("background-size", "cover");
+		$('#schedule').css("background-image", "url(" + $(this).data('img') + ")");
+		$('#schedule').css("background-size", "cover");
 	});
 
 	// Mobile Nav

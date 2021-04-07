@@ -5,7 +5,7 @@
 	/**
 	 * @method private
 	 * @name construct
-	 * @description Builds instance.
+	 * @goals_deliverables Builds instance.
 	 * @param data [object] "Instance data"
 	 */
 
@@ -16,7 +16,7 @@
 	/**
 	 * @method private
 	 * @name destruct
-	 * @description Tears down instance.
+	 * @goals_deliverables Tears down instance.
 	 * @param data [object] "Instance data"
 	 */
 
@@ -29,7 +29,7 @@
 	/**
 	 * @method private
 	 * @name onMouseEnter
-	 * @description Handles mouse enter event.
+	 * @goals_deliverables Handles mouse enter event.
 	 * @param e [object] "Event data"
 	 */
 
@@ -47,7 +47,7 @@
 	/**
 	 * @method private
 	 * @name onMouseLeave
-	 * @description Handles mouse leave event.
+	 * @goals_deliverables Handles mouse leave event.
 	 * @param e [object] "Event data"
 	 */
 
@@ -62,7 +62,7 @@
 	/**
 	 * @method private
 	 * @name onMouseLeave
-	 * @description Handles mouse move event.
+	 * @goals_deliverables Handles mouse move event.
 	 * @param e [object] "Event data"
 	 */
 
@@ -73,7 +73,7 @@
 	/**
 	 * @method private
 	 * @name buildTooltip
-	 * @description Builds new tooltip instance.
+	 * @goals_deliverables Builds new tooltip instance.
 	 * @param data [object] "Instance data"
 	 */
 
@@ -204,7 +204,7 @@
 	/**
 	 * @method private
 	 * @name positionTooltip
-	 * @description Positions active tooltip instance.
+	 * @goals_deliverables Positions active tooltip instance.
 	 * @param left [int] "Left position"
 	 * @param top [int] "Top position"
 	 */
@@ -221,7 +221,7 @@
 	/**
 	 * @method private
 	 * @name removeTooltip
-	 * @description Removes active tooltip instance.
+	 * @goals_deliverables Removes active tooltip instance.
 	 */
 
 	function removeTooltip() {
@@ -236,7 +236,7 @@
 	/**
 	 * @method private
 	 * @name format
-	 * @description Formats tooltip text.
+	 * @goals_deliverables Formats tooltip text.
 	 * @return [string] "Tooltip text"
 	 */
 
@@ -247,7 +247,7 @@
 	/**
 	 * @plugin
 	 * @name Tooltip
-	 * @description A jQuery plugin for simple tooltips.
+	 * @goals_deliverables A jQuery plugin for simple tooltips.
 	 * @type widget
 	 * @dependency core.js
 	 */
