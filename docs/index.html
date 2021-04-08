@@ -47,20 +47,17 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#"><img src="./img/logo.png" data-active-url="./img/logo-active.png"
-						alt="" /></a>
+				<a class="navbar-brand" href="#"><img src="./img/logo.png" width="50" alt="" /></a>
 			</div>
 			<!-- Collect the nav links, forms, and other content for toggling -->
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav navbar-right main-nav">
-					<li><a href="#summary">Summary</a></li>
-					<li><a href="#description">Problem Description</a></li>
-					<li><a href="#goals_deliverables">Goals and Deliverables</a></li>
-					<li><a href="#schedule">Schedule</a></li>
-					<li><a href="#resource">Resource</a></li>
+					<li><a href="index.html">Overview</a></li>
+					<li><a href="proposal.html">Proposal</a></li>
+					<li><a href="implementation.html">Implementation</a></li>
 				</ul>
 			</div>
-			<!-- /.navbar-collapse -->
+			<!-- Collect the nav links, forms, and other content for toggling -->
 		</div>
 		<!-- /.container-fluid -->
 	</nav>
@@ -74,356 +71,34 @@
 							<h4 class="light white">
 								Team Members: Sainan Chen, Tianqi Yang, Yizhou Chi, Huibo Yang
 							</h4>
-							<h3 class="white typed">
+							<h4 class="light muted" style="line-height:1.3; text-align: left;">
+								<br>
+								Birds are born to the sky, flapping their wings without constraints.
+								It’s always fascinating to observe the flock of birds flying off the
+								trees. Happily, freely, wandering around, they are flying so close,
+								but they will never collide with each other. It is such a scenery to
+								peek during sunset. We want to not only learn and simulate the
+								flying pattern of a flock of birds but also reproduce the scene
+								we’ve just described. There are two major challenges. We need to
+								firstly use appropriate algorithms (e.g., Boids) to simulate the
+								flock behaviors. The birds will be interacting with each other and
+								can also be influenced by the external factors like winds, scare,
+								and places to rest. Then, by applying suitable light tracing
+								methods, we want to make the flock reflect the environment lighting
+								in order to create beautiful images. <br>
+								<br>
 								In this project, we will implement a 3D flocking simulation.
 								We extend the boids algorithm, which contains separation,
 								alignment and cohesion, by adding features like landing and
 								taking off from trees. Users can interact with the flock by
 								leading or scaring birds.
-							</h3>
-							<span class="typed-cursor">|</span>
+							</h4>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</header>
-	<section id="description" class="section section-padded">
-		<div class="container">
-			<div class="row text-center title">
-				<h2>Problem description</h2>
-				<h4 class="light muted">
-					Birds are born to the sky, flapping their wings without constraints.
-					It’s always fascinating to observe the flock of birds flying off the
-					trees. Happily, freely, wandering around, they are flying so close,
-					but they will never collide with each other. It is such a scenery to
-					peek during sunset. We want to not only learn and simulate the
-					flying pattern of a flock of birds but also reproduce the scene
-					we’ve just described. There are two major challenges. We need to
-					firstly use appropriate algorithms (e.g., Boids) to simulate the
-					flock behaviors. The birds will be interacting with each other and
-					can also be influenced by the external factors like winds, scare,
-					and places to rest. Then, by applying suitable light tracing
-					methods, we want to make the flock reflect the environment lighting
-					in order to create beautiful images.
-				</h4>
-			</div>
-			<!-- <div class="row description">
-				<div class="col-md-4">
-					<div class="service">
-						<div class="icon-holder">
-							<img src="./img/heart-blue.png" alt="" class="icon">
-						</div>
-						<h4 class="heading">Cardio Training</h4>
-						<p class="goals_deliverables">A elementum ligula lacus ac quam ultrices a scelerisque praesent vel suspendisse scelerisque a aenean hac montes.</p>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="service">
-						<div class="icon-holder">
-							<img src="./img/guru-blue.png" alt="" class="icon">
-						</div>
-						<h4 class="heading">Yoga Pilates</h4>
-						<p class="goals_deliverables">A elementum ligula lacus ac quam ultrices a scelerisque praesent vel suspendisse scelerisque a aenean hac montes.</p>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="service">
-						<div class="icon-holder">
-							<img src="./img/weight-blue.png" alt="" class="icon">
-						</div>
-						<h4 class="heading">Power Training</h4>
-						<p class="goals_deliverables">A elementum ligula lacus ac quam ultrices a scelerisque praesent vel suspendisse scelerisque a aenean hac montes.</p>
-					</div>
-				</div>
-			</div> -->
-		</div>
-		<div class="cut cut-bottom"></div>
-	</section>
-	<section id="goals_deliverables" class="section gray-bg">
-		<div class="container">
-			<div class="row title text-center">
-				<h2 class="margin-top">Goals and Deliverables</h2>
-				<h4 class="light muted">
-					In general, our goal is to generate an interactive scene of flocks
-					that simulates the real boids’ flying behaviors. The project
-					consists of 5 stages, and we plan to finish the first 4 stages,
-					while the last stage is the extra expectation that we will implement
-					if we get time.
-				</h4>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<div class="goals_deliverables text-left" style="padding: 0rem 15rem;">
-						<h4 style="padding-top: 3rem">Stage 1</h4>
-						<ul style="font-size: 2rem;">
-							<li>
-								Use a particle system to simulate a flock (represent birds by
-								points).
-							</li>
-							<li>
-								The forces between birds include separation, alignment, and
-								cohesion.
-							</li>
-							<li>The external forces include wind.</li>
-							<li>
-								Interactive features:
-								<ul>
-									<li>
-										The predator: the user clicks somewhere, if it is around
-										or in the path of the flock, the flock tries to avoid it
-										and not close to it. The mouse becomes a predator or other
-										obstacle and the flock bypasses around it.
-									</li>
-									<li>
-										The wind: the user changes the direction and the level of
-										the wind between 0 to 12, and the shape of the flock
-										changes. We can see how the wind affects the flock.
-									</li>
-									<li>
-										The center: the user can change the center of mass of the
-										flock. The mouse is the lead bird of the flock and the
-										user drags the mouse and the flock follows it.
-									</li>
-								</ul>
-							</li>
-						</ul>
-						<h4 style="padding-top: 3rem">Stage 2</h4>
-						<ul style="font-size: 2rem;">
-							<li>
-								Add random trees (represented by bars) to the background.
-							</li>
-							<li>
-								Birds rest on the nearest tree every 15s. Every rest is 10s.
-							</li>
-							<li>
-								Add "perching" behavior. If a boid gets close to the bottom of
-								the screen/ branches of trees, have it land and hang out on
-								the ground for a bit before taking off again and rejoining the
-								flock.
-							</li>
-							<li>
-								Interactive features:
-								<ul>
-									<li>
-										The shake: the user clicks the tree, if the birds stand on
-										the branches, the birds fly away from the tree. Some join
-										the flying birds and others back to the tree after a few
-										seconds when there is no one shaking the tree.
-									</li>
-								</ul>
-							</li>
-						</ul>
-						<h4 style="padding-top: 2rem">Stage 3</h4>
-						<ul style="font-size: 2rem;">
-							<li>Create 3D models for the birds and trees.</li>
-						</ul>
-						<h4 style="padding-top: 2rem">Stage 4</h4>
-						<ul style="font-size: 2rem;">
-							<li>
-								Implement environmental lighting with source light from sun.
-								(from project 3-2)
-							</li>
-						</ul>
-						<h4 style="padding-top: 2rem">Stage 5</h4>
-						<ul style="font-size: 2rem;">
-							<li>Render trees and birds with proper textures.</li>
-							<li>Make bird wings flippable. (animation)</li>
-						</ul>
-						<br>
-						<br>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<div class="goals_deliverables text-left"  style="padding: 5rem 12rem">
-						<h4>Questions to answer </h4>
-						<ul style="font-size: 2rem;">
-							<li>What is the flying behavior of flock? Is there a specific pattern in the movement?</li>
-							<li>How to accelerate the Boids algorithm?</li>
-							<li> How to implement environment lighting to make the scene more realistic?</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<div class="goals_deliverables text-left" style="padding: 5rem 12rem">
-						<h4>Performance measurement / expected output</h4>
-						<h5 class="text-left">In general, the direct way to judge the performance of our particle system
-							is comparing it
-							with real flock behaviors. Also, we want to make sure the rendering process is fast enough
-							and the interactive simulation session is seamless.</h5>
-						<div class="text-left">
-							<ul style="font-size: 2rem;">
-								<li>
-									Stage 1 mainly focuses on the flying behavior of flocks (represented by particles).
-									<ul>
-										<li>Generally, the particles will move following a designated direction (can be
-											directed by mouse). </li>
-										<li>The particles representing the birds should move smoothly with reasonable
-											speeds
-											and dynamically stable distances between particles. </li>
-										<li>The particles should also react reasonably to situations like wind and
-											predator.
-											When there is wind blowing from right to left, the flock should move faster
-											when
-											it directs to left and slower when it directs to right. When there is a
-											predator
-											(can be represented by mouse), particles should move to the opposite
-											direction
-											from where the predator came from with a rapidly increased speed. </li>
-									</ul>
-								</li>
-								<li>
-									For stage 2, we want to make sure the particles(birds) can land on or take off from
-									bars(trees).
-									<ul style="font-size: 2rem;">
-										<li>The landing and takeoff should be smooth with reasonable acceleration. </li>
-										<li>During landing, the particles should randomly land on the bar with
-											relatively
-											even spacing. When the bar is clicked (tree is shaken), all birds take off
-											again. </li>
-									</ul>
-								</li>
-								<li>
-									For stage 3, we change particles and bars into 3D bird and tree models.
-								</li>
-								<li>
-									For stage 4, we want to see shadows of birds on the ground.
-								</li>
-								<li>
-									For stage 5 (extra expectation), the main idea is to further improve the 3D models
-									for
-									birds and trees by adding textures and details (e.g. leaves) and make wings
-									flippable.
-									<ul style="font-size: 2rem;">
-										<li>
-											There should be no “candy wrapper“ artifact for wing flipping, and the wings
-											should only be flipping when the bird is flying.
-										</li>
-										<li>
-											It might be hard to simulate the feather textures, but we can texture map 2D
-											textures (e.g. different colors) onto the surfaces of the models.
-										</li>
-									</ul>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-	<section id="schedule" class="section">
-		<div class="container">
-			<div class="row title text-center">
-				<h2 class="white">Schedule</h2>
-			</div>
-			<div class="row no-margin">
-				<div class="col-md-8 no-padding pricings col-md-offset-2 text-center">
-					<div class="schedule">
-						<div class="box active" data-img="./img/pricing1.jpg">
-							<h4 class="white regular light">1st Week (April 8–18)</h4>
-							<ul class="white-list text-left">
-								<li>
-									Begin implementing the most basic Boids algorithm (Cohesion
-									force, Separation force, Alignment force)
-								</li>
-								<li>
-									Implement interactive functions:
-									<ul style="list-style-type: none;">
-										<li>
-											Add a predator that the boids try to avoid that scatters
-											the flock if it gets too close.
-										</li>
-										<li>
-											Add a strong wind or current to see what effect it has
-											on the flock.
-										</li>
-										<li>
-											Click on the environment -> change the center of mass of
-											the flock
-										</li>
-									</ul>
-								</li>
-							</ul>
-							<br />
-							<br />
-							<h4 class="white regular light">2nd Week (April 19–25)</h4>
-							<ul class="white-list text-left">
-								<li>Finish up implementing the interactive feature.</li>
-								<li>Add trees to the space</li>
-								<li>
-									Birds rest on the nearest tree every 15s. Every rest is 10s.
-								</li>
-								<li>
-									Add "perching" behavior. If a boid gets close to the bottom
-									of the screen/ branches of trees, have it land and hang out
-									on the ground for a bit before taking off again and
-									rejoining the flock.
-								</li>
-								<li>
-									Interactive feature: click a tree -> birds on the tree fly
-									away. (detailed behaviors to be discussed later).
-								</li>
-								<li>
-									Finish up milestone deliverables (Report, Video, Slides) (
-									April 27).
-								</li>
-							</ul>
-							<br />
-							<br />
-							<h4 class="white regular light">3rd Week (April 26–May 2)</h4>
-							<ul class="white-list text-left">
-								<li>3D shape of the birds and trees.</li>
-								<li>Add environmental lighting or other effects.</li>
-							</ul>
-							<br />
-							<br />
-							<h4 class="white regular light">4th Week (May 2--May 11)</h4>
-							<ul class="white-list text-left">
-								<li>Texture-mapping.</li>
-								<li>Flipping wings (animation).</li>
-								<li>Build final report webpage.</li>
-								<li>Finish up final video and presentation materials.</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-	<section id="resource" class="section blue-bg">
-		<div class="container">
-			<div class="row title text-center">
-				<h2 class="white">Resource</h2>
-				<ul class="text-left" style="padding: 0rem 5rem; color: yellow">
-					<li> <a href="https://github.com/jyanar/Boids">C++ Repo</a></li>
-					<li> <a href="http://www.red3d.com/cwr/boids/">Boids Paper</a></li>
-					<li> <a href="https://eater.net/boids">2D demo</a></li>
-					<li><a
-							href="http://www.csc.kth.se/utbildning/kth/kurser/DD143X/dkand11/Group5Lars/carl-oscar_erneholm.pdf">Paper
-							with Pseudo Code</a>
-					</li>
-					<li><a href="https://arxiv.org/pdf/1909.12330.pdf">Complicated Math</a></li>
-					<li><a href="https://naoki-yoshioka.github.io/sss/articles/maruyama.pdf">Dynamic
-							Organization of Flocking Behaviors in
-							a Large Scale Boids Model</a></li>
-				</ul>
-			</div>
-	</section>
-	<footer>
-		<div class="container">
-			<div class="row"></div>
-			<div class="row bottom-footer text-center-mobile">
-				<div class="col-sm-8">
-					<p>&copy; 2021 All Rights Reserved. Powered by Sainan Chen, Tianqi Yang, Yizhou Chi, Huibo Yang.</p>
-				</div>
-			</div>
-		</div>
-	</footer>
 	<!-- Holder for mobile navigation -->
 	<div class="mobile-nav">
 		<ul></ul>
