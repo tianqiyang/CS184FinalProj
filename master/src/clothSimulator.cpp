@@ -333,12 +333,52 @@ void ClothSimulator::drawWireframe(GLShader &shader) {
 
     Vector3D pa = s.pm_a->position;
     Vector3D pb = pa + Vector3D(.001, 0, 0);
+    Vector3D pc = pa + Vector3D(.0005, 0.0007, .001);
+    Vector3D pd = pa + Vector3D(.0005, 0.0007, -.001);
 
     Vector3D na = s.pm_a->normal();
     Vector3D nb = na;
+    Vector3D nc = na;
 
+    //a b
     positions.col(si) << pa.x, pa.y, pa.z, 1.0;
     positions.col(si + 1) << pb.x, pb.y, pb.z, 1.0;
+
+    normals.col(si) << na.x, na.y, na.z, 0.0;
+    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+
+    si += 2;
+
+    // b c
+    positions.col(si) << pb.x, pb.y, pb.z, 1.0;
+    positions.col(si + 1) << pc.x, pc.y, pc.z, 1.0;
+
+    normals.col(si) << na.x, na.y, na.z, 0.0;
+    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+
+    si += 2;
+
+    // c a
+    positions.col(si) << pc.x, pc.y, pc.z, 1.0;
+    positions.col(si + 1) << pa.x, pa.y, pa.z, 1.0;
+
+    normals.col(si) << na.x, na.y, na.z, 0.0;
+    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+
+    si += 2;
+
+    // a d
+    positions.col(si) << pa.x, pa.y, pa.z, 1.0;
+    positions.col(si + 1) << pd.x, pd.y, pd.z, 1.0;
+
+    normals.col(si) << na.x, na.y, na.z, 0.0;
+    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+
+    si += 2;
+
+    // b d
+    positions.col(si) << pb.x, pb.y, pb.z, 1.0;
+    positions.col(si + 1) << pd.x, pd.y, pd.z, 1.0;
 
     normals.col(si) << na.x, na.y, na.z, 0.0;
     normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
