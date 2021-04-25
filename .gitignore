@@ -1,6 +1,7 @@
 # Cruft
 .DS_Store
 
+.DS_Store
 # Visual Studio
 Win32/*
 .vs
@@ -40,3 +41,5 @@ CMakeSettings.json
 *.app
 build
 xcode
+
+.vscode
