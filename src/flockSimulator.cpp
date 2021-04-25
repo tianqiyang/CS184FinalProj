@@ -178,13 +178,13 @@ ClothSimulator::~ClothSimulator() {
   glDeleteTextures(1, &m_gl_cubemap_tex);
 
   if (cloth) delete cloth;
-  if (cp) delete cp;
+  if (fp) delete fp;
   if (collision_objects) delete collision_objects;
 }
 
 void ClothSimulator::loadCloth(Cloth *cloth) { this->cloth = cloth; }
 
-void ClothSimulator::loadClothParameters(ClothParameters *cp) { this->cp = cp; }
+void ClothSimulator::loadClothParameters(FlockParameters *fp) { this->fp = fp; }
 
 void ClothSimulator::loadCollisionObjects(vector<CollisionObject *> *objects) { this->collision_objects = objects; }
 
@@ -247,7 +247,7 @@ void ClothSimulator::drawContents() {
     vector<Vector3D> external_accelerations = {gravity};
 
     for (int i = 0; i < simulation_steps; i++) {
-      cloth->simulate(frames_per_sec, simulation_steps, cp, external_accelerations, collision_objects);
+      cloth->simulate(frames_per_sec, simulation_steps, fp, external_accelerations, collision_objects);
     }
   }
 
@@ -323,9 +323,9 @@ void ClothSimulator::drawWireframe(GLShader &shader) {
   int num_bending_springs = num_structural_springs - cloth->num_width_points -
                             cloth->num_height_points;
 
-  int num_springs = cp->enable_structural_constraints * num_structural_springs +
-                    cp->enable_shearing_constraints * num_shear_springs +
-                    cp->enable_bending_constraints * num_bending_springs;
+  int num_springs = fp->enable_structural_constraints * num_structural_springs +
+                    fp->enable_shearing_constraints * num_shear_springs +
+                    fp->enable_bending_constraints * num_bending_springs;
 
   MatrixXf positions(4, num_springs * 2);
   MatrixXf normals(4, num_springs * 2);
@@ -337,9 +337,9 @@ void ClothSimulator::drawWireframe(GLShader &shader) {
   for (int i = 0; i < cloth->springs.size(); i++) {
     Spring s = cloth->springs[i];
 
-    if ((s.spring_type == STRUCTURAL && !cp->enable_structural_constraints) ||
-        (s.spring_type == SHEARING && !cp->enable_shearing_constraints) ||
-        (s.spring_type == BENDING && !cp->enable_bending_constraints)) {
+    if ((s.spring_type == STRUCTURAL && !fp->enable_structural_constraints) ||
+        (s.spring_type == SHEARING && !fp->enable_shearing_constraints) ||
+        (s.spring_type == BENDING && !fp->enable_bending_constraints)) {
       continue;
     }
 
@@ -634,34 +634,34 @@ void ClothSimulator::initGUI(Screen *screen) {
 
   // Spring types
 
-  new Label(window, "Spring types", "sans-bold");
+  //new Label(window, "Flock Constants", "sans-bold");
 
-  {
-    Button *b = new Button(window, "structural");
-    b->setFlags(Button::ToggleButton);
-    b->setPushed(cp->enable_structural_constraints);
-    b->setFontSize(14);
-    b->setChangeCallback(
-        [this](bool state) { cp->enable_structural_constraints = state; });
+  //{
+  //  Button *b = new Button(window, "structural");
+  //  b->setFlags(Button::ToggleButton);
+  //  b->setPushed(fp->enable_structural_constraints);
+  //  b->setFontSize(14);
+  //  b->setChangeCallback(
+  //      [this](bool state) { fp->enable_structural_constraints = state; });
 
-    b = new Button(window, "shearing");
-    b->setFlags(Button::ToggleButton);
-    b->setPushed(cp->enable_shearing_constraints);
-    b->setFontSize(14);
-    b->setChangeCallback(
-        [this](bool state) { cp->enable_shearing_constraints = state; });
+  //  b = new Button(window, "shearing");
+  //  b->setFlags(Button::ToggleButton);
+  //  b->setPushed(fp->enable_shearing_constraints);
+  //  b->setFontSize(14);
+  //  b->setChangeCallback(
+  //      [this](bool state) { fp->enable_shearing_constraints = state; });
 
-    b = new Button(window, "bending");
-    b->setFlags(Button::ToggleButton);
-    b->setPushed(cp->enable_bending_constraints);
-    b->setFontSize(14);
-    b->setChangeCallback(
-        [this](bool state) { cp->enable_bending_constraints = state; });
-  }
+  //  b = new Button(window, "bending");
+  //  b->setFlags(Button::ToggleButton);
+  //  b->setPushed(fp->enable_bending_constraints);
+  //  b->setFontSize(14);
+  //  b->setChangeCallback(
+  //      [this](bool state) { fp->enable_bending_constraints = state; });
+  //}
 
   // Mass-spring parameters
 
-  new Label(window, "Parameters", "sans-bold");
+  new Label(window, "Flock Parameters", "sans-bold");
 
   {
     Widget *panel = new Widget(window);
@@ -671,28 +671,28 @@ void ClothSimulator::initGUI(Screen *screen) {
     layout->setSpacing(0, 10);
     panel->setLayout(layout);
 
-    new Label(panel, "density :", "sans-bold");
+    new Label(panel, "coherence :", "sans-bold");
 
     FloatBox<double> *fb = new FloatBox<double>(panel);
     fb->setEditable(true);
     fb->setFixedSize(Vector2i(100, 20));
     fb->setFontSize(14);
-    fb->setValue(cp->density / 10);
-    fb->setUnits("g/cm^2");
+    fb->setValue(fp->coherence);
+    fb->setUnits(" ");
     fb->setSpinnable(true);
-    fb->setCallback([this](float value) { cp->density = (double)(value * 10); });
+    fb->setCallback([this](float value) { fp->density = (double)(value); });
 
-    new Label(panel, "ks :", "sans-bold");
+    new Label(panel, "alignment :", "sans-bold");
 
     fb = new FloatBox<double>(panel);
     fb->setEditable(true);
     fb->setFixedSize(Vector2i(100, 20));
     fb->setFontSize(14);
-    fb->setValue(cp->ks);
+    fb->setValue(fp->ks);
     fb->setUnits("N/m");
     fb->setSpinnable(true);
     fb->setMinValue(0);
-    fb->setCallback([this](float value) { cp->ks = value; });
+    fb->setCallback([this](float value) { fp->ks = value; });
   }
 
   // Simulation constants
@@ -739,12 +739,12 @@ void ClothSimulator::initGUI(Screen *screen) {
         new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
 
     Slider *slider = new Slider(panel);
-    slider->setValue(cp->damping);
+    slider->setValue(fp->damping);
     slider->setFixedWidth(105);
 
     TextBox *percentage = new TextBox(panel);
     percentage->setFixedWidth(75);
-    percentage->setValue(to_string(cp->damping));
+    percentage->setValue(to_string(fp->damping));
     percentage->setUnits("%");
     percentage->setFontSize(14);
 
@@ -752,7 +752,7 @@ void ClothSimulator::initGUI(Screen *screen) {
       percentage->setValue(std::to_string(value));
     });
     slider->setFinalCallback([&](float value) {
-      cp->damping = (double)value;
+      fp->damping = (double)value;
       // cout << "Final slider value: " << (int)(value * 100) << endl;
     });
   }
