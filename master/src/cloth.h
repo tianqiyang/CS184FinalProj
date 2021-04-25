@@ -53,7 +53,7 @@ struct Cloth {
   void simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
                 vector<Vector3D> external_accelerations,
                 vector<CollisionObject *> *collision_objects);
-
+  vector<PointMass> getNeighbours(PointMass pm, double range);
   void reset();
   void buildClothMesh();
 
@@ -78,11 +78,15 @@ struct Cloth {
 
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;
-  double x = 2;
-  double y = 2;
-  double z = 2;
+  double x = 1;
+  double y = 1;
+  double z = 1;
 
   int num_birds = 100;//20 - 1000
+
+  double COHESION_RANGE = 0.1;
+  double SEPARATION_RANGE = 0.05;
+  double ALIGNMENT_RANGE = 0.05;
 };
 
 #endif /* CLOTH_H */

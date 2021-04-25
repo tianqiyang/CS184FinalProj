@@ -122,28 +122,70 @@ void Cloth::buildGrid()
   */
 }
 
+vector<PointMass> Cloth::getNeighbours(PointMass pm, double range) {
+  vector<PointMass> npms;
+  for (PointMass p : point_masses) {
+    double dis = (p.position - pm.position).norm();
+    if (dis < range) {
+      npms.push_back(p);
+    }
+  }
+  return npms;
+}
+
 void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
                      vector<Vector3D> external_accelerations,
                      vector<CollisionObject *> *collision_objects)
 {
-  double offset = .00001;
-  double base = 100000.0;
-  // Vector3D temp = Vector3D(random() / base, random() / base, random() / base);
+  // cohesion
+  // for (PointMass &point_mass: point_masses) {
+  //   Vector3D goal = Vector3D();
+  //   vector<PointMass> neighbour = getNeighbours(point_mass);
+  //   std::cout<<neighbour.size() << endl;
+  //   for (auto npm : neighbour) {
+  //     goal = goal + npm.position;
+  //   }
+  //   goal = goal / neighbour.size() / 10000.;
+  //   point_mass.cumulatedSpeed = goal;
+  // }
+  // separation 
   for (PointMass &point_mass: point_masses) {
-    // Vector3D temp2 = temp;
-    if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
-      point_mass.speed.x *= -1;
+    Vector3D goal = Vector3D();
+    vector<PointMass> neighbour = getNeighbours(point_mass, SEPARATION_RANGE);
+    for (auto npm : neighbour) {
+      goal = goal + point_mass.position - npm.position;
     }
-    // if (point_mass.position.y >= y - offset || point_mass.position.y <= offset ) { // random bounce to random, -random, random
-    //   temp2.y *= -1;
+    goal = goal / neighbour.size() / 10000.;
+    point_mass.cumulatedSpeed = goal;
+  }
+  // alignment 
+  // for (PointMass &point_mass: point_masses) {
+  //   double speed = 0.;
+  //   double velocity = 0.;
+  //   vector<PointMass> neighbour = getNeighbours(point_mass, ALIGNMENT_RANGE);
+  //   for (auto npm : neighbour) {
+  //     speed += npm.speed - point_mass.speed;
+  //     velocity += npm.velo
+  //   }
+  //   goal = goal / neighbour.size() / 1000.;
+  //   point_mass.cumulatedSpeed = goal;
+  // }
+
+  
+  for (PointMass &point_mass: point_masses) {
+    point_mass.speed += point_mass.cumulatedSpeed;
+    // if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
+    //   point_mass.speed.x *= -1;
     // }
-    // if (point_mass.position.z >= z - offset || point_mass.position.z <= offset ) { // random bounce to random, random, -random
-    //   temp2.z *= -1;
+    // if (point_mass.position.y > y || point_mass.position.y < 0) { // random bounce to random, -random, random
+    //   point_mass.speed.y *= -1;
     // }
-    // std::cout<< point_mass.position << endl;
-    // point_mass.speed = temp2;
+    // if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
+    //   point_mass.speed.z *= -1;
+    // }
     point_mass.position += point_mass.speed;
   }
+
   /*
   double mass = width * height * cp->density / num_width_points / num_height_points;
   double delta_t = 1.0f / frames_per_sec / simulation_steps;
