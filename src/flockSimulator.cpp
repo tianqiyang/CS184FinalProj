@@ -61,6 +61,7 @@ void load_cubemap(int frame_idx, GLuint handle, const std::vector<std::string>& 
   }
 }
 
+// TODO: change texture files and load them in this function.
 void ClothSimulator::load_textures() {
   glGenTextures(1, &m_gl_texture_1);
   glGenTextures(1, &m_gl_texture_2);
@@ -91,6 +92,7 @@ void ClothSimulator::load_textures() {
   std::cout << "Loaded cubemap texture" << std::endl;
 }
 
+// TODO: change shaders
 void ClothSimulator::load_shaders() {
   std::set<std::string> shader_folder_contents;
   bool success = FileUtils::list_files_in_directory(m_project_root + "/shaders", shader_folder_contents);
@@ -152,6 +154,7 @@ void ClothSimulator::load_shaders() {
   }
 }
 
+
 ClothSimulator::ClothSimulator(std::string project_root, Screen *screen)
 : m_project_root(project_root) {
   this->screen = screen;
@@ -162,6 +165,7 @@ ClothSimulator::ClothSimulator(std::string project_root, Screen *screen)
   glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_DEPTH_TEST);
 }
+
 
 ClothSimulator::~ClothSimulator() {
   for (auto shader : shaders) {
@@ -202,18 +206,18 @@ void ClothSimulator::init() {
   camera_info.nClip = 0.01;
   camera_info.fClip = 10000;
 
-  // Try to intelligently figure out the camera target
+  // TODO:: Try to intelligently figure out the camera target
 
-  Vector3D avg_pm_position(0, 0, 0);
+  Vector3D avg_bd_position(0, 0, 0);
 
-  for (auto &pm : cloth->point_masses) {
-    avg_pm_position += pm.position / cloth->point_masses.size();
+  for (auto &bd : flock->birds) {
+    avg_bd_position += bd.position / flock->birds.size();
   }
 
-  CGL::Vector3D target(avg_pm_position.x, avg_pm_position.y / 2,
-                       avg_pm_position.z);
+  CGL::Vector3D target(avg_bd_position.x, avg_bd_position.y / 2,
+                       avg_bd_position.z);
   CGL::Vector3D c_dir(0., 0., 0.);
-  canonical_view_distance = max(cloth->width, cloth->height) * 0.9;
+  canonical_view_distance = max(flock->width, flock->height) * 0.9;
   scroll_rate = canonical_view_distance / 10;
 
   view_distance = canonical_view_distance * 2;
@@ -307,6 +311,10 @@ void ClothSimulator::drawContents() {
 }
 
 void ClothSimulator::drawWireframe(GLShader &shader) {
+
+    for (bd::flock->birds) {
+        Vector3D bd->position 
+    }
   int num_structural_springs =
       2 * cloth->num_width_points * cloth->num_height_points -
       cloth->num_width_points - cloth->num_height_points;
@@ -614,6 +622,8 @@ bool ClothSimulator::resizeCallbackEvent(int width, int height) {
   camera.set_screen_size(screen_w, screen_h);
   return true;
 }
+
+
 
 void ClothSimulator::initGUI(Screen *screen) {
   Window *window;
