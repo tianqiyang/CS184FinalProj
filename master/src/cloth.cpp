@@ -27,7 +27,7 @@ Cloth::~Cloth()
 {
   point_masses.clear();
   springs.clear();
-
+  birds.clear();
   if (clothMesh)
   {
     delete clothMesh;
@@ -37,6 +37,7 @@ Cloth::~Cloth()
 void Cloth::buildGrid()
 {
   // TODO (Part 1): Build a grid of masses and springs.
+  /*
   for (int j = 0; j < num_height_points; j += 1)
   {
     for (int i = 0; i < num_width_points; i += 1)
@@ -53,17 +54,28 @@ void Cloth::buildGrid()
       }
       if (orientation == 0)
       {
-        center = Vector3D(x, 1., y);
+        center = Vector3D(x + rand() % 100 / 1000., 1., y);
+        std::cout << x << " " << y << " " << center.x << endl;
       }
       else
       {
         double sign = random() > .5 ? 1. : -1.;
         double rand_offset = sign * rand() / 1000. /  2147483647.;
-        center = Vector3D(x, y, rand_offset);
+        center = Vector3D(x + rand(), y + rand(), rand_offset);
       }
       point_masses.emplace_back(PointMass(center, pin));
     }
+  }*/
+  for (int i = 0; i < num_birds; i += 1) {
+    point_masses.emplace_back(PointMass(Vector3D(rand() % 100 / 1000., rand() % 100 / 1000., rand() % 100 / 1000.), false));
   }
+
+  PointMass *a;
+  for (int i = 0; i < point_masses.size(); i++) {
+    a = &point_masses[i];
+    birds.emplace_back(Bird(a));
+  }
+  /*
   PointMass *a, *b;
   for (int j = 0; j < num_height_points; j += 1)
   {
@@ -107,6 +119,7 @@ void Cloth::buildGrid()
       }
     }
   }
+  */
 }
 
 void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,

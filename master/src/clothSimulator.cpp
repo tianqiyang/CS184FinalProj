@@ -328,20 +328,14 @@ void ClothSimulator::drawWireframe(GLShader &shader) {
 
   int si = 0;
 
-  for (int i = 0; i < cloth->springs.size(); i++) {
-    Spring s = cloth->springs[i];
-
-    if ((s.spring_type == STRUCTURAL && !cp->enable_structural_constraints) ||
-        (s.spring_type == SHEARING && !cp->enable_shearing_constraints) ||
-        (s.spring_type == BENDING && !cp->enable_bending_constraints)) {
-      continue;
-    }
+  for (int i = 0; i < cloth->birds.size(); i++) {
+    Bird s = cloth->birds[i];
 
     Vector3D pa = s.pm_a->position;
-    Vector3D pb = s.pm_b->position;
+    Vector3D pb = pa + Vector3D(.001, 0, 0);
 
     Vector3D na = s.pm_a->normal();
-    Vector3D nb = s.pm_b->normal();
+    Vector3D nb = na;
 
     positions.col(si) << pa.x, pa.y, pa.z, 1.0;
     positions.col(si + 1) << pb.x, pb.y, pb.z, 1.0;

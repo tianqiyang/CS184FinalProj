@@ -10,6 +10,7 @@
 #include "clothMesh.h"
 #include "collision/collisionObject.h"
 #include "spring.h"
+#include "bird.h"
 
 using namespace CGL;
 using namespace std;
@@ -70,6 +71,7 @@ struct Cloth {
 
   // Cloth components
   vector<PointMass> point_masses;
+  vector<Bird> birds;
   vector<vector<int>> pinned;
   vector<Spring> springs;
   ClothMesh *clothMesh;
@@ -79,6 +81,8 @@ struct Cloth {
   double x = 2;
   double y = 2;
   double z = 2;
+
+  int num_birds = 100;//20 - 1000
 };
 
 #endif /* CLOTH_H */
