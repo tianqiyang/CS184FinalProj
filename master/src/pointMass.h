@@ -13,7 +13,7 @@ class Halfedge;
 struct PointMass {
   PointMass(Vector3D position, bool pinned)
       : pinned(pinned), start_position(position), position(position),
-        last_position(position) {}
+        last_position(position), speed(Vector3D(0.0001, 0, 0)) {}
 
   Vector3D normal();
   Vector3D velocity(double delta_t) {
@@ -31,6 +31,9 @@ struct PointMass {
 
   // mesh reference
   Halfedge *halfedge;
+
+  // speed
+  Vector3D speed;
 };
 
 #endif /* POINTMASS_H */

@@ -113,6 +113,25 @@ void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParame
                      vector<Vector3D> external_accelerations,
                      vector<CollisionObject *> *collision_objects)
 {
+  double offset = .00001;
+  double base = 100000.0;
+  // Vector3D temp = Vector3D(random() / base, random() / base, random() / base);
+  for (PointMass &point_mass: point_masses) {
+    // Vector3D temp2 = temp;
+    if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
+      point_mass.speed.x *= -1;
+    }
+    // if (point_mass.position.y >= y - offset || point_mass.position.y <= offset ) { // random bounce to random, -random, random
+    //   temp2.y *= -1;
+    // }
+    // if (point_mass.position.z >= z - offset || point_mass.position.z <= offset ) { // random bounce to random, random, -random
+    //   temp2.z *= -1;
+    // }
+    // std::cout<< point_mass.position << endl;
+    // point_mass.speed = temp2;
+    point_mass.position += point_mass.speed;
+  }
+  /*
   double mass = width * height * cp->density / num_width_points / num_height_points;
   double delta_t = 1.0f / frames_per_sec / simulation_steps;
 
@@ -183,7 +202,7 @@ void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParame
         spring.pm_b->position = (spring.pm_b->position - spring.pm_a->position).unit() * 0.55 * spring.rest_length + midpoint;
       }
     }
-  }
+  }*/
 }
 
 void Cloth::build_spatial_map()

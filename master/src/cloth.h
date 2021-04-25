@@ -76,6 +76,9 @@ struct Cloth {
 
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;
+  double x = 2;
+  double y = 2;
+  double z = 2;
 };
 
 #endif /* CLOTH_H */
