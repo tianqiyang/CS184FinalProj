@@ -15,8 +15,8 @@
 #include "CGL/CGL.h"
 #include "collision/plane.h"
 #include "collision/sphere.h"
-#include "cloth.h"
-#include "clothSimulator.h"
+#include "flock.h"
+#include "flockSimulator.h"
 #include "json.hpp"
 #include "misc/file_utils.h"
 
@@ -29,7 +29,7 @@ using json = nlohmann::json;
 
 #define msg(s) cerr << "[Flocks] " << s << endl;
 
-FlcokSimulator* app = nullptr;
+FlockSimulator* app = nullptr;
 GLFWwindow* window = nullptr;
 Screen* screen = nullptr;
 
@@ -152,7 +152,7 @@ void incompleteObjectError(const char* object, const char* attribute) {
 }
 
 // TODO: may need later
-bool loadObjectsFromFile(string filename, Cloth* cloth, ClothParameters* cp, vector<CollisionObject*>* objects, int sphere_num_lat, int sphere_num_lon) {
+bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vector<CollisionObject*>* objects, int sphere_num_lat, int sphere_num_lon) {
     // Read JSON from file
     return true;
 }
@@ -190,15 +190,25 @@ int main(int argc, char** argv) {
     };
     std::string project_root;
     bool found_project_root = find_project_root(search_paths, project_root);
-}
+
 
 /* 
 TODO: could used to initialize instances of flocks or birds, if their attributes are needed to be set in the following section.
 */
+    Flock flock;
+    FlockParameters fp;
+    vector<CollisionObject*> objects;
+
+    int c;
+
+    int sphere_num_lat = 40;
+    int sphere_num_lon = 40;
+
+    std::string file_to_load_from;
+    bool file_specified = false;
 
 
-
-TODO: Figure out what arguments are needed for our project.
+//TODO: Figure out what arguments are needed for our project.
 while ((c = getopt(argc, argv, "f:r:a:o:")) != -1) {
     switch (c) {
     case 'f': {
@@ -251,4 +261,54 @@ if (!file_specified) { // No arguments, default initialization
     def_fname << project_root;
     def_fname << "/scene/pinned2.json";
     file_to_load_from = def_fname.str();
+}
+bool success = loadObjectsFromFile(file_to_load_from, &flock, &fp, &objects, sphere_num_lat, sphere_num_lon);
+if (!success) {
+    std::cout << "Warn: Unable to load from file: " << file_to_load_from << std::endl;
+}
+
+glfwSetErrorCallback(error_callback);
+
+createGLContexts();
+
+// Initialize the Flock object
+flock.buildGrid();
+flock.buildFlockMesh();
+
+// Initialize the FlockSimulator object
+app = new FlockSimulator(project_root, screen);
+app->loadFlock(&flock);
+app->loadFlockParameters(&fp);
+app->loadCollisionObjects(&objects);
+app->init();
+
+// Call this after all the widgets have been defined
+
+screen->setVisible(true);
+screen->performLayout();
+
+// Attach callbacks to the GLFW window
+
+setGLFWCallbacks();
+
+while (!glfwWindowShouldClose(window)) {
+    glfwPollEvents();
+
+    glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    app->drawContents();
+
+    // Draw nanogui
+    screen->drawContents();
+    screen->drawWidgets();
+
+    glfwSwapBuffers(window);
+
+    if (!app->isAlive()) {
+        glfwSetWindowShouldClose(window, 1);
+    }
+}
+
+return 0;
 }

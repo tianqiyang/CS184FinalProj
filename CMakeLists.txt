@@ -162,17 +162,17 @@ endif(WIN32)
 #-------------------------------------------------------------------------------
 
 # Disable building extras we won't need (pure C++ project)
-#set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
-#set(NANOGUI_BUILD_PYTHON  OFF CACHE BOOL " " FORCE)
-#set(NANOGUI_INSTALL       OFF CACHE BOOL " " FORCE)
-#set(NANOGUI_USE_GLAD      ON  CACHE BOOL " " FORCE)
+set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
+set(NANOGUI_BUILD_PYTHON  OFF CACHE BOOL " " FORCE)
+set(NANOGUI_INSTALL       OFF CACHE BOOL " " FORCE)
+set(NANOGUI_USE_GLAD      ON  CACHE BOOL " " FORCE)
 
 # Add the configurations from nanogui
-#add_subdirectory(ext/nanogui)
-#include_directories(ext/nanogui/include)
+add_subdirectory(ext/nanogui)
+include_directories(ext/nanogui/include)
 
 # For reliability of parallel build, make the NanoGUI targets dependencies
-#set_property(TARGET glfw glfw_objects nanogui PROPERTY FOLDER "dependencies")
+set_property(TARGET glfw glfw_objects nanogui PROPERTY FOLDER "dependencies")
 
 # For Windows, set the library output directory to put the DLL's next
 # to the binary. I tried to use add_custom_command to just do a copy as a
@@ -185,8 +185,8 @@ if(WIN32)
   # it is considered a "RUNTIME" and not a "LIBRARY" target according to CMake.
   # See https://cmake.org/cmake/help/v3.0/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html
   # > For DLL platforms the DLL part of a shared library is treated as a runtime target
-  #set_target_properties(nanogui PROPERTIES
-  #      RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+  set_target_properties(nanogui PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 endif(WIN32)
 
 #-------------------------------------------------------------------------------

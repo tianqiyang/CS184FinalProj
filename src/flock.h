@@ -7,7 +7,7 @@
 
 #include "CGL/CGL.h"
 #include "CGL/misc.h"
-#include "clothMesh.h"
+#include "flockMesh.h"
 #include "collision/collisionObject.h"
 #include "spring.h"
 
@@ -31,9 +31,9 @@ struct FlockParameters {
   bool enable_bending_constraints;*/
 
   // flock parameters
-  double coherence,
-  double alignment,
-  double separation
+  double coherence;
+  double alignment;
+  double separation;
 };
 
 struct Flock {
@@ -44,12 +44,12 @@ struct Flock {
 
   void buildGrid();
 
-  void simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
+  void simulate(double frames_per_sec, double simulation_steps, FlockParameters *fp,
                 vector<Vector3D> external_accelerations,
                 vector<CollisionObject *> *collision_objects);
 
   void reset();
-  void buildClothMesh();
+  void buildFlockMesh();
 
   void build_spatial_map();
   void self_collide(PointMass &pm, double simulation_steps);
@@ -67,7 +67,7 @@ struct Flock {
   vector<PointMass> point_masses;
   vector<vector<int>> pinned;
   vector<Spring> springs;
-  FlockMesh *clothMesh;
+  FlockMesh *flockMesh;
 
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;

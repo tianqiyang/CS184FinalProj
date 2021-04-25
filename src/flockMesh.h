@@ -1,5 +1,5 @@
-#ifndef CLOTH_MESH_H
-#define CLOTH_MESH_H
+#ifndef FLOCK_MESH_H
+#define FLOCK_MESH_H
 
 #include <vector>
 
@@ -43,11 +43,11 @@ public:
   PointMass *pm;
 }; // struct Halfedge
 
-class ClothMesh {
+class FlockMesh {
 public:
   ~FlockMesh() {}
 
   vector<Triangle *> triangles;
-}; // struct ClothMesh
+}; // struct FlockMesh
 
-#endif // CLOTH_MESH_H
+#endif // FLOCK_MESH_H

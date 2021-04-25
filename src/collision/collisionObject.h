@@ -3,7 +3,7 @@
 
 #include <nanogui/nanogui.h>
 
-#include "../clothMesh.h"
+#include "../flockMesh.h"
 
 using namespace CGL;
 using namespace std;

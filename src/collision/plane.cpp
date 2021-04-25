@@ -1,8 +1,8 @@
 #include "iostream"
 #include <nanogui/nanogui.h>
 
-#include "../clothMesh.h"
-#include "../clothSimulator.h"
+#include "../flockMesh.h"
+#include "../flockSimulator.h"
 #include "plane.h"
 
 using namespace std;
