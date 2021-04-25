@@ -14,6 +14,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "misc/stb_image.h"
 
+#include "sphere.h"
+
 using namespace nanogui;
 using namespace std;
 
@@ -367,35 +369,49 @@ void FlockSimulator::drawWireframe(GLShader &shader) {
 }
 
 void FlockSimulator::drawNormals(GLShader &shader) {
-  int num_tris = flock->flockMesh->triangles.size();
+  //int num_tris = flock->flockMesh->triangles.size();
 
-  MatrixXf positions(4, num_tris * 3);
-  MatrixXf normals(4, num_tris * 3);
+  //MatrixXf positions(4, num_tris * 3);
+  //MatrixXf normals(4, num_tris * 3);
 
-  for (int i = 0; i < num_tris; i++) {
-    Triangle *tri = flock->flockMesh->triangles[i];
+  //for (int i = 0; i < num_tris; i++) {
+  //  Triangle *tri = flock->flockMesh->triangles[i];
 
-    Vector3D p1 = tri->pm1->position;
-    Vector3D p2 = tri->pm2->position;
-    Vector3D p3 = tri->pm3->position;
+  //  Vector3D p1 = tri->pm1->position;
+  //  Vector3D p2 = tri->pm2->position;
+  //  Vector3D p3 = tri->pm3->position;
 
-    Vector3D n1 = tri->pm1->normal();
-    Vector3D n2 = tri->pm2->normal();
-    Vector3D n3 = tri->pm3->normal();
+  //  Vector3D n1 = tri->pm1->normal();
+  //  Vector3D n2 = tri->pm2->normal();
+  //  Vector3D n3 = tri->pm3->normal();
 
-    positions.col(i * 3) << p1.x, p1.y, p1.z, 1.0;
-    positions.col(i * 3 + 1) << p2.x, p2.y, p2.z, 1.0;
-    positions.col(i * 3 + 2) << p3.x, p3.y, p3.z, 1.0;
+  //  positions.col(i * 3) << p1.x, p1.y, p1.z, 1.0;
+  //  positions.col(i * 3 + 1) << p2.x, p2.y, p2.z, 1.0;
+  //  positions.col(i * 3 + 2) << p3.x, p3.y, p3.z, 1.0;
 
-    normals.col(i * 3) << n1.x, n1.y, n1.z, 0.0;
-    normals.col(i * 3 + 1) << n2.x, n2.y, n2.z, 0.0;
-    normals.col(i * 3 + 2) << n3.x, n3.y, n3.z, 0.0;
-  }
+  //  normals.col(i * 3) << n1.x, n1.y, n1.z, 0.0;
+  //  normals.col(i * 3 + 1) << n2.x, n2.y, n2.z, 0.0;
+  //  normals.col(i * 3 + 2) << n3.x, n3.y, n3.z, 0.0;
+  //}
+    int sphere_num_lat = 10;
+    int sphere_num_lon = 10;
+    Vector3D origin;
+    double radius, friction;
+    for (auto& bd : flock->point_masses) {
+        origin = bd->position;
+        radius = 0.02;
+        friction = 0.3;
+        Sphere* s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
+        s->render(shader);
+    }
 
-  shader.uploadAttrib("in_position", positions, false);
+
+
+
+ /* shader.uploadAttrib("in_position", positions, false);
   shader.uploadAttrib("in_normal", normals, false);
 
-  shader.drawArray(GL_TRIANGLES, 0, num_tris * 3);
+  shader.drawArray(GL_TRIANGLES, 0, num_tris * 3);*/
 }
 
 void FlockSimulator::drawPhong(GLShader &shader) {
