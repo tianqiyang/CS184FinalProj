@@ -243,9 +243,10 @@ void ClothSimulator::drawContents() {
 
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
-
+    Vector3D windDir = Vector3D(random(), random(), random());
+    windDir.normalize();
     for (int i = 0; i < simulation_steps; i++) {
-      cloth->simulate(frames_per_sec, simulation_steps, cp, external_accelerations, collision_objects);
+      cloth->simulate(frames_per_sec, simulation_steps, cp, external_accelerations, collision_objects, windDir);
     }
   }
 

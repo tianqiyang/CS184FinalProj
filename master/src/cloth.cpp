@@ -143,7 +143,8 @@ vector<PointMass> Cloth::getNeighbours(PointMass pm, double range) {
 
 void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
                      vector<Vector3D> external_accelerations,
-                     vector<CollisionObject *> *collision_objects)
+                     vector<CollisionObject *> *collision_objects,
+                     Vector3D windDir)
 {
   // cohesion
   for (PointMass &point_mass: point_masses) {
@@ -197,7 +198,7 @@ void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParame
     if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
       point_mass.speed.z *= -1;
     }
-    point_mass.position += point_mass.speed;
+    point_mass.position += point_mass.speed + windDir * .00000001;
   }
 
   /*
