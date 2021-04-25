@@ -13,8 +13,9 @@ class Halfedge;
 struct PointMass {
   PointMass(Vector3D position, bool pinned)
       : pinned(pinned), start_position(position), position(position),
+        // last_position(position), speed(Vector3D(random() % 100/1000000., random() % 100 /1000000., random() % 100 /1000000.)) {}
         last_position(position), speed(Vector3D(0.0001, 0, 0)) {}
-
+        
   Vector3D normal();
   Vector3D velocity(double delta_t) {
     return (position - last_position) / delta_t;

@@ -14,8 +14,6 @@
 using namespace CGL;
 using namespace std;
 
-enum e_orientation { HORIZONTAL = 0, VERTICAL = 1 };
-
 struct FlockParameters {
    FlockParameters() {}
    FlockParameters(double coherence,
