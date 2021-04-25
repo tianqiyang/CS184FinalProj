@@ -37,10 +37,10 @@ struct FlockParameters {
 };
 
 struct Flock {
-  Cloth() {}
-  Cloth(double width, double height, int num_width_points,
+  Flock() {}
+  Flock(double width, double height, int num_width_points,
         int num_height_points, float thickness);
-  ~Cloth();
+  ~Flock();
 
   void buildGrid();
 
@@ -67,7 +67,7 @@ struct Flock {
   vector<PointMass> point_masses;
   vector<vector<int>> pinned;
   vector<Spring> springs;
-  ClothMesh *clothMesh;
+  FlockMesh *clothMesh;
 
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;

@@ -11,7 +11,7 @@ set(FLOCK_VIEWER_SOURCE
 
     # Application
     main.cpp
-    clothSimulator.cpp
+    flockSimulator.cpp
 
     # Miscellaneous
     # png.cpp

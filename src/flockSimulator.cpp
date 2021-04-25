@@ -62,7 +62,7 @@ void load_cubemap(int frame_idx, GLuint handle, const std::vector<std::string>& 
 }
 
 // TODO: change texture files and load them in this function.
-void ClothSimulator::load_textures() {
+void FlockSimulator::load_textures() {
   glGenTextures(1, &m_gl_texture_1);
   glGenTextures(1, &m_gl_texture_2);
   glGenTextures(1, &m_gl_texture_3);
@@ -93,7 +93,7 @@ void ClothSimulator::load_textures() {
 }
 
 // TODO: change shaders
-void ClothSimulator::load_shaders() {
+void FlockSimulator::load_shaders() {
   std::set<std::string> shader_folder_contents;
   bool success = FileUtils::list_files_in_directory(m_project_root + "/shaders", shader_folder_contents);
   if (!success) {
@@ -155,7 +155,7 @@ void ClothSimulator::load_shaders() {
 }
 
 
-ClothSimulator::ClothSimulator(std::string project_root, Screen *screen)
+FlockSimulator::FlockSimulator(std::string project_root, Screen *screen)
 : m_project_root(project_root) {
   this->screen = screen;
   
@@ -167,7 +167,7 @@ ClothSimulator::ClothSimulator(std::string project_root, Screen *screen)
 }
 
 
-ClothSimulator::~ClothSimulator() {
+FlockSimulator::~FlockSimulator() {
   for (auto shader : shaders) {
     shader.nanogui_shader->free();
   }
@@ -177,22 +177,22 @@ ClothSimulator::~ClothSimulator() {
   glDeleteTextures(1, &m_gl_texture_4);
   glDeleteTextures(1, &m_gl_cubemap_tex);
 
-  if (cloth) delete cloth;
+  if (flock) delete flock;
   if (fp) delete fp;
   if (collision_objects) delete collision_objects;
 }
 
-void ClothSimulator::loadCloth(Cloth *cloth) { this->cloth = cloth; }
+void FlockSimulator::loadFlock(Flock *flock) { this->flock = flock; }
 
-void ClothSimulator::loadClothParameters(FlockParameters *fp) { this->fp = fp; }
+void FlockSimulator::loadFlockParameters(FlockParameters *fp) { this->fp = fp; }
 
-void ClothSimulator::loadCollisionObjects(vector<CollisionObject *> *objects) { this->collision_objects = objects; }
+void FlockSimulator::loadCollisionObjects(vector<CollisionObject *> *objects) { this->collision_objects = objects; }
 
 /**
  * Initializes the cloth simulation and spawns a new thread to separate
  * rendering from simulation.
  */
-void ClothSimulator::init() {
+void FlockSimulator::init() {
 
   // Initialize GUI
   screen->setSize(default_window_size);
@@ -210,8 +210,8 @@ void ClothSimulator::init() {
 
   Vector3D avg_bd_position(0, 0, 0);
 
-  for (auto &bd : flock->birds) {
-    avg_bd_position += bd.position / flock->birds.size();
+  for (auto &bd : flock->point_masses) {
+    avg_bd_position += bd.position / flock->point_masses.size();
   }
 
   CGL::Vector3D target(avg_bd_position.x, avg_bd_position.y / 2,
@@ -238,16 +238,16 @@ void ClothSimulator::init() {
   canonicalCamera.configure(camera_info, screen_w, screen_h);
 }
 
-bool ClothSimulator::isAlive() { return is_alive; }
+bool FlockSimulator::isAlive() { return is_alive; }
 
-void ClothSimulator::drawContents() {
+void FlockSimulator::drawContents() {
   glEnable(GL_DEPTH_TEST);
 
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
 
     for (int i = 0; i < simulation_steps; i++) {
-      cloth->simulate(frames_per_sec, simulation_steps, fp, external_accelerations, collision_objects);
+      flock->simulate(frames_per_sec, simulation_steps, fp, external_accelerations, collision_objects);
     }
   }
 
@@ -310,18 +310,18 @@ void ClothSimulator::drawContents() {
   }
 }
 
-void ClothSimulator::drawWireframe(GLShader &shader) {
+void FlockSimulator::drawWireframe(GLShader &shader) {
 
     for (bd::flock->birds) {
         Vector3D bd->position 
     }
   int num_structural_springs =
-      2 * cloth->num_width_points * cloth->num_height_points -
-      cloth->num_width_points - cloth->num_height_points;
+      2 * flock->num_width_points * flock->num_height_points -
+      flock->num_width_points - flock->num_height_points;
   int num_shear_springs =
-      2 * (cloth->num_width_points - 1) * (cloth->num_height_points - 1);
-  int num_bending_springs = num_structural_springs - cloth->num_width_points -
-                            cloth->num_height_points;
+      2 * (flock->num_width_points - 1) * (flock->num_height_points - 1);
+  int num_bending_springs = num_structural_springs - flock->num_width_points -
+                            flock->num_height_points;
 
   int num_springs = fp->enable_structural_constraints * num_structural_springs +
                     fp->enable_shearing_constraints * num_shear_springs +
@@ -334,8 +334,8 @@ void ClothSimulator::drawWireframe(GLShader &shader) {
 
   int si = 0;
 
-  for (int i = 0; i < cloth->springs.size(); i++) {
-    Spring s = cloth->springs[i];
+  for (int i = 0; i < flock->springs.size(); i++) {
+    Spring s = flock->springs[i];
 
     if ((s.spring_type == STRUCTURAL && !fp->enable_structural_constraints) ||
         (s.spring_type == SHEARING && !fp->enable_shearing_constraints) ||
@@ -366,14 +366,14 @@ void ClothSimulator::drawWireframe(GLShader &shader) {
   shader.drawArray(GL_LINES, 0, num_springs * 2);
 }
 
-void ClothSimulator::drawNormals(GLShader &shader) {
-  int num_tris = cloth->clothMesh->triangles.size();
+void FlockSimulator::drawNormals(GLShader &shader) {
+  int num_tris = flock->flockMesh->triangles.size();
 
   MatrixXf positions(4, num_tris * 3);
   MatrixXf normals(4, num_tris * 3);
 
   for (int i = 0; i < num_tris; i++) {
-    Triangle *tri = cloth->clothMesh->triangles[i];
+    Triangle *tri = flock->flockMesh->triangles[i];
 
     Vector3D p1 = tri->pm1->position;
     Vector3D p2 = tri->pm2->position;
@@ -398,8 +398,8 @@ void ClothSimulator::drawNormals(GLShader &shader) {
   shader.drawArray(GL_TRIANGLES, 0, num_tris * 3);
 }
 
-void ClothSimulator::drawPhong(GLShader &shader) {
-  int num_tris = cloth->clothMesh->triangles.size();
+void FlockSimulator::drawPhong(GLShader &shader) {
+  int num_tris = flock->flockMesh->triangles.size();
 
   MatrixXf positions(4, num_tris * 3);
   MatrixXf normals(4, num_tris * 3);
@@ -407,7 +407,7 @@ void ClothSimulator::drawPhong(GLShader &shader) {
   MatrixXf tangents(4, num_tris * 3);
 
   for (int i = 0; i < num_tris; i++) {
-    Triangle *tri = cloth->clothMesh->triangles[i];
+    Triangle *tri = flock->flockMesh->triangles[i];
 
     Vector3D p1 = tri->pm1->position;
     Vector3D p2 = tri->pm2->position;
@@ -450,9 +450,9 @@ void ClothSimulator::drawPhong(GLShader &shader) {
 // functions that have to be recreated here.
 // ----------------------------------------------------------------------------
 
-void ClothSimulator::resetCamera() { camera.copy_placement(canonicalCamera); }
+void FlockSimulator::resetCamera() { camera.copy_placement(canonicalCamera); }
 
-Matrix4f ClothSimulator::getProjectionMatrix() {
+Matrix4f FlockSimulator::getProjectionMatrix() {
   Matrix4f perspective;
   perspective.setZero();
 
@@ -473,7 +473,7 @@ Matrix4f ClothSimulator::getProjectionMatrix() {
   return perspective;
 }
 
-Matrix4f ClothSimulator::getViewMatrix() {
+Matrix4f FlockSimulator::getViewMatrix() {
   Matrix4f lookAt;
   Matrix3f R;
 
@@ -505,7 +505,7 @@ Matrix4f ClothSimulator::getViewMatrix() {
 // EVENT HANDLING
 // ----------------------------------------------------------------------------
 
-bool ClothSimulator::cursorPosCallbackEvent(double x, double y) {
+bool FlockSimulator::cursorPosCallbackEvent(double x, double y) {
   if (left_down && !middle_down && !right_down) {
     if (ctrl_down) {
       mouseRightDragged(x, y);
@@ -524,7 +524,7 @@ bool ClothSimulator::cursorPosCallbackEvent(double x, double y) {
   return true;
 }
 
-bool ClothSimulator::mouseButtonCallbackEvent(int button, int action,
+bool FlockSimulator::mouseButtonCallbackEvent(int button, int action,
                                               int modifiers) {
   switch (action) {
   case GLFW_PRESS:
@@ -559,20 +559,20 @@ bool ClothSimulator::mouseButtonCallbackEvent(int button, int action,
   return false;
 }
 
-void ClothSimulator::mouseMoved(double x, double y) { y = screen_h - y; }
+void FlockSimulator::mouseMoved(double x, double y) { y = screen_h - y; }
 
-void ClothSimulator::mouseLeftDragged(double x, double y) {
+void FlockSimulator::mouseLeftDragged(double x, double y) {
   float dx = x - mouse_x;
   float dy = y - mouse_y;
 
   camera.rotate_by(-dy * (PI / screen_h), -dx * (PI / screen_w));
 }
 
-void ClothSimulator::mouseRightDragged(double x, double y) {
+void FlockSimulator::mouseRightDragged(double x, double y) {
   camera.move_by(mouse_x - x, y - mouse_y, canonical_view_distance);
 }
 
-bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
+bool FlockSimulator::keyCallbackEvent(int key, int scancode, int action,
                                       int mods) {
   ctrl_down = (bool)(mods & GLFW_MOD_CONTROL);
 
@@ -606,16 +606,16 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
   return true;
 }
 
-bool ClothSimulator::dropCallbackEvent(int count, const char **filenames) {
+bool FlockSimulator::dropCallbackEvent(int count, const char **filenames) {
   return true;
 }
 
-bool ClothSimulator::scrollCallbackEvent(double x, double y) {
+bool FlockSimulator::scrollCallbackEvent(double x, double y) {
   camera.move_forward(y * scroll_rate);
   return true;
 }
 
-bool ClothSimulator::resizeCallbackEvent(int width, int height) {
+bool FlockSimulator::resizeCallbackEvent(int width, int height) {
   screen_w = width;
   screen_h = height;
 
@@ -625,7 +625,7 @@ bool ClothSimulator::resizeCallbackEvent(int width, int height) {
 
 
 
-void ClothSimulator::initGUI(Screen *screen) {
+void FlockSimulator::initGUI(Screen *screen) {
   Window *window;
   
   window = new Window(screen, "Simulation");
