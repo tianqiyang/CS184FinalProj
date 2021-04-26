@@ -151,11 +151,218 @@ void incompleteObjectError(const char* object, const char* attribute) {
     exit(-1);
 }
 
+const string SPHERE = "sphere";
+const string PLANE = "plane";
+const string CLOTH = "cloth";
+
+const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, CLOTH};
+
 // TODO: may need later
 bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vector<CollisionObject*>* objects, int sphere_num_lat, int sphere_num_lon) {
-    // Read JSON from file
-    return true;
+  // Read JSON from file
+  ifstream i(filename);
+  if (!i.good()) {
+    return false;
+  }
+  json j;
+  i >> j;
+
+  // Loop over objects in scene
+  for (json::iterator it = j.begin(); it != j.end(); ++it) {
+    string key = it.key();
+
+    // Check that object is valid
+    unordered_set<string>::const_iterator query = VALID_KEYS.find(key);
+    if (query == VALID_KEYS.end()) {
+      cout << "Invalid scene object found: " << key << endl;
+      exit(-1);
+    }
+
+    // Retrieve object
+    json object = it.value();
+
+    // Parse object depending on type (flock, sphere, or plane)
+    if (key == CLOTH) {
+      // Cloth
+      double width, height;
+      int num_width_points, num_height_points;
+      float thickness;
+      e_orientation orientation;
+      vector<vector<int>> pinned;
+
+      auto it_width = object.find("width");
+      if (it_width != object.end()) {
+        width = *it_width;
+      } else {
+        incompleteObjectError("flock", "width");
+      }
+
+      auto it_height = object.find("height");
+      if (it_height != object.end()) {
+        height = *it_height;
+      } else {
+        incompleteObjectError("flock", "height");
+      }
+
+      auto it_num_width_points = object.find("num_width_points");
+      if (it_num_width_points != object.end()) {
+        num_width_points = *it_num_width_points;
+      } else {
+        incompleteObjectError("flock", "num_width_points");
+      }
+
+      auto it_num_height_points = object.find("num_height_points");
+      if (it_num_height_points != object.end()) {
+        num_height_points = *it_num_height_points;
+      } else {
+        incompleteObjectError("flock", "num_height_points");
+      }
+
+      auto it_thickness = object.find("thickness");
+      if (it_thickness != object.end()) {
+        thickness = *it_thickness;
+      } else {
+        incompleteObjectError("flock", "thickness");
+      }
+
+      auto it_orientation = object.find("orientation");
+      if (it_orientation != object.end()) {
+        orientation = *it_orientation;
+      } else {
+        incompleteObjectError("flock", "orientation");
+      }
+
+      auto it_pinned = object.find("pinned");
+      if (it_pinned != object.end()) {
+        vector<json> points = *it_pinned;
+        for (auto pt : points) {
+          vector<int> point = pt;
+          pinned.push_back(point);
+        }
+      }
+
+      flock->width = width;
+      flock->height = height;
+      flock->num_width_points = num_width_points;
+      flock->num_height_points = num_height_points;
+      flock->thickness = thickness;
+      flock->orientation = orientation;
+      flock->pinned = pinned;
+
+      // Cloth parameters
+      bool enable_structural_constraints, enable_shearing_constraints, enable_bending_constraints;
+      double damping, density, ks;
+
+      auto it_enable_structural = object.find("enable_structural");
+      if (it_enable_structural != object.end()) {
+        enable_structural_constraints = *it_enable_structural;
+      } else {
+        incompleteObjectError("flock", "enable_structural");
+      }
+
+      auto it_enable_shearing = object.find("enable_shearing");
+      if (it_enable_shearing != object.end()) {
+        enable_shearing_constraints = *it_enable_shearing;
+      } else {
+        incompleteObjectError("flock", "it_enable_shearing");
+      }
+
+      auto it_enable_bending = object.find("enable_bending");
+      if (it_enable_bending != object.end()) {
+        enable_bending_constraints = *it_enable_bending;
+      } else {
+        incompleteObjectError("flock", "it_enable_bending");
+      }
+
+      auto it_damping = object.find("damping");
+      if (it_damping != object.end()) {
+        damping = *it_damping;
+      } else {
+        incompleteObjectError("flock", "damping");
+      }
+
+      auto it_density = object.find("density");
+      if (it_density != object.end()) {
+        density = *it_density;
+      } else {
+        incompleteObjectError("flock", "density");
+      }
+
+      auto it_ks = object.find("ks");
+      if (it_ks != object.end()) {
+        ks = *it_ks;
+      } else {
+        incompleteObjectError("flock", "ks");
+      }
+
+    //   fp->coherence = coherence;
+    //   fp->alignment = alignment;
+    //   fp->separation = separation;
+    } else if (key == SPHERE) {
+      Vector3D origin;
+      double radius, friction;
+
+      auto it_origin = object.find("origin");
+      if (it_origin != object.end()) {
+        vector<double> vec_origin = *it_origin;
+        origin = Vector3D(vec_origin[0], vec_origin[1], vec_origin[2]);
+      } else {
+        incompleteObjectError("sphere", "origin");
+      }
+
+      auto it_radius = object.find("radius");
+      if (it_radius != object.end()) {
+        radius = *it_radius;
+      } else {
+        incompleteObjectError("sphere", "radius");
+      }
+
+      auto it_friction = object.find("friction");
+      if (it_friction != object.end()) {
+        friction = *it_friction;
+      } else {
+        incompleteObjectError("sphere", "friction");
+      }
+
+      Sphere *s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
+      objects->push_back(s);
+    } else { // PLANE
+      Vector3D point, normal;
+      double friction;
+
+      auto it_point = object.find("point");
+      if (it_point != object.end()) {
+        vector<double> vec_point = *it_point;
+        point = Vector3D(vec_point[0], vec_point[1], vec_point[2]);
+      } else {
+        incompleteObjectError("plane", "point");
+      }
+
+      auto it_normal = object.find("normal");
+      if (it_normal != object.end()) {
+        vector<double> vec_normal = *it_normal;
+        normal = Vector3D(vec_normal[0], vec_normal[1], vec_normal[2]);
+      } else {
+        incompleteObjectError("plane", "normal");
+      }
+
+      auto it_friction = object.find("friction");
+      if (it_friction != object.end()) {
+        friction = *it_friction;
+      } else {
+        incompleteObjectError("plane", "friction");
+      }
+
+      Plane *p = new Plane(point, normal, friction);
+      objects->push_back(p);
+    }
+  }
+
+  i.close();
+  
+  return true;
 }
+
 
 // May need change later
 //check the search path is valid by finding search_path/shaders/shabi.txt
@@ -272,8 +479,8 @@ glfwSetErrorCallback(error_callback);
 createGLContexts();
 
 // Initialize the Flock object
-//flock.buildGrid();
-//flock.buildFlockMesh();
+flock.buildGrid();
+flock.buildFlockMesh();
 
 // Initialize the FlockSimulator object
 app = new FlockSimulator(project_root, screen);
@@ -297,7 +504,7 @@ while (!glfwWindowShouldClose(window)) {
     glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //app->drawContents();
+    app->drawContents();
 
     // Draw nanogui
     screen->drawContents();
