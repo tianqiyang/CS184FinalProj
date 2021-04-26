@@ -247,7 +247,7 @@ void FlockSimulator::drawContents() {
 
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
-    Vector3D windDir = Vector3D(random(), random(), random());
+    Vector3D windDir = Vector3D(rand(), rand(), rand());
     windDir.normalize();
     for (int i = 0; i < simulation_steps; i++) {
       flock->simulate(frames_per_sec, simulation_steps, fp, external_accelerations, collision_objects, windDir);
@@ -314,7 +314,7 @@ void FlockSimulator::drawContents() {
 }
 
 void FlockSimulator::drawWireframe(GLShader &shader) {
-  int num_springs = 100000;
+  int num_springs = 1000;
 
   MatrixXf positions(4, num_springs * 2);
   MatrixXf normals(4, num_springs * 2);
@@ -649,7 +649,12 @@ bool FlockSimulator::mouseButtonCallbackEvent(int button, int action,
   return false;
 }
 
-void FlockSimulator::mouseMoved(double x, double y) { y = screen_h - y; }
+void FlockSimulator::mouseMoved(double x, double y) { 
+    if (enable_following) {
+        flock->follow(x, y);
+    }
+    y = screen_h - y;
+}
 
 void FlockSimulator::mouseLeftDragged(double x, double y) {
   float dx = x - mouse_x;
@@ -659,7 +664,8 @@ void FlockSimulator::mouseLeftDragged(double x, double y) {
 }
 
 void FlockSimulator::mouseRightDragged(double x, double y) {
-  camera.move_by(mouse_x - x, y - mouse_y, canonical_view_distance);
+  camera.move_by(
+      - x, y - mouse_y, canonical_view_distance);
 }
 
 bool FlockSimulator::keyCallbackEvent(int key, int scancode, int action,
@@ -682,6 +688,9 @@ bool FlockSimulator::keyCallbackEvent(int key, int scancode, int action,
     case 'P':
       is_paused = !is_paused;
       break;
+    case 'e':
+    case 'E':
+        enable_following = !enable_following;
     case 'n':
     case 'N':
       if (is_paused) {

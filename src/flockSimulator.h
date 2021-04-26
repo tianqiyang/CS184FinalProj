@@ -123,7 +123,7 @@ private:
   // Keyboard flags
 
   bool ctrl_down = false;
-
+  bool enable_following = false;
   // Simulation flags
 
   bool is_paused = true;

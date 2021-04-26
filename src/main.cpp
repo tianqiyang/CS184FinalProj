@@ -41,7 +41,6 @@ void createGLContexts() {
     if (!glfwInit()) {
         return;
     }
-
     glfwSetTime(0);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

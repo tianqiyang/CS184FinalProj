@@ -57,6 +57,7 @@ struct Flock {
   void self_collide(PointMass &pm, double simulation_steps);
   float hash_position(Vector3D pos);
 
+  void follow(double x, double y);
   // Cloth properties
   double width;
   double height;

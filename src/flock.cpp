@@ -341,6 +341,13 @@ float Flock::hash_position(Vector3D pos)
 /// YOU DO NOT NEED TO REFER TO ANY CODE BELOW THIS ///
 ///////////////////////////////////////////////////////
 
+
+void Flock::follow(double x, double y) {
+    for (PointMass p : point_masses) {
+        p.cumulatedSpeed += p.position - Vector3D(x, y, 0);
+    }
+}
+
 void Flock::reset()
 {
   PointMass *pm = &point_masses[0];
