@@ -21,13 +21,13 @@ using namespace std;
 
 Vector3D load_texture(int frame_idx, GLuint handle, const char* where) {
   Vector3D size_retval;
-  
+
   if (strlen(where) == 0) return size_retval;
-  
+
   glActiveTexture(GL_TEXTURE0 + frame_idx);
   glBindTexture(GL_TEXTURE_2D, handle);
-  
-  
+
+
   int img_x, img_y, img_n;
   unsigned char* img_data = stbi_load(where, &img_x, &img_y, &img_n, 3);
   size_retval.x = img_x;
@@ -40,7 +40,7 @@ Vector3D load_texture(int frame_idx, GLuint handle, const char* where) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  
+
   return size_retval;
 }
 
@@ -48,7 +48,7 @@ void load_cubemap(int frame_idx, GLuint handle, const std::vector<std::string>& 
   glActiveTexture(GL_TEXTURE0 + frame_idx);
   glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
   for (int side_idx = 0; side_idx < 6; ++side_idx) {
-    
+
     int img_x, img_y, img_n;
     unsigned char* img_data = stbi_load(file_locs[side_idx].c_str(), &img_x, &img_y, &img_n, 3);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side_idx, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
@@ -70,17 +70,17 @@ void FlockSimulator::load_textures() {
   glGenTextures(1, &m_gl_texture_3);
   glGenTextures(1, &m_gl_texture_4);
   glGenTextures(1, &m_gl_cubemap_tex);
-  
+
   m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/texture_1.png").c_str());
   m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
   m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
   m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
-  
+
   std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size << std::endl;
   std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
   std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
   std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
-  
+
   std::vector<std::string> cubemap_fnames = {
     m_project_root + "/textures/cube/posx.jpg",
     m_project_root + "/textures/cube/negx.jpg",
@@ -89,7 +89,7 @@ void FlockSimulator::load_textures() {
     m_project_root + "/textures/cube/posz.jpg",
     m_project_root + "/textures/cube/negz.jpg"
   };
-  
+
   load_cubemap(5, m_gl_cubemap_tex, cubemap_fnames);
   std::cout << "Loaded cubemap texture" << std::endl;
 }
@@ -101,33 +101,33 @@ void FlockSimulator::load_shaders() {
   if (!success) {
     std::cout << "Error: Could not find the shaders folder!" << std::endl;
   }
-  
+
   std::string std_vert_shader = m_project_root + "/shaders/Default.vert";
-  
+
   for (const std::string& shader_fname : shader_folder_contents) {
     std::string file_extension;
     std::string shader_name;
-    
+
     FileUtils::split_filename(shader_fname, shader_name, file_extension);
-    
+
     if (file_extension != "frag") {
       std::cout << "Skipping non-shader file: " << shader_fname << std::endl;
       continue;
     }
-    
+
     std::cout << "Found shader file: " << shader_fname << std::endl;
-    
+
     // Check if there is a proper .vert shader or not for it
     std::string vert_shader = std_vert_shader;
     std::string associated_vert_shader_path = m_project_root + "/shaders/" + shader_name + ".vert";
     if (FileUtils::file_exists(associated_vert_shader_path)) {
       vert_shader = associated_vert_shader_path;
     }
-    
+
     std::shared_ptr<GLShader> nanogui_shader = make_shared<GLShader>();
     nanogui_shader->initFromFiles(shader_name, vert_shader,
                                   m_project_root + "/shaders/" + shader_fname);
-    
+
     // Special filenames are treated a bit differently
     ShaderTypeHint hint;
     if (shader_name == "Wireframe") {
@@ -140,13 +140,13 @@ void FlockSimulator::load_shaders() {
       hint = ShaderTypeHint::PHONG;
       std::cout << "Type: Custom" << std::endl;
     }
-    
+
     UserShader user_shader(shader_name, nanogui_shader, hint);
-    
+
     shaders.push_back(user_shader);
     shaders_combobox_names.push_back(shader_name);
   }
-  
+
   // Assuming that it's there, use "Wireframe" by default
   for (size_t i = 0; i < shaders_combobox_names.size(); ++i) {
     if (shaders_combobox_names[i] == "Wireframe") {
@@ -160,7 +160,7 @@ void FlockSimulator::load_shaders() {
 FlockSimulator::FlockSimulator(std::string project_root, Screen *screen)
 : m_project_root(project_root) {
   this->screen = screen;
-  
+
   this->load_shaders();
   this->load_textures();
 
@@ -283,7 +283,7 @@ void FlockSimulator::drawContents() {
     drawNormals(shader);
     break;
   case PHONG:
-  
+
     // Others
     Vector3D cam_pos = camera.position();
     shader.setUniform("u_color", color, false);
@@ -299,10 +299,10 @@ void FlockSimulator::drawContents() {
     shader.setUniform("u_texture_2", 2, false);
     shader.setUniform("u_texture_3", 3, false);
     shader.setUniform("u_texture_4", 4, false);
-    
+
     shader.setUniform("u_normal_scaling", m_normal_scaling, false);
     shader.setUniform("u_height_scaling", m_height_scaling, false);
-    
+
     shader.setUniform("u_texture_cubemap", 5, false);
     drawPhong(shader);
     break;
@@ -314,16 +314,63 @@ void FlockSimulator::drawContents() {
 }
 
 void FlockSimulator::drawWireframe(GLShader &shader) {
-  int num_springs = 1000;
-
-  MatrixXf positions(4, num_springs * 2);
-  MatrixXf normals(4, num_springs * 2);
-
-  // Draw springs as lines
-
-  int si = 0;
-
+  //Try to use triangle instead of line
+  /*
+  int num_tri = 6;
   for (int i = 0; i < flock->birds.size(); i++) {
+    MatrixXf positions(4, num_tri);
+    MatrixXf normals(4, num_tri);
+
+    Bird s = flock->birds[i];
+
+    Vector3D p1 = s.pm_a->position;
+    Vector3D p2 = p1 + Vector3D(.01, 0, 0);
+    Vector3D p3 = p1 + Vector3D(.005, 0.007, .01);
+    Vector3D p4 = p1 + Vector3D(.005, 0.007, -.01);
+
+    Vector3D n1 = s.pm_a->normal();
+    Vector3D n2 = n1;
+    Vector3D n3 = n2;
+    Vector3D n4;
+
+    //1 2 3
+    positions.col(i * 3) << p1.x, p1.y, p1.z, 1.0;
+    positions.col(i * 3 + 1) << p2.x, p2.y, p2.z, 1.0;
+    positions.col(i * 3 + 2) << p3.x, p3.y, p3.z, 1.0;
+
+    normals.col(i * 3) << n1.x, n1.y, n1.z, 0.0;
+    normals.col(i * 3 + 1) << n2.x, n2.y, n2.z, 0.0;
+    normals.col(i * 3 + 2) << n3.x, n3.y, n3.z, 0.0;
+
+    // 1 2 4
+    n1 = cross(p1 - p2, p4 - p2);
+    n2 = n1;
+    n4 = n1;
+    positions.col(i * 3 + 3) << p1.x, p1.y, p1.z, 1.0;
+    positions.col(i * 3 + 4) << p2.x, p2.y, p2.z, 1.0;
+    positions.col(i * 3 + 5) << p4.x, p4.y, p4.z, 1.0;
+
+    normals.col(i * 3 + 3) << n1.x, n1.y, n1.z, 0.0;
+    normals.col(i * 3 + 4) << n2.x, n2.y, n2.z, 0.0;
+    normals.col(i * 3 + 5) << n4.x, n4.y, n4.z, 0.0;
+
+    float r = p1.x;
+    float g = p1.y;
+    float b = p1.z;
+    shader.setUniform("u_color", nanogui::Color(r, g, b, 1.0f), false);
+    shader.uploadAttrib("in_position", positions, false);
+    shader.uploadAttrib("in_normal", normals, false);
+
+    shader.drawArray(GL_TRIANGLES, 0, num_tri);
+  }
+  */
+  int num_springs = 10;
+  // Draw springs as lines
+  for (int i = 0; i < flock->birds.size(); i++) {
+    MatrixXf positions(4, num_springs);
+    MatrixXf normals(4, num_springs);
+    int si = 0;
+
     Bird s = flock->birds[i];
 
     Vector3D pa = s.pm_a->position;
@@ -383,63 +430,16 @@ void FlockSimulator::drawWireframe(GLShader &shader) {
     normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
 
     si += 2;
+
+    float r = pa.x;
+    float g = pa.y;
+    float b = pa.z;
+    shader.setUniform("u_color", nanogui::Color(r, g, b, 1.0f), false);
+    shader.uploadAttrib("in_position", positions, false);
+    // Commented out: the wireframe shader does not have this attribute
+    //shader.uploadAttrib("in_normal", normals);
+    shader.drawArray(GL_LINES, 0, num_springs);
   }
-
-  shader.setUniform("u_color", nanogui::Color(0.8f, 0.7f, 1.7f, 1.0f), false);
-  shader.uploadAttrib("in_position", positions, false);
-  // Commented out: the wireframe shader does not have this attribute
-  //shader.uploadAttrib("in_normal", normals);
-
-  shader.drawArray(GL_LINES, 0, num_springs * 2);
-  //int num_structural_springs =
-  //    2 * flock->num_width_points * flock->num_height_points -
-  //    flock->num_width_points - flock->num_height_points;
-  //int num_shear_springs =
-  //    2 * (flock->num_width_points - 1) * (flock->num_height_points - 1);
-  //int num_bending_springs = num_structural_springs - flock->num_width_points -
-  //                          flock->num_height_points;
-
-  ///*int num_springs = fp->enable_structural_constraints * num_structural_springs +
-  //                  fp->enable_shearing_constraints * num_shear_springs +
-  //                  fp->enable_bending_constraints * num_bending_springs;
-
-  //MatrixXf positions(4, num_springs * 2);
-  //MatrixXf normals(4, num_springs * 2);*/
-
-  //// Draw springs as lines
-
-  //int si = 0;
-
-  //for (int i = 0; i < flock->springs.size(); i++) {
-  //  Spring s = flock->springs[i];
-
-  //  if ((s.spring_type == STRUCTURAL && !fp->enable_structural_constraints) ||
-  //      (s.spring_type == SHEARING && !fp->enable_shearing_constraints) ||
-  //      (s.spring_type == BENDING && !fp->enable_bending_constraints)) {
-  //    continue;
-  //  }
-
-  //  Vector3D pa = s.pm_a->position;
-  //  Vector3D pb = s.pm_b->position;
-
-  //  Vector3D na = s.pm_a->normal();
-  //  Vector3D nb = s.pm_b->normal();
-
-  //  positions.col(si) << pa.x, pa.y, pa.z, 1.0;
-  //  positions.col(si + 1) << pb.x, pb.y, pb.z, 1.0;
-
-  //  normals.col(si) << na.x, na.y, na.z, 0.0;
-  //  normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
-
-  //  si += 2;
-  //}
-
-  ////shader.setUniform("u_color", nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f), false);
-  //shader.uploadAttrib("in_position", positions, false);
-  //// Commented out: the wireframe shader does not have this attribute
-  ////shader.uploadAttrib("in_normal", normals);
-
-  //shader.drawArray(GL_LINES, 0, num_springs * 2);
 }
 
 void FlockSimulator::drawNormals(GLShader &shader) {
@@ -514,11 +514,11 @@ void FlockSimulator::drawPhong(GLShader &shader) {
     normals.col(i * 3    ) << n1.x, n1.y, n1.z, 0.0;
     normals.col(i * 3 + 1) << n2.x, n2.y, n2.z, 0.0;
     normals.col(i * 3 + 2) << n3.x, n3.y, n3.z, 0.0;
-    
+
     uvs.col(i * 3    ) << tri->uv1.x, tri->uv1.y;
     uvs.col(i * 3 + 1) << tri->uv2.x, tri->uv2.y;
     uvs.col(i * 3 + 2) << tri->uv3.x, tri->uv3.y;
-    
+
     tangents.col(i * 3    ) << 1.0, 0.0, 0.0, 1.0;
     tangents.col(i * 3 + 1) << 1.0, 0.0, 0.0, 1.0;
     tangents.col(i * 3 + 2) << 1.0, 0.0, 0.0, 1.0;
@@ -649,7 +649,7 @@ bool FlockSimulator::mouseButtonCallbackEvent(int button, int action,
   return false;
 }
 
-void FlockSimulator::mouseMoved(double x, double y) { 
+void FlockSimulator::mouseMoved(double x, double y) {
     if (enable_following) {
         flock->follow(x, y);
     }
@@ -726,7 +726,7 @@ bool FlockSimulator::resizeCallbackEvent(int width, int height) {
 
 void FlockSimulator::initGUI(Screen *screen) {
   Window *window;
-  
+
   window = new Window(screen, "Simulation");
   window->setPosition(Vector2i(default_window_size(0) - 245, 15));
   window->setLayout(new GroupLayout(15, 6, 14, 5));
@@ -916,7 +916,7 @@ void FlockSimulator::initGUI(Screen *screen) {
   //  fb->setSpinnable(true);
   //  fb->setCallback([this](float value) { gravity.z = value; });
   //}
-  
+
   window = new Window(screen, "Appearance");
   window->setPosition(Vector2i(15, 15));
   window->setLayout(new GroupLayout(15, 6, 14, 5));
@@ -924,8 +924,8 @@ void FlockSimulator::initGUI(Screen *screen) {
   // Appearance
 
   {
-    
-    
+
+
     ComboBox *cb = new ComboBox(window, shaders_combobox_names);
     cb->setFontSize(14);
     cb->setCallback(
