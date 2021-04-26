@@ -332,7 +332,7 @@ void FlockSimulator::drawWireframe(GLShader &shader) {
     // Vector3D pc = pa + Vector3D(.0005, 0.0007, .001);
     // Vector3D pd = pa + Vector3D(.0005, 0.0007, -.001);
 
-     Vector3D pb = pa + Vector3D(.01, 0, 0);
+    Vector3D pb = pa + Vector3D(.01, 0, 0);
     Vector3D pc = pa + Vector3D(.005, 0.007, .01);
     Vector3D pd = pa + Vector3D(.005, 0.007, -.01);
     Vector3D na = s.pm_a->normal();

@@ -35,6 +35,7 @@ struct FlockParameters {
   double coherence;
   double alignment;
   double separation;
+  int num_birds = 50;
 };
 
 struct Flock {

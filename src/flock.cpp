@@ -71,18 +71,10 @@ void Flock::buildGrid()
   }
 
   PointMass *a;
-  double total = 0;
   for (int i = 0; i < point_masses.size(); i++) {
     a = &point_masses[i];
     birds.emplace_back(Bird(a));
-    double tempDis = 0;
-    for (PointMass p : point_masses) {
-      double dis = (p.position - point_masses[i].position).norm();
-      tempDis += dis;
-    }
-    total += tempDis /point_masses.size();
   }
-  std:cout << "avg " <<total / point_masses.size() << endl;
   /*
   PointMass *a, *b;
   for (int j = 0; j < num_height_points; j += 1)
@@ -146,6 +138,26 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
                      vector<CollisionObject *> *collision_objects,
                      Vector3D windDir)
 {
+  // need more birds
+  if (fp->num_birds > point_masses.size()) {
+    int need = fp->num_birds - point_masses.size();
+    for (int i = 0; i < need; i += 1) {
+      point_masses.emplace_back(PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false));
+    }
+    PointMass *a;
+    for (int i = 0; i < point_masses.size(); i++) {
+      a = &point_masses[i];
+      birds.emplace_back(Bird(a));
+    }
+  }
+  // remove extra birds
+  if (fp->num_birds < point_masses.size()) {
+    int extra = point_masses.size() - fp->num_birds;
+    for (int i = 0; i < extra; i += 1) { 
+      point_masses.pop_back();
+      birds.pop_back();
+    }
+  }
   // cohesion
   for (PointMass &point_mass: point_masses) {
     Vector3D goal = Vector3D();
