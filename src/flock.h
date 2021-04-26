@@ -5,9 +5,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "bird.h"
 #include "CGL/CGL.h"
 #include "CGL/misc.h"
-#include "clothMesh.h"
+#include "flockMesh.h"
 #include "collision/collisionObject.h"
 #include "spring.h"
 
@@ -31,25 +32,25 @@ struct FlockParameters {
   bool enable_bending_constraints;*/
 
   // flock parameters
-  double coherence,
-  double alignment,
-  double separation
+  double coherence;
+  double alignment;
+  double separation;
 };
 
 struct Flock {
-  Cloth() {}
-  Cloth(double width, double height, int num_width_points,
+  Flock() {}
+  Flock(double width, double height, int num_width_points,
         int num_height_points, float thickness);
-  ~Cloth();
+  ~Flock();
 
   void buildGrid();
 
-  void simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
+  void simulate(double frames_per_sec, double simulation_steps, FlockParameters *fp,
                 vector<Vector3D> external_accelerations,
                 vector<CollisionObject *> *collision_objects);
-
+  vector<PointMass> getNeighbours(PointMass pm, double range);
   void reset();
-  void buildClothMesh();
+  void buildFlockMesh();
 
   void build_spatial_map();
   void self_collide(PointMass &pm, double simulation_steps);
@@ -65,12 +66,22 @@ struct Flock {
 
   // Cloth components
   vector<PointMass> point_masses;
+  vector<Bird> birds;
   vector<vector<int>> pinned;
   vector<Spring> springs;
-  ClothMesh *clothMesh;
+  FlockMesh *flockMesh;
 
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;
+  double x = 1;
+  double y = 1;
+  double z = 1;
+
+  int num_birds = 100;//20 - 1000
+
+  double COHESION_RANGE = 0.1;
+  double SEPARATION_RANGE = 0.05;
+  double ALIGNMENT_RANGE = 0.05;
 };
 
 #endif /* CLOTH_H */

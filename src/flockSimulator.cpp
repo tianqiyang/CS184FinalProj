@@ -14,6 +14,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "misc/stb_image.h"
 
+#include "collision/sphere.h"
+
 using namespace nanogui;
 using namespace std;
 
@@ -62,7 +64,7 @@ void load_cubemap(int frame_idx, GLuint handle, const std::vector<std::string>& 
 }
 
 // TODO: change texture files and load them in this function.
-void ClothSimulator::load_textures() {
+void FlockSimulator::load_textures() {
   glGenTextures(1, &m_gl_texture_1);
   glGenTextures(1, &m_gl_texture_2);
   glGenTextures(1, &m_gl_texture_3);
@@ -93,7 +95,7 @@ void ClothSimulator::load_textures() {
 }
 
 // TODO: change shaders
-void ClothSimulator::load_shaders() {
+void FlockSimulator::load_shaders() {
   std::set<std::string> shader_folder_contents;
   bool success = FileUtils::list_files_in_directory(m_project_root + "/shaders", shader_folder_contents);
   if (!success) {
@@ -155,7 +157,7 @@ void ClothSimulator::load_shaders() {
 }
 
 
-ClothSimulator::ClothSimulator(std::string project_root, Screen *screen)
+FlockSimulator::FlockSimulator(std::string project_root, Screen *screen)
 : m_project_root(project_root) {
   this->screen = screen;
   
@@ -167,7 +169,7 @@ ClothSimulator::ClothSimulator(std::string project_root, Screen *screen)
 }
 
 
-ClothSimulator::~ClothSimulator() {
+FlockSimulator::~FlockSimulator() {
   for (auto shader : shaders) {
     shader.nanogui_shader->free();
   }
@@ -177,22 +179,22 @@ ClothSimulator::~ClothSimulator() {
   glDeleteTextures(1, &m_gl_texture_4);
   glDeleteTextures(1, &m_gl_cubemap_tex);
 
-  if (cloth) delete cloth;
+  if (flock) delete flock;
   if (fp) delete fp;
   if (collision_objects) delete collision_objects;
 }
 
-void ClothSimulator::loadCloth(Cloth *cloth) { this->cloth = cloth; }
+void FlockSimulator::loadFlock(Flock *flock) { this->flock = flock; }
 
-void ClothSimulator::loadClothParameters(FlockParameters *fp) { this->fp = fp; }
+void FlockSimulator::loadFlockParameters(FlockParameters *fp) { this->fp = fp; }
 
-void ClothSimulator::loadCollisionObjects(vector<CollisionObject *> *objects) { this->collision_objects = objects; }
+void FlockSimulator::loadCollisionObjects(vector<CollisionObject *> *objects) { this->collision_objects = objects; }
 
 /**
- * Initializes the cloth simulation and spawns a new thread to separate
+ * Initializes the flock simulation and spawns a new thread to separate
  * rendering from simulation.
  */
-void ClothSimulator::init() {
+void FlockSimulator::init() {
 
   // Initialize GUI
   screen->setSize(default_window_size);
@@ -210,8 +212,8 @@ void ClothSimulator::init() {
 
   Vector3D avg_bd_position(0, 0, 0);
 
-  for (auto &bd : flock->birds) {
-    avg_bd_position += bd.position / flock->birds.size();
+  for (auto &bd : flock->point_masses) {
+    avg_bd_position += bd.position / flock->point_masses.size();
   }
 
   CGL::Vector3D target(avg_bd_position.x, avg_bd_position.y / 2,
@@ -238,16 +240,16 @@ void ClothSimulator::init() {
   canonicalCamera.configure(camera_info, screen_w, screen_h);
 }
 
-bool ClothSimulator::isAlive() { return is_alive; }
+bool FlockSimulator::isAlive() { return is_alive; }
 
-void ClothSimulator::drawContents() {
+void FlockSimulator::drawContents() {
   glEnable(GL_DEPTH_TEST);
 
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
 
     for (int i = 0; i < simulation_steps; i++) {
-      cloth->simulate(frames_per_sec, simulation_steps, fp, external_accelerations, collision_objects);
+      flock->simulate(frames_per_sec, simulation_steps, fp, external_accelerations, collision_objects);
     }
   }
 
@@ -310,96 +312,107 @@ void ClothSimulator::drawContents() {
   }
 }
 
-void ClothSimulator::drawWireframe(GLShader &shader) {
+void FlockSimulator::drawWireframe(GLShader &shader) {
 
-    for (bd::flock->birds) {
-        Vector3D bd->position 
-    }
-  int num_structural_springs =
-      2 * cloth->num_width_points * cloth->num_height_points -
-      cloth->num_width_points - cloth->num_height_points;
-  int num_shear_springs =
-      2 * (cloth->num_width_points - 1) * (cloth->num_height_points - 1);
-  int num_bending_springs = num_structural_springs - cloth->num_width_points -
-                            cloth->num_height_points;
+  //int num_structural_springs =
+  //    2 * flock->num_width_points * flock->num_height_points -
+  //    flock->num_width_points - flock->num_height_points;
+  //int num_shear_springs =
+  //    2 * (flock->num_width_points - 1) * (flock->num_height_points - 1);
+  //int num_bending_springs = num_structural_springs - flock->num_width_points -
+  //                          flock->num_height_points;
 
-  int num_springs = fp->enable_structural_constraints * num_structural_springs +
-                    fp->enable_shearing_constraints * num_shear_springs +
-                    fp->enable_bending_constraints * num_bending_springs;
+  ///*int num_springs = fp->enable_structural_constraints * num_structural_springs +
+  //                  fp->enable_shearing_constraints * num_shear_springs +
+  //                  fp->enable_bending_constraints * num_bending_springs;
 
-  MatrixXf positions(4, num_springs * 2);
-  MatrixXf normals(4, num_springs * 2);
+  //MatrixXf positions(4, num_springs * 2);
+  //MatrixXf normals(4, num_springs * 2);*/
 
-  // Draw springs as lines
+  //// Draw springs as lines
 
-  int si = 0;
+  //int si = 0;
 
-  for (int i = 0; i < cloth->springs.size(); i++) {
-    Spring s = cloth->springs[i];
+  //for (int i = 0; i < flock->springs.size(); i++) {
+  //  Spring s = flock->springs[i];
 
-    if ((s.spring_type == STRUCTURAL && !fp->enable_structural_constraints) ||
-        (s.spring_type == SHEARING && !fp->enable_shearing_constraints) ||
-        (s.spring_type == BENDING && !fp->enable_bending_constraints)) {
-      continue;
-    }
+  //  if ((s.spring_type == STRUCTURAL && !fp->enable_structural_constraints) ||
+  //      (s.spring_type == SHEARING && !fp->enable_shearing_constraints) ||
+  //      (s.spring_type == BENDING && !fp->enable_bending_constraints)) {
+  //    continue;
+  //  }
 
-    Vector3D pa = s.pm_a->position;
-    Vector3D pb = s.pm_b->position;
+  //  Vector3D pa = s.pm_a->position;
+  //  Vector3D pb = s.pm_b->position;
 
-    Vector3D na = s.pm_a->normal();
-    Vector3D nb = s.pm_b->normal();
+  //  Vector3D na = s.pm_a->normal();
+  //  Vector3D nb = s.pm_b->normal();
 
-    positions.col(si) << pa.x, pa.y, pa.z, 1.0;
-    positions.col(si + 1) << pb.x, pb.y, pb.z, 1.0;
+  //  positions.col(si) << pa.x, pa.y, pa.z, 1.0;
+  //  positions.col(si + 1) << pb.x, pb.y, pb.z, 1.0;
 
-    normals.col(si) << na.x, na.y, na.z, 0.0;
-    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+  //  normals.col(si) << na.x, na.y, na.z, 0.0;
+  //  normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
 
-    si += 2;
-  }
+  //  si += 2;
+  //}
 
-  //shader.setUniform("u_color", nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f), false);
-  shader.uploadAttrib("in_position", positions, false);
-  // Commented out: the wireframe shader does not have this attribute
-  //shader.uploadAttrib("in_normal", normals);
+  ////shader.setUniform("u_color", nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f), false);
+  //shader.uploadAttrib("in_position", positions, false);
+  //// Commented out: the wireframe shader does not have this attribute
+  ////shader.uploadAttrib("in_normal", normals);
 
-  shader.drawArray(GL_LINES, 0, num_springs * 2);
+  //shader.drawArray(GL_LINES, 0, num_springs * 2);
 }
 
-void ClothSimulator::drawNormals(GLShader &shader) {
-  int num_tris = cloth->clothMesh->triangles.size();
+void FlockSimulator::drawNormals(GLShader &shader) {
+  //int num_tris = flock->flockMesh->triangles.size();
 
-  MatrixXf positions(4, num_tris * 3);
-  MatrixXf normals(4, num_tris * 3);
+  //MatrixXf positions(4, num_tris * 3);
+  //MatrixXf normals(4, num_tris * 3);
 
-  for (int i = 0; i < num_tris; i++) {
-    Triangle *tri = cloth->clothMesh->triangles[i];
+  //for (int i = 0; i < num_tris; i++) {
+  //  Triangle *tri = flock->flockMesh->triangles[i];
 
-    Vector3D p1 = tri->pm1->position;
-    Vector3D p2 = tri->pm2->position;
-    Vector3D p3 = tri->pm3->position;
+  //  Vector3D p1 = tri->pm1->position;
+  //  Vector3D p2 = tri->pm2->position;
+  //  Vector3D p3 = tri->pm3->position;
 
-    Vector3D n1 = tri->pm1->normal();
-    Vector3D n2 = tri->pm2->normal();
-    Vector3D n3 = tri->pm3->normal();
+  //  Vector3D n1 = tri->pm1->normal();
+  //  Vector3D n2 = tri->pm2->normal();
+  //  Vector3D n3 = tri->pm3->normal();
 
-    positions.col(i * 3) << p1.x, p1.y, p1.z, 1.0;
-    positions.col(i * 3 + 1) << p2.x, p2.y, p2.z, 1.0;
-    positions.col(i * 3 + 2) << p3.x, p3.y, p3.z, 1.0;
+  //  positions.col(i * 3) << p1.x, p1.y, p1.z, 1.0;
+  //  positions.col(i * 3 + 1) << p2.x, p2.y, p2.z, 1.0;
+  //  positions.col(i * 3 + 2) << p3.x, p3.y, p3.z, 1.0;
 
-    normals.col(i * 3) << n1.x, n1.y, n1.z, 0.0;
-    normals.col(i * 3 + 1) << n2.x, n2.y, n2.z, 0.0;
-    normals.col(i * 3 + 2) << n3.x, n3.y, n3.z, 0.0;
-  }
+  //  normals.col(i * 3) << n1.x, n1.y, n1.z, 0.0;
+  //  normals.col(i * 3 + 1) << n2.x, n2.y, n2.z, 0.0;
+  //  normals.col(i * 3 + 2) << n3.x, n3.y, n3.z, 0.0;
+  //}
+    int sphere_num_lat = 10;
+    int sphere_num_lon = 10;
+    Vector3D origin;
+    double radius, friction;
+    for (auto& bd : flock->point_masses) {
+        origin = bd.position;
+        radius = 0.02;
+        friction = 0.3;
+        Sphere* s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
+        s->render(shader);
+    }
 
-  shader.uploadAttrib("in_position", positions, false);
+
+
+
+ /* shader.uploadAttrib("in_position", positions, false);
   shader.uploadAttrib("in_normal", normals, false);
 
-  shader.drawArray(GL_TRIANGLES, 0, num_tris * 3);
+  shader.drawArray(GL_TRIANGLES, 0, num_tris * 3);*/
 }
 
-void ClothSimulator::drawPhong(GLShader &shader) {
-  int num_tris = cloth->clothMesh->triangles.size();
+void FlockSimulator::drawPhong(GLShader &shader) {
+  int num_tris = flock->flockMesh->triangles.size();
 
   MatrixXf positions(4, num_tris * 3);
   MatrixXf normals(4, num_tris * 3);
@@ -407,7 +420,7 @@ void ClothSimulator::drawPhong(GLShader &shader) {
   MatrixXf tangents(4, num_tris * 3);
 
   for (int i = 0; i < num_tris; i++) {
-    Triangle *tri = cloth->clothMesh->triangles[i];
+    Triangle *tri = flock->flockMesh->triangles[i];
 
     Vector3D p1 = tri->pm1->position;
     Vector3D p2 = tri->pm2->position;
@@ -450,9 +463,9 @@ void ClothSimulator::drawPhong(GLShader &shader) {
 // functions that have to be recreated here.
 // ----------------------------------------------------------------------------
 
-void ClothSimulator::resetCamera() { camera.copy_placement(canonicalCamera); }
+void FlockSimulator::resetCamera() { camera.copy_placement(canonicalCamera); }
 
-Matrix4f ClothSimulator::getProjectionMatrix() {
+Matrix4f FlockSimulator::getProjectionMatrix() {
   Matrix4f perspective;
   perspective.setZero();
 
@@ -473,7 +486,7 @@ Matrix4f ClothSimulator::getProjectionMatrix() {
   return perspective;
 }
 
-Matrix4f ClothSimulator::getViewMatrix() {
+Matrix4f FlockSimulator::getViewMatrix() {
   Matrix4f lookAt;
   Matrix3f R;
 
@@ -505,7 +518,7 @@ Matrix4f ClothSimulator::getViewMatrix() {
 // EVENT HANDLING
 // ----------------------------------------------------------------------------
 
-bool ClothSimulator::cursorPosCallbackEvent(double x, double y) {
+bool FlockSimulator::cursorPosCallbackEvent(double x, double y) {
   if (left_down && !middle_down && !right_down) {
     if (ctrl_down) {
       mouseRightDragged(x, y);
@@ -524,7 +537,7 @@ bool ClothSimulator::cursorPosCallbackEvent(double x, double y) {
   return true;
 }
 
-bool ClothSimulator::mouseButtonCallbackEvent(int button, int action,
+bool FlockSimulator::mouseButtonCallbackEvent(int button, int action,
                                               int modifiers) {
   switch (action) {
   case GLFW_PRESS:
@@ -559,20 +572,20 @@ bool ClothSimulator::mouseButtonCallbackEvent(int button, int action,
   return false;
 }
 
-void ClothSimulator::mouseMoved(double x, double y) { y = screen_h - y; }
+void FlockSimulator::mouseMoved(double x, double y) { y = screen_h - y; }
 
-void ClothSimulator::mouseLeftDragged(double x, double y) {
+void FlockSimulator::mouseLeftDragged(double x, double y) {
   float dx = x - mouse_x;
   float dy = y - mouse_y;
 
   camera.rotate_by(-dy * (PI / screen_h), -dx * (PI / screen_w));
 }
 
-void ClothSimulator::mouseRightDragged(double x, double y) {
+void FlockSimulator::mouseRightDragged(double x, double y) {
   camera.move_by(mouse_x - x, y - mouse_y, canonical_view_distance);
 }
 
-bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
+bool FlockSimulator::keyCallbackEvent(int key, int scancode, int action,
                                       int mods) {
   ctrl_down = (bool)(mods & GLFW_MOD_CONTROL);
 
@@ -583,7 +596,7 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
       break;
     case 'r':
     case 'R':
-      cloth->reset();
+      flock->reset();
       break;
     case ' ':
       resetCamera();
@@ -606,16 +619,16 @@ bool ClothSimulator::keyCallbackEvent(int key, int scancode, int action,
   return true;
 }
 
-bool ClothSimulator::dropCallbackEvent(int count, const char **filenames) {
+bool FlockSimulator::dropCallbackEvent(int count, const char **filenames) {
   return true;
 }
 
-bool ClothSimulator::scrollCallbackEvent(double x, double y) {
+bool FlockSimulator::scrollCallbackEvent(double x, double y) {
   camera.move_forward(y * scroll_rate);
   return true;
 }
 
-bool ClothSimulator::resizeCallbackEvent(int width, int height) {
+bool FlockSimulator::resizeCallbackEvent(int width, int height) {
   screen_w = width;
   screen_h = height;
 
@@ -625,7 +638,7 @@ bool ClothSimulator::resizeCallbackEvent(int width, int height) {
 
 
 
-void ClothSimulator::initGUI(Screen *screen) {
+void FlockSimulator::initGUI(Screen *screen) {
   Window *window;
   
   window = new Window(screen, "Simulation");
@@ -680,7 +693,7 @@ void ClothSimulator::initGUI(Screen *screen) {
     fb->setValue(fp->coherence);
     fb->setUnits(" ");
     fb->setSpinnable(true);
-    fb->setCallback([this](float value) { fp->density = (double)(value); });
+    fb->setCallback([this](float value) { fp->coherence = (double)(value); });
 
     new Label(panel, "alignment :", "sans-bold");
 
@@ -688,14 +701,26 @@ void ClothSimulator::initGUI(Screen *screen) {
     fb->setEditable(true);
     fb->setFixedSize(Vector2i(100, 20));
     fb->setFontSize(14);
-    fb->setValue(fp->ks);
-    fb->setUnits("N/m");
+    fb->setValue(fp->alignment);
+    fb->setUnits(" ");
     fb->setSpinnable(true);
     fb->setMinValue(0);
-    fb->setCallback([this](float value) { fp->ks = value; });
+    fb->setCallback([this](float value) { fp->alignment = value; });
+
+    new Label(panel, "separation :", "sans-bold");
+
+    fb = new FloatBox<double>(panel);
+    fb->setEditable(true);
+    fb->setFixedSize(Vector2i(100, 20));
+    fb->setFontSize(14);
+    fb->setValue(fp->separation);
+    fb->setUnits(" ");
+    fb->setSpinnable(true);
+    fb->setMinValue(0);
+    fb->setCallback([this](float value) { fp->separation = value; });
   }
 
-  // Simulation constants
+   //Simulation constants
 
   new Label(window, "Simulation", "sans-bold");
 
@@ -729,79 +754,79 @@ void ClothSimulator::initGUI(Screen *screen) {
     num_steps->setCallback([this](int value) { simulation_steps = value; });
   }
 
-  // Damping slider and textbox
+  //// Damping slider and textbox
 
-  new Label(window, "Damping", "sans-bold");
+  //new Label(window, "Damping", "sans-bold");
 
-  {
-    Widget *panel = new Widget(window);
-    panel->setLayout(
-        new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+  //{
+  //  Widget *panel = new Widget(window);
+  //  panel->setLayout(
+  //      new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
 
-    Slider *slider = new Slider(panel);
-    slider->setValue(fp->damping);
-    slider->setFixedWidth(105);
+  //  Slider *slider = new Slider(panel);
+  //  slider->setValue(fp->damping);
+  //  slider->setFixedWidth(105);
 
-    TextBox *percentage = new TextBox(panel);
-    percentage->setFixedWidth(75);
-    percentage->setValue(to_string(fp->damping));
-    percentage->setUnits("%");
-    percentage->setFontSize(14);
+  //  TextBox *percentage = new TextBox(panel);
+  //  percentage->setFixedWidth(75);
+  //  percentage->setValue(to_string(fp->damping));
+  //  percentage->setUnits("%");
+  //  percentage->setFontSize(14);
 
-    slider->setCallback([percentage](float value) {
-      percentage->setValue(std::to_string(value));
-    });
-    slider->setFinalCallback([&](float value) {
-      fp->damping = (double)value;
-      // cout << "Final slider value: " << (int)(value * 100) << endl;
-    });
-  }
+  //  slider->setCallback([percentage](float value) {
+  //    percentage->setValue(std::to_string(value));
+  //  });
+  //  slider->setFinalCallback([&](float value) {
+  //    fp->damping = (double)value;
+  //    // cout << "Final slider value: " << (int)(value * 100) << endl;
+  //  });
+  //}
 
-  // Gravity
+  //// Gravity
 
-  new Label(window, "Gravity", "sans-bold");
+  //new Label(window, "Gravity", "sans-bold");
 
-  {
-    Widget *panel = new Widget(window);
-    GridLayout *layout =
-        new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
-    layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
-    layout->setSpacing(0, 10);
-    panel->setLayout(layout);
+  //{
+  //  Widget *panel = new Widget(window);
+  //  GridLayout *layout =
+  //      new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
+  //  layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
+  //  layout->setSpacing(0, 10);
+  //  panel->setLayout(layout);
 
-    new Label(panel, "x :", "sans-bold");
+  //  new Label(panel, "x :", "sans-bold");
 
-    FloatBox<double> *fb = new FloatBox<double>(panel);
-    fb->setEditable(true);
-    fb->setFixedSize(Vector2i(100, 20));
-    fb->setFontSize(14);
-    fb->setValue(gravity.x);
-    fb->setUnits("m/s^2");
-    fb->setSpinnable(true);
-    fb->setCallback([this](float value) { gravity.x = value; });
+  //  FloatBox<double> *fb = new FloatBox<double>(panel);
+  //  fb->setEditable(true);
+  //  fb->setFixedSize(Vector2i(100, 20));
+  //  fb->setFontSize(14);
+  //  fb->setValue(gravity.x);
+  //  fb->setUnits("m/s^2");
+  //  fb->setSpinnable(true);
+  //  fb->setCallback([this](float value) { gravity.x = value; });
 
-    new Label(panel, "y :", "sans-bold");
+  //  new Label(panel, "y :", "sans-bold");
 
-    fb = new FloatBox<double>(panel);
-    fb->setEditable(true);
-    fb->setFixedSize(Vector2i(100, 20));
-    fb->setFontSize(14);
-    fb->setValue(gravity.y);
-    fb->setUnits("m/s^2");
-    fb->setSpinnable(true);
-    fb->setCallback([this](float value) { gravity.y = value; });
+  //  fb = new FloatBox<double>(panel);
+  //  fb->setEditable(true);
+  //  fb->setFixedSize(Vector2i(100, 20));
+  //  fb->setFontSize(14);
+  //  fb->setValue(gravity.y);
+  //  fb->setUnits("m/s^2");
+  //  fb->setSpinnable(true);
+  //  fb->setCallback([this](float value) { gravity.y = value; });
 
-    new Label(panel, "z :", "sans-bold");
+  //  new Label(panel, "z :", "sans-bold");
 
-    fb = new FloatBox<double>(panel);
-    fb->setEditable(true);
-    fb->setFixedSize(Vector2i(100, 20));
-    fb->setFontSize(14);
-    fb->setValue(gravity.z);
-    fb->setUnits("m/s^2");
-    fb->setSpinnable(true);
-    fb->setCallback([this](float value) { gravity.z = value; });
-  }
+  //  fb = new FloatBox<double>(panel);
+  //  fb->setEditable(true);
+  //  fb->setFixedSize(Vector2i(100, 20));
+  //  fb->setFontSize(14);
+  //  fb->setValue(gravity.z);
+  //  fb->setUnits("m/s^2");
+  //  fb->setSpinnable(true);
+  //  fb->setCallback([this](float value) { gravity.z = value; });
+  //}
   
   window = new Window(screen, "Appearance");
   window->setPosition(Vector2i(15, 15));
@@ -830,7 +855,7 @@ void ClothSimulator::initGUI(Screen *screen) {
         [this](const nanogui::Color &color) { this->color = color; });
   }
 
-  new Label(window, "Parameters", "sans-bold");
+  /*new Label(window, "Parameters", "sans-bold");
 
   {
     Widget *panel = new Widget(window);
@@ -859,5 +884,5 @@ void ClothSimulator::initGUI(Screen *screen) {
     fb->setValue(this->m_height_scaling);
     fb->setSpinnable(true);
     fb->setCallback([this](float value) { this->m_height_scaling = value; });
-  }
+  }*/
 }

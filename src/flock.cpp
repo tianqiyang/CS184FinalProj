@@ -9,7 +9,7 @@
 
 using namespace std;
 
-Cloth::Cloth(double width, double height, int num_width_points,
+Flock::Flock(double width, double height, int num_width_points,
              int num_height_points, float thickness) {
   this->width = width;
   this->height = height;
@@ -18,19 +18,19 @@ Cloth::Cloth(double width, double height, int num_width_points,
   this->thickness = thickness;
 
   buildGrid();
-  buildClothMesh();
+  buildFlockMesh();
 }
 
-Cloth::~Cloth() {
+Flock::~Flock() {
   point_masses.clear();
   springs.clear();
 
-  if (clothMesh) {
-    delete clothMesh;
+  if (flockMesh) {
+    delete flockMesh;
   }
 }
 
-void Cloth::buildGrid() {
+void Flock::buildGrid() {
   // TODO (Part 1): Build a grid of masses and springs.
 
     double x, y, z;
@@ -96,10 +96,10 @@ void Cloth::buildGrid() {
 
 }
 
-void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
+void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParameters *cp,
                      vector<Vector3D> external_accelerations,
                      vector<CollisionObject *> *collision_objects) {
-  double mass = width * height * cp->density / num_width_points / num_height_points;
+  double mass = 10.0;
   double delta_t = 1.0f / frames_per_sec / simulation_steps;
 
   // TODO (Part 2): Compute total force acting on each point mass.
@@ -113,33 +113,8 @@ void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParame
       p->forces += mass * acceleration;
   }
 
-  for (int i = 0; i < springs.size(); i++) {
-      Spring* sp = &springs[i];
-      if ((sp->spring_type == STRUCTURAL && cp->enable_structural_constraints)
-          || (sp->spring_type == SHEARING && cp->enable_shearing_constraints)
-          || (sp->spring_type == BENDING && cp->enable_bending_constraints)) {
-
-          double c = 1.0;
-          if (sp->spring_type == BENDING) {
-              c = 0.2;
-          }
-          double force_mag = c * (cp->ks) * ((sp->pm_a->position - sp->pm_b->position).norm() - sp->rest_length);
-          sp->pm_a->forces += force_mag * (sp->pm_b->position - sp->pm_a->position).unit();
-          sp->pm_b->forces += force_mag * (sp->pm_a->position - sp->pm_b->position).unit();
-      }
-  }
 
   // TODO (Part 2): Use Verlet integration to compute new point mass positions
-  for (int i = 0; i < point_masses.size(); i++) {
-      PointMass* p = &point_masses[i];
-      if (p->pinned) {
-          continue;
-      }
-      Vector3D acceleration = p->forces / mass;
-      Vector3D temp = p->position;
-      p->position = p->position + (1. - cp->damping / 100.0) * (p->position - p->last_position) + acceleration * pow(delta_t, 2);
-      p->last_position = temp;
-  }
 
   // TODO (Part 4): Handle self-collisions.
   build_spatial_map();
@@ -187,7 +162,7 @@ void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParame
   }
 }
 
-void Cloth::build_spatial_map() {
+void Flock::build_spatial_map() {
     
   for (const auto &entry : map) {
       
@@ -217,7 +192,7 @@ void Cloth::build_spatial_map() {
 
 }
 
-void Cloth::self_collide(PointMass &pm, double simulation_steps) {
+void Flock::self_collide(PointMass &pm, double simulation_steps) {
   // TODO (Part 4): Handle self-collision for a given point mass.
     float hash = hash_position(pm.position);
     Vector3D sum;
@@ -240,7 +215,7 @@ void Cloth::self_collide(PointMass &pm, double simulation_steps) {
     return; 
 }
 
-float Cloth::hash_position(Vector3D pos) {
+float Flock::hash_position(Vector3D pos) {
   // TODO (Part 4): Hash a 3D position into a unique float identifier that represents membership in some 3D box volume.
     
     float w = 3 * width / num_width_points;
@@ -264,7 +239,7 @@ float Cloth::hash_position(Vector3D pos) {
 /// YOU DO NOT NEED TO REFER TO ANY CODE BELOW THIS ///
 ///////////////////////////////////////////////////////
 
-void Cloth::reset() {
+void Flock::reset() {
   PointMass *pm = &point_masses[0];
   for (int i = 0; i < point_masses.size(); i++) {
     pm->position = pm->start_position;
@@ -273,10 +248,10 @@ void Cloth::reset() {
   }
 }
 
-void Cloth::buildClothMesh() {
+void Flock::buildFlockMesh() {
   if (point_masses.size() == 0) return;
 
-  ClothMesh *clothMesh = new ClothMesh();
+  FlockMesh *flockMesh = new FlockMesh();
   vector<Triangle *> triangles;
 
   // Create vector of triangles
@@ -365,7 +340,7 @@ void Cloth::buildClothMesh() {
     h3->triangle = t;
   }
 
-  // Go back through the cloth mesh and link triangles together using halfedge
+  // Go back through the flock mesh and link triangles together using halfedge
   // twin pointers
 
   // Convenient variables for math
@@ -421,6 +396,6 @@ void Cloth::buildClothMesh() {
     topLeft = !topLeft;
   }
 
-  clothMesh->triangles = triangles;
-  this->clothMesh = clothMesh;
+  flockMesh->triangles = triangles;
+  this->flockMesh = flockMesh;
 }
