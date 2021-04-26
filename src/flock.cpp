@@ -75,59 +75,16 @@ void Flock::buildGrid()
     a = &point_masses[i];
     birds.emplace_back(Bird(a));
   }
-  /*
-  PointMass *a, *b;
-  for (int j = 0; j < num_height_points; j += 1)
-  {
-    for (int i = 0; i < num_width_points; i += 1)
-    {
-      if (i > 0)
-      {
-        a = &point_masses[j * num_width_points + i - 1];
-        b = &point_masses[j * num_width_points + i];
-        springs.emplace_back(Spring(a, b, STRUCTURAL));
-      }
-      if (j > 0)
-      {
-        a = &point_masses[(j - 1) * num_width_points + i];
-        b = &point_masses[j * num_width_points + i];
-        springs.emplace_back(Spring(a, b, STRUCTURAL));
-        if (i > 0)
-        {
-          a = &point_masses[(j - 1) * num_width_points + i - 1];
-          b = &point_masses[j * num_width_points + i];
-          springs.emplace_back(Spring(a, b, SHEARING));
-        }
-        if (i < num_width_points - 1)
-        {
-          a = &point_masses[(j - 1) * num_width_points + i + 1];
-          b = &point_masses[j * num_width_points + i];
-          springs.emplace_back(Spring(a, b, SHEARING));
-        }
-      }
-      if (j >= 2)
-      {
-        a = &point_masses[(j - 2) * num_width_points + i];
-        b = &point_masses[j * num_width_points + i];
-        springs.emplace_back(Spring(a, b, BENDING));
-      }
-      if (i < num_width_points - 2)
-      {
-        a = &point_masses[j * num_width_points + i + 2];
-        b = &point_masses[j * num_width_points + i];
-        springs.emplace_back(Spring(a, b, BENDING));
-      }
-    }
-  }
-  */
 }
 
 vector<PointMass> Flock::getNeighbours(PointMass pm, double range) {
   vector<PointMass> npms;
-  for (PointMass p : point_masses) {
+  for (PointMass &p : point_masses) {
     double dis = (p.position - pm.position).norm();
     if (dis > 0 && dis < range) {
-      npms.push_back(p);
+      PointMass temp = PointMass(p.position, false);
+      temp.speed = p.speed;
+      npms.push_back(temp);
     }
   }
   return npms;
@@ -162,7 +119,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   for (PointMass &point_mass: point_masses) {
     Vector3D goal = Vector3D();
     vector<PointMass> neighbour = getNeighbours(point_mass, fp->coherence);
-    for (auto npm : neighbour) {
+    for (PointMass &npm : neighbour) {
       goal = goal + npm.position;
     }
     goal = goal / neighbour.size();
@@ -175,7 +132,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   for (PointMass &point_mass: point_masses) {
     Vector3D goal = Vector3D();
     vector<PointMass> neighbour = getNeighbours(point_mass, fp->separation);
-    for (auto npm : neighbour) {
+    for (PointMass &npm : neighbour) {
       goal = goal + point_mass.position - npm.position;
     }
     goal = goal / neighbour.size();
@@ -188,7 +145,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     Vector3D speed = 0.;
     double velocity = 0.;
     vector<PointMass> neighbour = getNeighbours(point_mass, fp->alignment);
-    for (auto npm : neighbour) {
+    for (PointMass &npm : neighbour) {
       speed += npm.speed - point_mass.speed;
     }
     speed = speed / neighbour.size() / 100000.;
@@ -196,10 +153,10 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   }
 
   for (PointMass &point_mass: point_masses) {
-    point_mass.speed += point_mass.cumulatedSpeed * .00000001;
+    point_mass.speed += point_mass.cumulatedSpeed * .0000001;
     Vector3D dir = point_mass.speed;
-    dir.normalize();
-    point_mass.speed = dir * min(point_mass.speed.norm(), point_mass.maxSpeed);
+    dir.normalize(); 
+    point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);
     if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
       point_mass.speed.x *= -1;
     }
@@ -209,7 +166,14 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
       point_mass.speed.z *= -1;
     }
-    point_mass.position += point_mass.speed + windDir * .00000001;
+    point_mass.position += point_mass.speed + windDir * .0000001;
+      // std::cout << isnan(point_mass.position.x) << endl;
+    if (isnan(point_mass.position.x)) {
+      std::cout << "_____" << point_mass.position << " " << point_mass.speed << endl;
+      point_mass.position = Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.);
+      point_mass.speed = point_mass.maxSpeed;
+      std::cout << point_mass.position << " " << point_mass.speed << endl;
+    }
   }
 
   /*
@@ -343,8 +307,10 @@ float Flock::hash_position(Vector3D pos)
 
 
 void Flock::follow(double x, double y) {
-    for (PointMass p : point_masses) {
-        p.cumulatedSpeed += p.position - Vector3D(x, y, 0);
+    Vector3D dir = Vector3D(x, y, 0);
+    dir.normalize();
+    for (PointMass &p : point_masses) {
+        p.speed = dir * p.maxSpeed;
     }
 }
 
