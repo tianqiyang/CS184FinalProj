@@ -272,8 +272,8 @@ glfwSetErrorCallback(error_callback);
 createGLContexts();
 
 // Initialize the Flock object
-flock.buildGrid();
-flock.buildFlockMesh();
+//flock.buildGrid();
+//flock.buildFlockMesh();
 
 // Initialize the FlockSimulator object
 app = new FlockSimulator(project_root, screen);
@@ -297,7 +297,7 @@ while (!glfwWindowShouldClose(window)) {
     glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    app->drawContents();
+    //app->drawContents();
 
     // Draw nanogui
     screen->drawContents();

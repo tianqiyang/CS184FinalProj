@@ -720,39 +720,39 @@ void FlockSimulator::initGUI(Screen *screen) {
     fb->setCallback([this](float value) { fp->separation = value; });
   }
 
-  // Simulation constants
+   //Simulation constants
 
-  //new Label(window, "Simulation", "sans-bold");
+  new Label(window, "Simulation", "sans-bold");
 
-  //{
-  //  Widget *panel = new Widget(window);
-  //  GridLayout *layout =
-  //      new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
-  //  layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
-  //  layout->setSpacing(0, 10);
-  //  panel->setLayout(layout);
+  {
+    Widget *panel = new Widget(window);
+    GridLayout *layout =
+        new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
+    layout->setColAlignment({Alignment::Maximum, Alignment::Fill});
+    layout->setSpacing(0, 10);
+    panel->setLayout(layout);
 
-  //  new Label(panel, "frames/s :", "sans-bold");
+    new Label(panel, "frames/s :", "sans-bold");
 
-  //  IntBox<int> *fsec = new IntBox<int>(panel);
-  //  fsec->setEditable(true);
-  //  fsec->setFixedSize(Vector2i(100, 20));
-  //  fsec->setFontSize(14);
-  //  fsec->setValue(frames_per_sec);
-  //  fsec->setSpinnable(true);
-  //  fsec->setCallback([this](int value) { frames_per_sec = value; });
+    IntBox<int> *fsec = new IntBox<int>(panel);
+    fsec->setEditable(true);
+    fsec->setFixedSize(Vector2i(100, 20));
+    fsec->setFontSize(14);
+    fsec->setValue(frames_per_sec);
+    fsec->setSpinnable(true);
+    fsec->setCallback([this](int value) { frames_per_sec = value; });
 
-  //  new Label(panel, "steps/frame :", "sans-bold");
+    new Label(panel, "steps/frame :", "sans-bold");
 
-  //  IntBox<int> *num_steps = new IntBox<int>(panel);
-  //  num_steps->setEditable(true);
-  //  num_steps->setFixedSize(Vector2i(100, 20));
-  //  num_steps->setFontSize(14);
-  //  num_steps->setValue(simulation_steps);
-  //  num_steps->setSpinnable(true);
-  //  num_steps->setMinValue(0);
-  //  num_steps->setCallback([this](int value) { simulation_steps = value; });
-  //}
+    IntBox<int> *num_steps = new IntBox<int>(panel);
+    num_steps->setEditable(true);
+    num_steps->setFixedSize(Vector2i(100, 20));
+    num_steps->setFontSize(14);
+    num_steps->setValue(simulation_steps);
+    num_steps->setSpinnable(true);
+    num_steps->setMinValue(0);
+    num_steps->setCallback([this](int value) { simulation_steps = value; });
+  }
 
   //// Damping slider and textbox
 
@@ -855,7 +855,7 @@ void FlockSimulator::initGUI(Screen *screen) {
         [this](const nanogui::Color &color) { this->color = color; });
   }
 
-  new Label(window, "Parameters", "sans-bold");
+  /*new Label(window, "Parameters", "sans-bold");
 
   {
     Widget *panel = new Widget(window);
@@ -884,5 +884,5 @@ void FlockSimulator::initGUI(Screen *screen) {
     fb->setValue(this->m_height_scaling);
     fb->setSpinnable(true);
     fb->setCallback([this](float value) { this->m_height_scaling = value; });
-  }
+  }*/
 }
