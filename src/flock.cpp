@@ -307,10 +307,8 @@ float Flock::hash_position(Vector3D pos)
 
 
 void Flock::follow(double x, double y) {
-    Vector3D dir = Vector3D(x, y, 0);
-    dir.normalize();
-    for (PointMass &p : point_masses) {
-        p.speed = dir * p.maxSpeed;
+    for (PointMass p : point_masses) {
+        p.cumulatedSpeed += p.position - Vector3D(x, y, 0);
     }
 }
 
