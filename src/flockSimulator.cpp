@@ -314,6 +314,56 @@ void FlockSimulator::drawContents() {
 }
 
 void FlockSimulator::drawWireframe(GLShader &shader) {
+  //Try to use triangle instead of line
+  /*
+  int num_tri = 6;
+  for (int i = 0; i < flock->birds.size(); i++) {
+    MatrixXf positions(4, num_tri);
+    MatrixXf normals(4, num_tri);
+
+    Bird s = flock->birds[i];
+
+    Vector3D p1 = s.pm_a->position;
+    Vector3D p2 = p1 + Vector3D(.01, 0, 0);
+    Vector3D p3 = p1 + Vector3D(.005, 0.007, .01);
+    Vector3D p4 = p1 + Vector3D(.005, 0.007, -.01);
+
+    Vector3D n1 = s.pm_a->normal();
+    Vector3D n2 = n1;
+    Vector3D n3 = n2;
+    Vector3D n4;
+
+    //1 2 3
+    positions.col(i * 3) << p1.x, p1.y, p1.z, 1.0;
+    positions.col(i * 3 + 1) << p2.x, p2.y, p2.z, 1.0;
+    positions.col(i * 3 + 2) << p3.x, p3.y, p3.z, 1.0;
+
+    normals.col(i * 3) << n1.x, n1.y, n1.z, 0.0;
+    normals.col(i * 3 + 1) << n2.x, n2.y, n2.z, 0.0;
+    normals.col(i * 3 + 2) << n3.x, n3.y, n3.z, 0.0;
+
+    // 1 2 4
+    n1 = cross(p1 - p2, p4 - p2);
+    n2 = n1;
+    n4 = n1;
+    positions.col(i * 3 + 3) << p1.x, p1.y, p1.z, 1.0;
+    positions.col(i * 3 + 4) << p2.x, p2.y, p2.z, 1.0;
+    positions.col(i * 3 + 5) << p4.x, p4.y, p4.z, 1.0;
+
+    normals.col(i * 3 + 3) << n1.x, n1.y, n1.z, 0.0;
+    normals.col(i * 3 + 4) << n2.x, n2.y, n2.z, 0.0;
+    normals.col(i * 3 + 5) << n4.x, n4.y, n4.z, 0.0;
+
+    float r = p1.x;
+    float g = p1.y;
+    float b = p1.z;
+    shader.setUniform("u_color", nanogui::Color(r, g, b, 1.0f), false);
+    shader.uploadAttrib("in_position", positions, false);
+    shader.uploadAttrib("in_normal", normals, false);
+
+    shader.drawArray(GL_TRIANGLES, 0, num_tri);
+  }
+  */
   int num_springs = 10;
   // Draw springs as lines
   for (int i = 0; i < flock->birds.size(); i++) {
