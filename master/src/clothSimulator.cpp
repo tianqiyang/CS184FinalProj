@@ -336,7 +336,10 @@ void ClothSimulator::drawWireframe(GLShader &shader) {
     Vector3D pb = pa + Vector3D(.001, 0, 0);
     Vector3D pc = pa + Vector3D(.0005, 0.0007, .001);
     Vector3D pd = pa + Vector3D(.0005, 0.0007, -.001);
-
+//larger size bird
+//      Vector3D pb = pa + Vector3D(.01, 0, 0);
+//     Vector3D pc = pa + Vector3D(.005, 0.007, .01);
+//     Vector3D pd = pa + Vector3D(.005, 0.007, -.01);
     Vector3D na = s.pm_a->normal();
     Vector3D nb = na;
     Vector3D nc = na;
@@ -387,7 +390,7 @@ void ClothSimulator::drawWireframe(GLShader &shader) {
     si += 2;
   }
 
-  //shader.setUniform("u_color", nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f), false);
+  shader.setUniform("u_color", nanogui::Color(0.8f, 0.7f, 1.7f, 1.0f), false);
   shader.uploadAttrib("in_position", positions, false);
   // Commented out: the wireframe shader does not have this attribute
   //shader.uploadAttrib("in_normal", normals);
