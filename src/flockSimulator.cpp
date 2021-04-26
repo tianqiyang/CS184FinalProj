@@ -807,6 +807,18 @@ void FlockSimulator::initGUI(Screen *screen) {
     fb->setSpinnable(true);
     fb->setMinValue(0);
     fb->setCallback([this](float value) { fp->separation = value; });
+
+    new Label(panel, "Number of Birds :", "sans-bold");
+
+    fb = new FloatBox<double>(panel);
+    fb->setEditable(true);
+    fb->setFixedSize(Vector2i(100, 20));
+    fb->setFontSize(14);
+    fb->setValue(flock->num_birds);
+    fb->setUnits(" ");
+    fb->setSpinnable(true);
+    fb->setMinValue(0);
+    fb->setCallback([this](float value) { fp->num_birds = value; });
   }
 
    //Simulation constants
