@@ -328,34 +328,35 @@ bool loadObjectsFromFile(string filename, Cloth *cloth, ClothParameters *cp, vec
       Sphere *s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
       objects->push_back(s);
     } else { // PLANE
-      Vector3D point, normal;
-      double friction;
+      for (int i = 0; i < object.size(); i ++ ) {
+        Vector3D point, normal;
+        double friction;
+        auto it_point = object[i].find("point");
+        if (it_point != object[i].end()) {
+          vector<double> vec_point = *it_point;
+          point = Vector3D(vec_point[0], vec_point[1], vec_point[2]);
+        } else {
+          incompleteObjectError("plane", "point");
+        }
 
-      auto it_point = object.find("point");
-      if (it_point != object.end()) {
-        vector<double> vec_point = *it_point;
-        point = Vector3D(vec_point[0], vec_point[1], vec_point[2]);
-      } else {
-        incompleteObjectError("plane", "point");
+        auto it_normal = object[i].find("normal");
+        if (it_normal != object[i].end()) {
+          vector<double> vec_normal = *it_normal;
+          normal = Vector3D(vec_normal[0], vec_normal[1], vec_normal[2]);
+        } else {
+          incompleteObjectError("plane", "normal");
+        }
+
+        auto it_friction = object[i].find("friction");
+        if (it_friction != object[i].end()) {
+          friction = *it_friction;
+        } else {
+          incompleteObjectError("plane", "friction");
+        }
+
+        Plane *p = new Plane(point, normal, friction);
+        objects->push_back(p);
       }
-
-      auto it_normal = object.find("normal");
-      if (it_normal != object.end()) {
-        vector<double> vec_normal = *it_normal;
-        normal = Vector3D(vec_normal[0], vec_normal[1], vec_normal[2]);
-      } else {
-        incompleteObjectError("plane", "normal");
-      }
-
-      auto it_friction = object.find("friction");
-      if (it_friction != object.end()) {
-        friction = *it_friction;
-      } else {
-        incompleteObjectError("plane", "friction");
-      }
-
-      Plane *p = new Plane(point, normal, friction);
-      objects->push_back(p);
     }
   }
 

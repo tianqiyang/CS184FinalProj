@@ -27,7 +27,7 @@ Cloth::~Cloth()
 {
   point_masses.clear();
   springs.clear();
-
+  birds.clear();
   if (clothMesh)
   {
     delete clothMesh;
@@ -37,6 +37,7 @@ Cloth::~Cloth()
 void Cloth::buildGrid()
 {
   // TODO (Part 1): Build a grid of masses and springs.
+  /*
   for (int j = 0; j < num_height_points; j += 1)
   {
     for (int i = 0; i < num_width_points; i += 1)
@@ -53,17 +54,36 @@ void Cloth::buildGrid()
       }
       if (orientation == 0)
       {
-        center = Vector3D(x, 1., y);
+        center = Vector3D(x + rand() % 100 / 1000., 1., y);
+        std::cout << x << " " << y << " " << center.x << endl;
       }
       else
       {
         double sign = random() > .5 ? 1. : -1.;
         double rand_offset = sign * rand() / 1000. /  2147483647.;
-        center = Vector3D(x, y, rand_offset);
+        center = Vector3D(x + rand(), y + rand(), rand_offset);
       }
       point_masses.emplace_back(PointMass(center, pin));
     }
+  }*/
+  for (int i = 0; i < num_birds; i += 1) {
+    point_masses.emplace_back(PointMass(Vector3D(rand() % 100 / 1000., rand() % 100 / 1000., rand() % 100 / 1000.), false));
   }
+
+  PointMass *a;
+  double total = 0;
+  for (int i = 0; i < point_masses.size(); i++) {
+    a = &point_masses[i];
+    birds.emplace_back(Bird(a));
+    double tempDis = 0;
+    for (PointMass p : point_masses) {
+      double dis = (p.position - point_masses[i].position).norm();
+      tempDis += dis;
+    }
+    total += tempDis /point_masses.size();
+  }
+  std:cout << "avg " <<total / point_masses.size() << endl;
+  /*
   PointMass *a, *b;
   for (int j = 0; j < num_height_points; j += 1)
   {
@@ -107,12 +127,81 @@ void Cloth::buildGrid()
       }
     }
   }
+  */
+}
+
+vector<PointMass> Cloth::getNeighbours(PointMass pm, double range) {
+  vector<PointMass> npms;
+  for (PointMass p : point_masses) {
+    double dis = (p.position - pm.position).norm();
+    if (dis > 0 && dis < range) {
+      npms.push_back(p);
+    }
+  }
+  return npms;
 }
 
 void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
                      vector<Vector3D> external_accelerations,
-                     vector<CollisionObject *> *collision_objects)
+                     vector<CollisionObject *> *collision_objects,
+                     Vector3D windDir)
 {
+  // cohesion
+  for (PointMass &point_mass: point_masses) {
+    Vector3D goal = Vector3D();
+    vector<PointMass> neighbour = getNeighbours(point_mass, COHESION_RANGE);
+    // std::cout<<neighbour.size() << endl;
+    for (auto npm : neighbour) {
+      goal = goal + npm.position;
+    }
+    goal = goal / neighbour.size();
+    point_mass.cumulatedSpeed = goal;
+    if (neighbour.size() == 1) {
+      point_mass.cumulatedSpeed = Vector3D();
+    }
+  }
+  // separation 
+  for (PointMass &point_mass: point_masses) {
+    Vector3D goal = Vector3D();
+    vector<PointMass> neighbour = getNeighbours(point_mass, SEPARATION_RANGE);
+    for (auto npm : neighbour) {
+      goal = goal + point_mass.position - npm.position;
+    }
+    goal = goal / neighbour.size();
+    if (neighbour.size() > 1) {
+      point_mass.cumulatedSpeed += goal;
+    }
+  }
+  // alignment 
+  for (PointMass &point_mass: point_masses) {
+    Vector3D speed = 0.;
+    double velocity = 0.;
+    vector<PointMass> neighbour = getNeighbours(point_mass, ALIGNMENT_RANGE);
+    for (auto npm : neighbour) {
+      speed += npm.speed - point_mass.speed;
+    }
+    speed = speed / neighbour.size() / 100000.;
+    point_mass.cumulatedSpeed += speed;
+  }
+
+  for (PointMass &point_mass: point_masses) {
+    point_mass.speed += point_mass.cumulatedSpeed * .000000001;
+    Vector3D dir = point_mass.speed;
+    dir.normalize();
+    point_mass.speed = dir * min(point_mass.speed.norm(), point_mass.maxSpeed);
+    if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
+      point_mass.speed.x *= -1;
+    }
+    if (point_mass.position.y > y || point_mass.position.y < 0) { // random bounce to random, -random, random
+      point_mass.speed.y *= -1;
+    }
+    if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
+      point_mass.speed.z *= -1;
+    }
+    point_mass.position += point_mass.speed + windDir * .00000001;
+  }
+
+  /*
   double mass = width * height * cp->density / num_width_points / num_height_points;
   double delta_t = 1.0f / frames_per_sec / simulation_steps;
 
@@ -183,7 +272,7 @@ void Cloth::simulate(double frames_per_sec, double simulation_steps, ClothParame
         spring.pm_b->position = (spring.pm_b->position - spring.pm_a->position).unit() * 0.55 * spring.rest_length + midpoint;
       }
     }
-  }
+  }*/
 }
 
 void Cloth::build_spatial_map()

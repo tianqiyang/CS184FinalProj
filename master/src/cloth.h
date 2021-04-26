@@ -10,6 +10,7 @@
 #include "clothMesh.h"
 #include "collision/collisionObject.h"
 #include "spring.h"
+#include "bird.h"
 
 using namespace CGL;
 using namespace std;
@@ -51,8 +52,8 @@ struct Cloth {
 
   void simulate(double frames_per_sec, double simulation_steps, ClothParameters *cp,
                 vector<Vector3D> external_accelerations,
-                vector<CollisionObject *> *collision_objects);
-
+                vector<CollisionObject *> *collision_objects, Vector3D windDir);
+  vector<PointMass> getNeighbours(PointMass pm, double range);
   void reset();
   void buildClothMesh();
 
@@ -70,12 +71,22 @@ struct Cloth {
 
   // Cloth components
   vector<PointMass> point_masses;
+  vector<Bird> birds;
   vector<vector<int>> pinned;
   vector<Spring> springs;
   ClothMesh *clothMesh;
 
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;
+  double x = .5;
+  double y = .5;
+  double z = .5;
+
+  int num_birds = 200; //20 - 1000
+
+  double COHESION_RANGE = 0.067;
+  double SEPARATION_RANGE = 0.05;
+  double ALIGNMENT_RANGE = 0.05;
 };
 
 #endif /* CLOTH_H */

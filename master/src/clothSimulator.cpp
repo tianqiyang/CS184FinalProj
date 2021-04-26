@@ -243,9 +243,10 @@ void ClothSimulator::drawContents() {
 
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
-
+    Vector3D windDir = Vector3D(random(), random(), random());
+    windDir.normalize();
     for (int i = 0; i < simulation_steps; i++) {
-      cloth->simulate(frames_per_sec, simulation_steps, cp, external_accelerations, collision_objects);
+      cloth->simulate(frames_per_sec, simulation_steps, cp, external_accelerations, collision_objects, windDir);
     }
   }
 
@@ -328,23 +329,57 @@ void ClothSimulator::drawWireframe(GLShader &shader) {
 
   int si = 0;
 
-  for (int i = 0; i < cloth->springs.size(); i++) {
-    Spring s = cloth->springs[i];
-
-    if ((s.spring_type == STRUCTURAL && !cp->enable_structural_constraints) ||
-        (s.spring_type == SHEARING && !cp->enable_shearing_constraints) ||
-        (s.spring_type == BENDING && !cp->enable_bending_constraints)) {
-      continue;
-    }
+  for (int i = 0; i < cloth->birds.size(); i++) {
+    Bird s = cloth->birds[i];
 
     Vector3D pa = s.pm_a->position;
-    Vector3D pb = s.pm_b->position;
+    Vector3D pb = pa + Vector3D(.001, 0, 0);
+    Vector3D pc = pa + Vector3D(.0005, 0.0007, .001);
+    Vector3D pd = pa + Vector3D(.0005, 0.0007, -.001);
 
     Vector3D na = s.pm_a->normal();
-    Vector3D nb = s.pm_b->normal();
+    Vector3D nb = na;
+    Vector3D nc = na;
 
+    //a b
     positions.col(si) << pa.x, pa.y, pa.z, 1.0;
     positions.col(si + 1) << pb.x, pb.y, pb.z, 1.0;
+
+    normals.col(si) << na.x, na.y, na.z, 0.0;
+    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+
+    si += 2;
+
+    // b c
+    positions.col(si) << pb.x, pb.y, pb.z, 1.0;
+    positions.col(si + 1) << pc.x, pc.y, pc.z, 1.0;
+
+    normals.col(si) << na.x, na.y, na.z, 0.0;
+    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+
+    si += 2;
+
+    // c a
+    positions.col(si) << pc.x, pc.y, pc.z, 1.0;
+    positions.col(si + 1) << pa.x, pa.y, pa.z, 1.0;
+
+    normals.col(si) << na.x, na.y, na.z, 0.0;
+    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+
+    si += 2;
+
+    // a d
+    positions.col(si) << pa.x, pa.y, pa.z, 1.0;
+    positions.col(si + 1) << pd.x, pd.y, pd.z, 1.0;
+
+    normals.col(si) << na.x, na.y, na.z, 0.0;
+    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+
+    si += 2;
+
+    // b d
+    positions.col(si) << pb.x, pb.y, pb.z, 1.0;
+    positions.col(si + 1) << pd.x, pd.y, pd.z, 1.0;
 
     normals.col(si) << na.x, na.y, na.z, 0.0;
     normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;

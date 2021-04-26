@@ -6,7 +6,6 @@
 
 #include "camera.h"
 #include "cloth.h"
-#include "flock.h"
 #include "collision/collisionObject.h"
 
 using namespace nanogui;
@@ -22,7 +21,6 @@ public:
   void init();
 
   void loadCloth(Cloth *cloth);
-  void loadFlock(Flock *flock);
   void loadClothParameters(ClothParameters *cp);
   void loadCollisionObjects(vector<CollisionObject *> *objects);
   virtual bool isAlive();
@@ -65,7 +63,6 @@ private:
   nanogui::Color color = nanogui::Color(1.0f, 1.0f, 1.0f, 1.0f);
 
   Cloth *cloth;
-  Flock *flock;
   ClothParameters *cp;
   vector<CollisionObject *> *collision_objects;
 
