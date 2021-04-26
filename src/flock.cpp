@@ -123,7 +123,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       goal = goal + npm.position;
     }
     goal = goal / neighbour.size();
-    point_mass.cumulatedSpeed = goal;
+    point_mass.cumulatedSpeed += goal;
     if (neighbour.size() == 1) {
       point_mass.cumulatedSpeed = Vector3D();
     }
@@ -154,6 +154,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
 
   for (PointMass &point_mass: point_masses) {
     point_mass.speed += point_mass.cumulatedSpeed * .0000001;
+    point_mass.cumulatedSpeed = 0;
     Vector3D dir = point_mass.speed;
     dir.normalize(); 
     point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);
@@ -169,9 +170,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     point_mass.position += point_mass.speed + windDir * .0000001;
       // std::cout << isnan(point_mass.position.x) << endl;
     if (isnan(point_mass.position.x)) {
-      std::cout << "_____" << point_mass.position << " " << point_mass.speed << endl;
-      point_mass.position = Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.);
-      point_mass.speed = point_mass.maxSpeed;
+      point_mass = PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false);
       std::cout << point_mass.position << " " << point_mass.speed << endl;
     }
   }
