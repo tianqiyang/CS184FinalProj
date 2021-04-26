@@ -327,13 +327,14 @@ void FlockSimulator::drawWireframe(GLShader &shader) {
     Bird s = flock->birds[i];
 
     Vector3D pa = s.pm_a->position;
-    Vector3D pb = pa + Vector3D(.001, 0, 0);
-    Vector3D pc = pa + Vector3D(.0005, 0.0007, .001);
-    Vector3D pd = pa + Vector3D(.0005, 0.0007, -.001);
-//larger size bird
-//      Vector3D pb = pa + Vector3D(.01, 0, 0);
-//     Vector3D pc = pa + Vector3D(.005, 0.007, .01);
-//     Vector3D pd = pa + Vector3D(.005, 0.007, -.01);
+    // small bird
+    // Vector3D pb = pa + Vector3D(.001, 0, 0);
+    // Vector3D pc = pa + Vector3D(.0005, 0.0007, .001);
+    // Vector3D pd = pa + Vector3D(.0005, 0.0007, -.001);
+
+     Vector3D pb = pa + Vector3D(.01, 0, 0);
+    Vector3D pc = pa + Vector3D(.005, 0.007, .01);
+    Vector3D pd = pa + Vector3D(.005, 0.007, -.01);
     Vector3D na = s.pm_a->normal();
     Vector3D nb = na;
     Vector3D nc = na;
@@ -753,6 +754,7 @@ void FlockSimulator::initGUI(Screen *screen) {
   new Label(window, "Flock Parameters", "sans-bold");
 
   {
+    fp->coherence = COHESION_RANGE;
     Widget *panel = new Widget(window);
     GridLayout *layout =
         new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
@@ -773,6 +775,7 @@ void FlockSimulator::initGUI(Screen *screen) {
 
     new Label(panel, "alignment :", "sans-bold");
 
+    fp->alignment = ALIGNMENT_RANGE;
     fb = new FloatBox<double>(panel);
     fb->setEditable(true);
     fb->setFixedSize(Vector2i(100, 20));
@@ -785,6 +788,7 @@ void FlockSimulator::initGUI(Screen *screen) {
 
     new Label(panel, "separation :", "sans-bold");
 
+    fp->separation = SEPARATION_RANGE;
     fb = new FloatBox<double>(panel);
     fb->setEditable(true);
     fb->setFixedSize(Vector2i(100, 20));

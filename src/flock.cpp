@@ -67,7 +67,7 @@ void Flock::buildGrid()
     }
   }*/
   for (int i = 0; i < num_birds; i += 1) {
-    point_masses.emplace_back(PointMass(Vector3D(rand() % 100 / 1000., rand() % 100 / 1000., rand() % 100 / 1000.), false));
+    point_masses.emplace_back(PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false));
   }
 
   PointMass *a;
@@ -141,7 +141,7 @@ vector<PointMass> Flock::getNeighbours(PointMass pm, double range) {
   return npms;
 }
 
-void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParameters *cp,
+void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParameters *fp,
                      vector<Vector3D> external_accelerations,
                      vector<CollisionObject *> *collision_objects,
                      Vector3D windDir)
@@ -149,8 +149,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   // cohesion
   for (PointMass &point_mass: point_masses) {
     Vector3D goal = Vector3D();
-    vector<PointMass> neighbour = getNeighbours(point_mass, COHESION_RANGE);
-    // std::cout<<neighbour.size() << endl;
+    vector<PointMass> neighbour = getNeighbours(point_mass, fp->coherence);
     for (auto npm : neighbour) {
       goal = goal + npm.position;
     }
@@ -163,7 +162,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   // separation 
   for (PointMass &point_mass: point_masses) {
     Vector3D goal = Vector3D();
-    vector<PointMass> neighbour = getNeighbours(point_mass, SEPARATION_RANGE);
+    vector<PointMass> neighbour = getNeighbours(point_mass, fp->separation);
     for (auto npm : neighbour) {
       goal = goal + point_mass.position - npm.position;
     }
@@ -176,7 +175,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   for (PointMass &point_mass: point_masses) {
     Vector3D speed = 0.;
     double velocity = 0.;
-    vector<PointMass> neighbour = getNeighbours(point_mass, ALIGNMENT_RANGE);
+    vector<PointMass> neighbour = getNeighbours(point_mass, fp->alignment);
     for (auto npm : neighbour) {
       speed += npm.speed - point_mass.speed;
     }
@@ -185,7 +184,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   }
 
   for (PointMass &point_mass: point_masses) {
-    point_mass.speed += point_mass.cumulatedSpeed * .000000001;
+    point_mass.speed += point_mass.cumulatedSpeed * .00000001;
     Vector3D dir = point_mass.speed;
     dir.normalize();
     point_mass.speed = dir * min(point_mass.speed.norm(), point_mass.maxSpeed);

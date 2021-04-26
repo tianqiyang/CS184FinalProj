@@ -64,6 +64,11 @@ private:
 
   Flock *flock;
   FlockParameters *fp;
+  
+  double COHESION_RANGE = 0.67;
+  double SEPARATION_RANGE = 0.5;
+  double ALIGNMENT_RANGE = 0.5;
+
   vector<CollisionObject *> *collision_objects;
 
   // OpenGL attributes
