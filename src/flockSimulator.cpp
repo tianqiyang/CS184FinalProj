@@ -810,15 +810,15 @@ void FlockSimulator::initGUI(Screen *screen) {
 
     new Label(panel, "Number of Birds :", "sans-bold");
 
-    fb = new FloatBox<double>(panel);
-    fb->setEditable(true);
-    fb->setFixedSize(Vector2i(100, 20));
-    fb->setFontSize(14);
-    fb->setValue(flock->num_birds);
-    fb->setUnits(" ");
-    fb->setSpinnable(true);
-    fb->setMinValue(0);
-    fb->setCallback([this](float value) { fp->num_birds = value; });
+    IntBox<int>* ib = new IntBox<int>(panel);
+    ib->setEditable(true);
+    ib->setFixedSize(Vector2i(100, 20));
+    ib->setFontSize(14);
+    ib->setValue(flock->num_birds);
+    ib->setUnits(" ");
+    ib->setSpinnable(true);
+    ib->setMinValue(0);
+    ib->setCallback([this](int value) { fp->num_birds = value; });
   }
 
    //Simulation constants
