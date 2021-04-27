@@ -161,20 +161,23 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       }
   }
   for (PointMass &point_mass: point_masses) {
-    point_mass.speed += point_mass.cumulatedSpeed * .0000001;
-    point_mass.cumulatedSpeed = 0;
+    
     Vector3D dir = point_mass.speed;
     dir.normalize(); 
+    Vector3D decceleration = Vector3D(0,0,0); 
     point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);
     if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
-      point_mass.speed.x *= -1;
+        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
     }
     if (point_mass.position.y > y || point_mass.position.y < 0) { // random bounce to random, -random, random
-      point_mass.speed.y *= -1;
+        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
     }
     if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
-      point_mass.speed.z *= -1;
+        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
     }
+    point_mass.cumulatedSpeed += decceleration * 10;
+    point_mass.speed += point_mass.cumulatedSpeed * .0000001;
+    point_mass.cumulatedSpeed = 0;
     point_mass.position += point_mass.speed ;
       // std::cout << isnan(point_mass.position.x) << endl;
     if (isnan(point_mass.position.x)) {
