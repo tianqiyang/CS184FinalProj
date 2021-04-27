@@ -3,7 +3,7 @@
 #include <random>
 #include <vector>
 #include <random>
-
+#include <stdlib.h>
 #include "flock.h"
 #include "collision/plane.h"
 #include "collision/sphere.h"
@@ -33,40 +33,20 @@ Flock::~Flock()
   }
 }
 
+
+Vector3D Flock::generatePos() {
+    double x, y, z;
+    x = (double)(rand() % 100) / 100.;
+    y = (double)(rand() % 100) / 100.;
+    z = (double)(rand() % 100) / 100.;
+    return Vector3D(x, y, z);
+}
+
 void Flock::buildGrid()
 {
-  // TODO (Part 1): Build a grid of masses and springs.
-  /*
-  for (int j = 0; j < num_height_points; j += 1)
-  {
-    for (int i = 0; i < num_width_points; i += 1)
-    {
-      double x = (double)width * (double)i / (double)num_width_points;
-      double y = (double)height * (double)j / (double)num_height_points;
-      Vector3D center;
-      bool pin = false;
-      for (int k = 0; k < pinned.size(); k++) {
-        if ((pinned[k][0] == i) && (pinned[k][1] == j)) {
-          pin = true;
-          break;
-        }
-      }
-      if (orientation == 0)
-      {
-        center = Vector3D(x + rand() % 100 / 1000., 1., y);
-        std::cout << x << " " << y << " " << center.x << endl;
-      }
-      else
-      {
-        double sign = random() > .5 ? 1. : -1.;
-        double rand_offset = sign * rand() / 1000. /  2147483647.;
-        center = Vector3D(x + rand(), y + rand(), rand_offset);
-      }
-      point_masses.emplace_back(PointMass(center, pin));
-    }
-  }*/
+
   for (int i = 0; i < num_birds; i += 1) {
-    point_masses.emplace_back(PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false));
+      point_masses.emplace_back(PointMass(generatePos(), false));
   }
 
   PointMass *a;
@@ -81,7 +61,7 @@ vector<PointMass> Flock::getNeighbours(PointMass pm, double range) {
   vector<PointMass> npms;
   for (PointMass &p : point_masses) {
     double dis = (p.position - pm.position).norm();
-    if (dis > 0 && dis < range) {
+    if (dis < range && &p != &pm) {
       PointMass temp = PointMass(p.position, false);
       temp.speed = p.speed;
       npms.push_back(temp);
@@ -100,7 +80,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   if (fp->num_birds > point_masses.size()) {
     int num = fp->num_birds;
     for (int i = point_masses.size(); i < num; i += 1) {
-      point_masses.emplace_back(PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false));
+      point_masses.emplace_back(PointMass(generatePos(), false));
       // a = &point_masses[i];
       // birds.emplace_back(Bird(a));
     }
@@ -120,14 +100,16 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   for (PointMass &point_mass: point_masses) {
     Vector3D goal = Vector3D();
     vector<PointMass> neighbour = getNeighbours(point_mass, fp->coherence);
+
     for (PointMass &npm : neighbour) {
       goal = goal + npm.position;
     }
-    goal = goal / neighbour.size();
-    point_mass.cumulatedSpeed += goal;
-    if (neighbour.size() == 1) {
-      point_mass.cumulatedSpeed = Vector3D();
+    if (neighbour.size() != 0) {
+        goal = goal / neighbour.size();
     }
+    
+    point_mass.cumulatedSpeed += goal;
+
   }
   // separation 
   for (PointMass &point_mass: point_masses) {
@@ -136,10 +118,12 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     for (PointMass &npm : neighbour) {
       goal = goal + point_mass.position - npm.position;
     }
-    goal = goal / neighbour.size();
-    if (neighbour.size() > 1) {
-      point_mass.cumulatedSpeed += goal;
+    if (neighbour.size() != 0) {
+        goal = goal / neighbour.size();
     }
+    
+     point_mass.cumulatedSpeed += goal;
+    
   }
   // alignment 
   for (PointMass &point_mass: point_masses) {
@@ -149,7 +133,10 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     for (PointMass &npm : neighbour) {
       speed += npm.speed - point_mass.speed;
     }
-    speed = speed / neighbour.size() / 100000.;
+
+    if (neighbour.size() != 0) {
+        speed = speed / neighbour.size() / 100000.;
+    }
     point_mass.cumulatedSpeed += speed;
   }
   
@@ -160,21 +147,39 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
           p.cumulatedSpeed = dir * 100;
       }
   }
+
+  // avoid collision
+  for (PointMass &p : point_masses) {
+      double x, y, z;
+      x = p.position.x;
+      y = p.position.y;
+      z = p.position.z;
+      p.cumulatedSpeed +=
+          accelerationAgainstWall(this->x - x, Vector3D(-1, 0, 0)) +
+          accelerationAgainstWall(this->y - y, Vector3D(0, -1, 0)) +
+          accelerationAgainstWall(this->z - z, Vector3D(0, 0, -1)) +
+          accelerationAgainstWall(0 - x, Vector3D(1, 0, 0)) +
+          accelerationAgainstWall(0 - y, Vector3D(0, 1, 0)) +
+            accelerationAgainstWall(0 - z, Vector3D(0, 0, 1));
+  
+  }
+
+
   for (PointMass &point_mass: point_masses) {
     
     Vector3D dir = point_mass.speed;
     dir.normalize(); 
     Vector3D decceleration = Vector3D(0,0,0); 
     point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);
-    if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
-        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
-    }
-    if (point_mass.position.y > y || point_mass.position.y < 0) { // random bounce to random, -random, random
-        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
-    }
-    if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
-        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
-    }
+    //if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
+    //    decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
+    //}
+    //if (point_mass.position.y > y || point_mass.position.y < 0) { // random bounce to random, -random, random
+    //    decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
+    //}
+    //if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
+    //    decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
+    //}
     point_mass.cumulatedSpeed += decceleration * 10;
     point_mass.speed += point_mass.cumulatedSpeed * .0000001;
     point_mass.cumulatedSpeed = 0;
@@ -182,83 +187,22 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       // std::cout << isnan(point_mass.position.x) << endl;
     if (isnan(point_mass.position.x)) {
       point_mass = PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false);
-      std::cout << point_mass.position << " " << point_mass.speed << endl;
+
     }
   }
 
-  /*
-  double mass = width * height * cp->density / num_width_points / num_height_points;
-  double delta_t = 1.0f / frames_per_sec / simulation_steps;
-
-  // TODO (Part 2): Compute total force acting on each point mass.
-  // external force to every point mass
-  Vector3D total_acceleration = Vector3D();
-  for (Vector3D acceleration: external_accelerations) {
-    total_acceleration += acceleration;
-  }
-  Vector3D force = total_acceleration * mass;
-  for (PointMass &point_mass: point_masses) {
-    point_mass.forces = Vector3D(force);
-  }
-  //apply the spring correction forces
-  for (Spring &spring: springs) {
-    if ((spring.spring_type==2 && !cp->enable_bending_constraints) ||
-        (spring.spring_type==1 && !cp->enable_shearing_constraints) ||
-        (spring.spring_type==0 && !cp->enable_structural_constraints)) {
-      continue;
-    } else {
-      Vector3D diff = spring.pm_a->position - spring.pm_b->position;
-      double correction_force_mag = (diff.norm() - spring.rest_length) * cp->ks;
-      if (spring.spring_type==2) {
-        correction_force_mag *= 0.2;
-      }
-      spring.pm_a->forces += (spring.pm_b->position - spring.pm_a->position).unit() * correction_force_mag;
-      spring.pm_b->forces += (spring.pm_a->position - spring.pm_b->position).unit() * correction_force_mag;
-    }
-  }
-    
-  // TODO (Part 2): Use Verlet integration to compute new point mass positions
-  for (PointMass &point_mass: point_masses) {
-    if (!point_mass.pinned) {
-      Vector3D at = point_mass.forces / mass;
-      Vector3D new_position = point_mass.position + (1 - cp->damping/100.0) * (point_mass.position - point_mass.last_position) + at * delta_t * delta_t;
-      point_mass.last_position = Vector3D(point_mass.position);
-      point_mass.position = new_position;
-    }
-  }
-  
-  // TODO (Part 4): Handle self-collisions.
-  build_spatial_map();
-  for (PointMass &point_mass : point_masses) {
-    self_collide(point_mass, simulation_steps);
-  }
-
-  // TODO (Part 3): Handle collisions with other primitives.
-  for (PointMass &point_mass : point_masses) {
-    for (CollisionObject *collision_object : *collision_objects) {
-      collision_object->collide(point_mass);
-    }
-  }
-
-  // TODO (Part 2): Constrain the changes to be such that the spring does not change
-  // in length more than 10% per timestep [Provot 1995].
-  for (Spring &spring: springs) {
-    double distance = (spring.pm_a->position - spring.pm_b->position).norm();
-    if (spring.rest_length*1.1 < distance) {
-      if (spring.pm_a->pinned && spring.pm_b->pinned) {
-        continue;
-      } else if (spring.pm_a->pinned) {
-        spring.pm_b->position = (spring.pm_b->position - spring.pm_a->position).unit() * 1.1 * spring.rest_length + spring.pm_a->position;
-      } else if (spring.pm_b->pinned) {
-        spring.pm_a->position = (spring.pm_a->position - spring.pm_b->position).unit() * 1.1 * spring.rest_length + spring.pm_b->position;
-      } else {
-        Vector3D midpoint = (spring.pm_a->position + spring.pm_b->position) / 2.0;
-        spring.pm_a->position = (spring.pm_a->position - spring.pm_b->position).unit() * 0.55 * spring.rest_length + midpoint;
-        spring.pm_b->position = (spring.pm_b->position - spring.pm_a->position).unit() * 0.55 * spring.rest_length + midpoint;
-      }
-    }
-  }*/
 }
+
+ Vector3D Flock::accelerationAgainstWall(double distance, Vector3D direction) {
+     double encounterDis = 0.05;
+     double wallWeight = 20;
+     if (distance < encounterDis) {
+         return direction * (wallWeight/ abs(distance/encounterDis));
+     }
+     return Vector3D();
+ }
+
+ 
 
 void Flock::build_spatial_map()
 {

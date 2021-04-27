@@ -57,7 +57,11 @@ struct Flock {
   void self_collide(PointMass &pm, double simulation_steps);
   float hash_position(Vector3D pos);
 
+
+  Vector3D accelerationAgainstWall(double distance, Vector3D direction);
   void follow();
+  Vector3D generatePos();
+
   // flock properties
   double width;
   double height;
