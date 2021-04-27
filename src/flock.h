@@ -77,9 +77,9 @@ struct Flock {
 
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;
-  double x = 3;
-  double y = 3;
-  double z = 3;
+  double x = 1;
+  double y = 1;
+  double z = 1;
 
   int num_birds = 50;//20 - 1000
 
