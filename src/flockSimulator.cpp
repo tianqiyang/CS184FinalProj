@@ -147,9 +147,9 @@ void FlockSimulator::load_shaders() {
     shaders_combobox_names.push_back(shader_name);
   }
 
-  // Assuming that it's there, use "Wireframe" by default
+  // Assuming that it's there, use "Normal" by default
   for (size_t i = 0; i < shaders_combobox_names.size(); ++i) {
-    if (shaders_combobox_names[i] == "Wireframe") {
+    if (shaders_combobox_names[i] == "Normal") {
       active_shader_idx = i;
       break;
     }
@@ -257,7 +257,7 @@ void FlockSimulator::drawContents() {
   // Bind the active shader
 
   const UserShader& active_shader = shaders[active_shader_idx];
-
+  
   GLShader &shader = *active_shader.nanogui_shader;
   shader.bind();
 
