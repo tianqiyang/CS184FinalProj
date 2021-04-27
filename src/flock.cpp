@@ -149,20 +149,20 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   }
 
   // avoid collision
-  for (PointMass &p : point_masses) {
-      double x, y, z;
-      x = p.position.x;
-      y = p.position.y;
-      z = p.position.z;
-      p.cumulatedSpeed +=
-          accelerationAgainstWall(this->x - x, Vector3D(-1, 0, 0)) +
-          accelerationAgainstWall(this->y - y, Vector3D(0, -1, 0)) +
-          accelerationAgainstWall(this->z - z, Vector3D(0, 0, -1)) +
-          accelerationAgainstWall(0 - x, Vector3D(1, 0, 0)) +
-          accelerationAgainstWall(0 - y, Vector3D(0, 1, 0)) +
-            accelerationAgainstWall(0 - z, Vector3D(0, 0, 1));
-  
-  }
+  //for (PointMass &p : point_masses) {
+  //    double x, y, z;
+  //    x = p.position.x;
+  //    y = p.position.y;
+  //    z = p.position.z;
+  //    p.cumulatedSpeed +=
+  //        accelerationAgainstWall(this->x - x, Vector3D(-1, 0, 0)) +
+  //        accelerationAgainstWall(this->y - y, Vector3D(0, -1, 0)) +
+  //        accelerationAgainstWall(this->z - z, Vector3D(0, 0, -1)) +
+  //        accelerationAgainstWall(0 - x, Vector3D(1, 0, 0)) +
+  //        accelerationAgainstWall(0 - y, Vector3D(0, 1, 0)) +
+  //          accelerationAgainstWall(0 - z, Vector3D(0, 0, 1));
+  //
+  //}
 
 
   for (PointMass &point_mass: point_masses) {
@@ -171,15 +171,15 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     dir.normalize(); 
     Vector3D decceleration = Vector3D(0,0,0); 
     point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);
-    //if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
-    //    decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
-    //}
-    //if (point_mass.position.y > y || point_mass.position.y < 0) { // random bounce to random, -random, random
-    //    decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
-    //}
-    //if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
-    //    decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
-    //}
+    if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
+        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
+    }
+    if (point_mass.position.y > y || point_mass.position.y < 0) { // random bounce to random, -random, random
+        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
+    }
+    if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
+        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
+    }
     point_mass.cumulatedSpeed += decceleration * 10;
     point_mass.speed += point_mass.cumulatedSpeed * .0000001;
     point_mass.cumulatedSpeed = 0;
