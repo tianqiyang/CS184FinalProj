@@ -108,7 +108,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
         goal = goal / neighbour.size();
     }
     
-    point_mass.cumulatedSpeed += goal;
+    point_mass.cumulatedSpeed += goal * coherence_weight;
 
   }
   // separation 
@@ -122,10 +122,11 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
         goal = goal / neighbour.size();
     }
     
-     point_mass.cumulatedSpeed += goal;
+     point_mass.cumulatedSpeed += goal * separation_weight;
     
   }
   // alignment 
+  //Todo:: why /100000???
   for (PointMass &point_mass: point_masses) {
     Vector3D speed = 0.;
     double velocity = 0.;
@@ -135,9 +136,9 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     }
 
     if (neighbour.size() != 0) {
-        speed = speed / neighbour.size() / 100000.;
+        speed = speed / neighbour.size();
     }
-    point_mass.cumulatedSpeed += speed;
+    point_mass.cumulatedSpeed += speed * alignment_weight;
   }
   
   if (following) {

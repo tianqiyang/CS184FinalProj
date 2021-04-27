@@ -763,7 +763,7 @@ void FlockSimulator::initGUI(Screen *screen) {
   new Label(window, "Flock Parameters", "sans-bold");
 
   {
-    fp->coherence = COHESION_RANGE;
+    
     Widget *panel = new Widget(window);
     GridLayout *layout =
         new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
@@ -771,8 +771,10 @@ void FlockSimulator::initGUI(Screen *screen) {
     layout->setSpacing(0, 10);
     panel->setLayout(layout);
 
+    float max_para = max(flock->x, max(flock->y, flock->z));
     new Label(panel, "coherence :", "sans-bold");
 
+    fp->coherence = COHESION_RANGE;
     FloatBox<double> *fb = new FloatBox<double>(panel);
     fb->setEditable(true);
     fb->setFixedSize(Vector2i(100, 20));
@@ -780,7 +782,9 @@ void FlockSimulator::initGUI(Screen *screen) {
     fb->setValue(fp->coherence);
     fb->setUnits(" ");
     fb->setSpinnable(true);
-    fb->setCallback([this](float value) { fp->coherence = (double)(value); });
+    fb->setMinValue(0);
+    fb->setMaxValue(max_para);
+    fb->setCallback([this, max_para](float value) { fp->coherence = min(value, max_para); });
 
     new Label(panel, "alignment :", "sans-bold");
 
@@ -793,7 +797,8 @@ void FlockSimulator::initGUI(Screen *screen) {
     fb->setUnits(" ");
     fb->setSpinnable(true);
     fb->setMinValue(0);
-    fb->setCallback([this](float value) { fp->alignment = value; });
+    fb->setMaxValue(max_para);
+    fb->setCallback([this, max_para](float value) { fp->alignment = min(value, max_para); });
 
     new Label(panel, "separation :", "sans-bold");
 
@@ -806,7 +811,8 @@ void FlockSimulator::initGUI(Screen *screen) {
     fb->setUnits(" ");
     fb->setSpinnable(true);
     fb->setMinValue(0);
-    fb->setCallback([this](float value) { fp->separation = value; });
+    fb->setMaxValue(max_para);
+    fb->setCallback([this, max_para](float value) { fp->separation = min(value, max_para); });
 
     new Label(panel, "Number of Birds :", "sans-bold");
 
@@ -902,31 +908,33 @@ void FlockSimulator::initGUI(Screen *screen) {
   }
   //// Damping slider and textbox
 
-  //new Label(window, "Damping", "sans-bold");
+  new Label(window, "Damping", "sans-bold");
 
-  //{
-  //  Widget *panel = new Widget(window);
-  //  panel->setLayout(
-  //      new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+  {
+    Widget *panel = new Widget(window);
+    panel->setLayout(
+        new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
 
-  //  Slider *slider = new Slider(panel);
-  //  slider->setValue(fp->damping);
-  //  slider->setFixedWidth(105);
+    Slider *slider = new Slider(panel);
+    slider->setValue(flock->alignment_weight);
+    slider->setFixedWidth(105);
+    slider->setRange(pair<float, float>(0.0, 100.0));
 
-  //  TextBox *percentage = new TextBox(panel);
-  //  percentage->setFixedWidth(75);
-  //  percentage->setValue(to_string(fp->damping));
-  //  percentage->setUnits("%");
-  //  percentage->setFontSize(14);
+    TextBox *percentage = new TextBox(panel);
+    percentage->setFixedWidth(75);
+    percentage->setValue(to_string(flock->alignment_weight));
+    percentage->setUnits(" ");
+    percentage->setFontSize(14);
 
-  //  slider->setCallback([percentage](float value) {
-  //    percentage->setValue(std::to_string(value));
-  //  });
-  //  slider->setFinalCallback([&](float value) {
-  //    fp->damping = (double)value;
-  //    // cout << "Final slider value: " << (int)(value * 100) << endl;
-  //  });
-  //}
+    slider->setCallback([percentage](float value) {
+      percentage->setValue(std::to_string(value));
+    });
+    slider->setFinalCallback([&](float value) {
+      flock->alignment_weight = (double)value;
+      cout << flock->alignment_weight;
+      // cout << "Final slider value: " << (int)(value * 100) << endl;
+    });
+  }
 
   //// Gravity
 

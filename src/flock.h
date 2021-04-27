@@ -79,6 +79,11 @@ struct Flock {
   FlockMesh *flockMesh;
   PointMass cursor = PointMass(Vector3D(0.5, 0.5, 0.5), false);
 
+  //flock parameter weights
+  double coherence_weight = 1.0;
+  double alignment_weight = 1.0;
+  double separation_weight = 1.0;
+
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;
   double x = 1;
