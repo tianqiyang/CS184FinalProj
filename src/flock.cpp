@@ -108,7 +108,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
         goal = goal / neighbour.size();
     }
     
-    point_mass.cumulatedSpeed += goal * coherence_weight;
+    point_mass.cumulatedSpeed += (goal-point_mass.position) * coherence_weight;
 
   }
   // separation 
@@ -116,29 +116,29 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     Vector3D goal = Vector3D();
     vector<PointMass> neighbour = getNeighbours(point_mass, fp->separation);
     for (PointMass &npm : neighbour) {
-      goal = goal + point_mass.position - npm.position;
+      goal = goal + npm.position;
     }
     if (neighbour.size() != 0) {
         goal = goal / neighbour.size();
     }
     
-     point_mass.cumulatedSpeed += goal * separation_weight;
+     point_mass.cumulatedSpeed += (point_mass.position - goal) * separation_weight;
     
   }
   // alignment 
   //Todo:: why /100000???
   for (PointMass &point_mass: point_masses) {
-    Vector3D speed = 0.;
+    Vector3D speed = Vector3D();
     double velocity = 0.;
     vector<PointMass> neighbour = getNeighbours(point_mass, fp->alignment);
     for (PointMass &npm : neighbour) {
-      speed += npm.speed - point_mass.speed;
+      speed += npm.speed ;
     }
 
     if (neighbour.size() != 0) {
         speed = speed / neighbour.size();
     }
-    point_mass.cumulatedSpeed += speed * alignment_weight;
+    point_mass.cumulatedSpeed += (speed - point_mass.speed) * alignment_weight;
   }
   
   if (following) {
@@ -275,6 +275,7 @@ void Flock::reset()
   for (int i = 0; i < point_masses.size(); i++)
   {
     pm->cumulatedSpeed = 0;
+    pm->speed = 0;
     pm->position = pm->start_position;
     pm->last_position = pm->start_position;
     pm++;

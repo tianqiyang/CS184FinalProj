@@ -908,7 +908,7 @@ void FlockSimulator::initGUI(Screen *screen) {
   }
   //// Damping slider and textbox
 
-  new Label(window, "Damping", "sans-bold");
+  new Label(window, "Alignment weight", "sans-bold");
 
   {
     Widget *panel = new Widget(window);
@@ -936,6 +936,61 @@ void FlockSimulator::initGUI(Screen *screen) {
     });
   }
 
+  new Label(window, "Coherence weight", "sans-bold");
+
+  {
+      Widget* panel = new Widget(window);
+      panel->setLayout(
+          new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+
+      Slider* slider = new Slider(panel);
+      slider->setValue(flock->coherence_weight);
+      slider->setFixedWidth(105);
+      slider->setRange(pair<float, float>(0.0, 100.0));
+
+      TextBox* percentage = new TextBox(panel);
+      percentage->setFixedWidth(75);
+      percentage->setValue(to_string(flock->coherence_weight));
+      percentage->setUnits(" ");
+      percentage->setFontSize(14);
+
+      slider->setCallback([percentage](float value) {
+          percentage->setValue(std::to_string(value));
+          });
+      slider->setFinalCallback([&](float value) {
+          flock->coherence_weight = (double)value;
+          cout << flock->coherence_weight;
+          // cout << "Final slider value: " << (int)(value * 100) << endl;
+          });
+  }
+
+  new Label(window, "Separation weight", "sans-bold");
+
+  {
+      Widget* panel = new Widget(window);
+      panel->setLayout(
+          new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+
+      Slider* slider = new Slider(panel);
+      slider->setValue(flock->separation_weight);
+      slider->setFixedWidth(105);
+      slider->setRange(pair<float, float>(0.0, 100.0));
+
+      TextBox* percentage = new TextBox(panel);
+      percentage->setFixedWidth(75);
+      percentage->setValue(to_string(flock->separation_weight));
+      percentage->setUnits(" ");
+      percentage->setFontSize(14);
+
+      slider->setCallback([percentage](float value) {
+          percentage->setValue(std::to_string(value));
+          });
+      slider->setFinalCallback([&](float value) {
+          flock->separation_weight = (double)value;
+          cout << flock->separation_weight;
+          // cout << "Final slider value: " << (int)(value * 100) << endl;
+          });
+  }
   //// Gravity
 
   //new Label(window, "Gravity", "sans-bold");
