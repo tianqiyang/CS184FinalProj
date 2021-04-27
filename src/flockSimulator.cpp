@@ -364,82 +364,82 @@ void FlockSimulator::drawWireframe(GLShader &shader) {
     shader.drawArray(GL_TRIANGLES, 0, num_tri);
   }
   */
-  int num_springs = 10;
-  // Draw springs as lines
-  for (int i = 0; i < flock->birds.size(); i++) {
-    MatrixXf positions(4, num_springs);
-    MatrixXf normals(4, num_springs);
-    int si = 0;
+  //int num_springs = 10;
+  //// Draw springs as lines
+  //for (int i = 0; i < flock->birds.size(); i++) {
+  //  MatrixXf positions(4, num_springs);
+  //  MatrixXf normals(4, num_springs);
+  //  int si = 0;
 
-    Bird s = flock->birds[i];
+  //  Bird s = flock->birds[i];
 
-    Vector3D pa = s.pm_a->position;
-    // small bird
-    // Vector3D pb = pa + Vector3D(.001, 0, 0);
-    // Vector3D pc = pa + Vector3D(.0005, 0.0007, .001);
-    // Vector3D pd = pa + Vector3D(.0005, 0.0007, -.001);
+  //  Vector3D pa = s.pm_a->position;
+  //  // small bird
+  //  // Vector3D pb = pa + Vector3D(.001, 0, 0);
+  //  // Vector3D pc = pa + Vector3D(.0005, 0.0007, .001);
+  //  // Vector3D pd = pa + Vector3D(.0005, 0.0007, -.001);
 
-    Vector3D pb = pa + Vector3D(.01, 0, 0);
-    Vector3D pc = pa + Vector3D(.005, 0.007, .01);
-    Vector3D pd = pa + Vector3D(.005, 0.007, -.01);
-    Vector3D na = s.pm_a->normal();
-    Vector3D nb = na;
-    Vector3D nc = na;
+  //  Vector3D pb = pa + Vector3D(.01, 0, 0);
+  //  Vector3D pc = pa + Vector3D(.005, 0.007, .01);
+  //  Vector3D pd = pa + Vector3D(.005, 0.007, -.01);
+  //  Vector3D na = s.pm_a->normal();
+  //  Vector3D nb = na;
+  //  Vector3D nc = na;
 
-    //a b
-    positions.col(si) << pa.x, pa.y, pa.z, 1.0;
-    positions.col(si + 1) << pb.x, pb.y, pb.z, 1.0;
+  //  //a b
+  //  positions.col(si) << pa.x, pa.y, pa.z, 1.0;
+  //  positions.col(si + 1) << pb.x, pb.y, pb.z, 1.0;
 
-    normals.col(si) << na.x, na.y, na.z, 0.0;
-    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+  //  normals.col(si) << na.x, na.y, na.z, 0.0;
+  //  normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
 
-    si += 2;
+  //  si += 2;
 
-    // b c
-    positions.col(si) << pb.x, pb.y, pb.z, 1.0;
-    positions.col(si + 1) << pc.x, pc.y, pc.z, 1.0;
+  //  // b c
+  //  positions.col(si) << pb.x, pb.y, pb.z, 1.0;
+  //  positions.col(si + 1) << pc.x, pc.y, pc.z, 1.0;
 
-    normals.col(si) << na.x, na.y, na.z, 0.0;
-    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+  //  normals.col(si) << na.x, na.y, na.z, 0.0;
+  //  normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
 
-    si += 2;
+  //  si += 2;
 
-    // c a
-    positions.col(si) << pc.x, pc.y, pc.z, 1.0;
-    positions.col(si + 1) << pa.x, pa.y, pa.z, 1.0;
+  //  // c a
+  //  positions.col(si) << pc.x, pc.y, pc.z, 1.0;
+  //  positions.col(si + 1) << pa.x, pa.y, pa.z, 1.0;
 
-    normals.col(si) << na.x, na.y, na.z, 0.0;
-    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+  //  normals.col(si) << na.x, na.y, na.z, 0.0;
+  //  normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
 
-    si += 2;
+  //  si += 2;
 
-    // a d
-    positions.col(si) << pa.x, pa.y, pa.z, 1.0;
-    positions.col(si + 1) << pd.x, pd.y, pd.z, 1.0;
+  //  // a d
+  //  positions.col(si) << pa.x, pa.y, pa.z, 1.0;
+  //  positions.col(si + 1) << pd.x, pd.y, pd.z, 1.0;
 
-    normals.col(si) << na.x, na.y, na.z, 0.0;
-    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+  //  normals.col(si) << na.x, na.y, na.z, 0.0;
+  //  normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
 
-    si += 2;
+  //  si += 2;
 
-    // b d
-    positions.col(si) << pb.x, pb.y, pb.z, 1.0;
-    positions.col(si + 1) << pd.x, pd.y, pd.z, 1.0;
+  //  // b d
+  //  positions.col(si) << pb.x, pb.y, pb.z, 1.0;
+  //  positions.col(si + 1) << pd.x, pd.y, pd.z, 1.0;
 
-    normals.col(si) << na.x, na.y, na.z, 0.0;
-    normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
+  //  normals.col(si) << na.x, na.y, na.z, 0.0;
+  //  normals.col(si + 1) << nb.x, nb.y, nb.z, 0.0;
 
-    si += 2;
+  //  si += 2;
 
-    float r = pa.x;
-    float g = pa.y;
-    float b = pa.z;
-    shader.setUniform("u_color", nanogui::Color(r, g, b, 1.0f), false);
-    shader.uploadAttrib("in_position", positions, false);
-    // Commented out: the wireframe shader does not have this attribute
-    //shader.uploadAttrib("in_normal", normals);
-    shader.drawArray(GL_LINES, 0, num_springs);
-  }
+  //  float r = pa.x;
+  //  float g = pa.y;
+  //  float b = pa.z;
+  //  shader.setUniform("u_color", nanogui::Color(r, g, b, 1.0f), false);
+  //  shader.uploadAttrib("in_position", positions, false);
+  //  // Commented out: the wireframe shader does not have this attribute
+  //  //shader.uploadAttrib("in_normal", normals);
+  //  shader.drawArray(GL_LINES, 0, num_springs);
+  //}
 }
 
 void FlockSimulator::drawNormals(GLShader &shader) {
@@ -650,9 +650,6 @@ bool FlockSimulator::mouseButtonCallbackEvent(int button, int action,
 }
 
 void FlockSimulator::mouseMoved(double x, double y) {
-    if (enable_following) {
-        flock->follow(x, y);
-    }
     y = screen_h - y;
 }
 
@@ -691,6 +688,9 @@ bool FlockSimulator::keyCallbackEvent(int key, int scancode, int action,
     case 'e':
     case 'E':
         enable_following = !enable_following;
+        
+        flock->following = !flock->following;
+        break;
     case 'n':
     case 'N':
       if (is_paused) {
@@ -855,6 +855,51 @@ void FlockSimulator::initGUI(Screen *screen) {
     num_steps->setCallback([this](int value) { simulation_steps = value; });
   }
 
+  new Label(window, "Flock Parameters", "sans-bold");
+  {
+      Widget* panel = new Widget(window);
+      GridLayout* layout =
+          new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
+      layout->setColAlignment({ Alignment::Maximum, Alignment::Fill });
+      layout->setSpacing(0, 10);
+      panel->setLayout(layout);
+
+      new Label(panel, "x :", "sans-bold");
+      FloatBox<double>* fb = new FloatBox<double>(panel);
+      fb->setEditable(true);
+      fb->setFixedSize(Vector2i(100, 20));
+      fb->setFontSize(14);
+      fb->setValue(flock->cursor.position.x);
+      fb->setUnits(" ");
+      fb->setSpinnable(true);
+      fb->setCallback([this](float value) { flock->cursor.position.x = (double)(value); });
+
+      new Label(panel, "y :", "sans-bold");
+
+      fb = new FloatBox<double>(panel);
+      fb->setEditable(true);
+      fb->setFixedSize(Vector2i(100, 20));
+      fb->setFontSize(14);
+      fb->setValue(flock->cursor.position.y);
+      fb->setUnits(" ");
+      fb->setSpinnable(true);
+      fb->setMinValue(0);
+      fb->setCallback([this](float value) { flock->cursor.position.y = value; });
+
+      
+
+      new Label(panel, "z :", "sans-bold");
+
+      fb = new FloatBox<double>(panel);
+      fb->setEditable(true);
+      fb->setFixedSize(Vector2i(100, 20));
+      fb->setFontSize(14);
+      fb->setValue(flock->cursor.position.z);
+      fb->setUnits(" ");
+      fb->setSpinnable(true);
+      fb->setMinValue(0);
+      fb->setCallback([this](float value) { flock->cursor.position.z = value; });
+  }
   //// Damping slider and textbox
 
   //new Label(window, "Damping", "sans-bold");
@@ -947,14 +992,14 @@ void FlockSimulator::initGUI(Screen *screen) {
 
   // Shader Parameters
 
-  new Label(window, "Color", "sans-bold");
+  /*new Label(window, "Color", "sans-bold");
 
   {
     ColorWheel *cw = new ColorWheel(window, color);
     cw->setColor(this->color);
     cw->setCallback(
         [this](const nanogui::Color &color) { this->color = color; });
-  }
+  }*/
 
   /*new Label(window, "Parameters", "sans-bold");
 

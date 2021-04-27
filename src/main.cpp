@@ -458,8 +458,10 @@ if (!found_project_root) {
     return -1;
 }
 else {
-    std::cout << "Loading files starting from: " << project_root << std::endl;
+    std::cout << "Loading files starting from123: " << project_root << std::endl;
+
 }
+std::cout << "1";
 
 // TODO: write a json file and put its path in def_name
 if (!file_specified) { // No arguments, default initialization
@@ -468,9 +470,13 @@ if (!file_specified) { // No arguments, default initialization
     def_fname << "/scene/pinned2.json";
     file_to_load_from = def_fname.str();
 }
+std::cout << "beforeload";
 bool success = loadObjectsFromFile(file_to_load_from, &flock, &fp, &objects, sphere_num_lat, sphere_num_lon);
 if (!success) {
     std::cout << "Warn: Unable to load from file: " << file_to_load_from << std::endl;
+}
+else {
+    std::cout << "success";
 }
 
 glfwSetErrorCallback(error_callback);
@@ -479,7 +485,7 @@ createGLContexts();
 
 // Initialize the Flock object
 flock.buildGrid();
-flock.buildFlockMesh();
+//flock.buildFlockMesh();
 
 // Initialize the FlockSimulator object
 app = new FlockSimulator(project_root, screen);

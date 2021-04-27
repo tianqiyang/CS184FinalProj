@@ -57,21 +57,23 @@ struct Flock {
   void self_collide(PointMass &pm, double simulation_steps);
   float hash_position(Vector3D pos);
 
-  void follow(double x, double y);
-  // Cloth properties
+  void follow();
+  // flock properties
   double width;
   double height;
   int num_width_points;
   int num_height_points;
   double thickness;
   e_orientation orientation;
+  bool following = false;
 
-  // Cloth components
+  // flock components
   vector<PointMass> point_masses;
   vector<Bird> birds;
   vector<vector<int>> pinned;
   vector<Spring> springs;
   FlockMesh *flockMesh;
+  PointMass cursor = PointMass(Vector3D(0.5, 0.5, 0.5), false);
 
   // Spatial hashing
   unordered_map<float, vector<PointMass *> *> map;
