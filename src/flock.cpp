@@ -70,6 +70,22 @@ vector<PointMass> Flock::getNeighbours(PointMass pm, double range) {
   return npms;
 }
 
+vector<vector<PointMass*>> Flock::getNeighbours(PointMass pm, vector<double> range) {
+    vector<PointMass*> n1, n2, n3;
+    vector<vector<PointMass*>> vecs = vector<vector<PointMass*>>({n1, n2, n3});
+
+    for (PointMass &p : point_masses) {
+        double dis = (p.position - pm.position).norm();
+        for (int i = 0; i < 3; i++) {
+            if (dis < range[i] && &p != &pm) {
+                vecs[i].push_back(&p);
+            }
+        }
+        
+    }
+    return vecs;
+}
+
 void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParameters *fp,
                      vector<Vector3D> external_accelerations,
                      vector<CollisionObject *> *collision_objects,
@@ -96,50 +112,41 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       birds.pop_back();
     }
   }
-  // cohesion
-  for (PointMass &point_mass: point_masses) {
-    Vector3D goal = Vector3D();
-    vector<PointMass> neighbour = getNeighbours(point_mass, fp->coherence);
 
-    for (PointMass &npm : neighbour) {
-      goal = goal + npm.position;
-    }
-    if (neighbour.size() != 0) {
-        goal = goal / neighbour.size();
-    }
-    
-    point_mass.cumulatedSpeed += (goal-point_mass.position) * coherence_weight;
+  for (PointMass& point_mass : point_masses) {
+      vector<double> pars = vector<double>({ fp->coherence, fp->separation, fp->alignment });
+      vector<vector<PointMass*>> vecs = getNeighbours(point_mass, pars);
+      Vector3D goal = Vector3D();
+      for (PointMass* npm : vecs[0]) {
+          goal = goal + npm->position;
+      
+          if (vecs[0].size() != 0) {
+              goal = goal / vecs[0].size();
+          }
+          point_mass.cumulatedSpeed += (goal - point_mass.position) * coherence_weight;
+      }
+      goal = Vector3D();
+      for (PointMass* npm : vecs[1]) {
+          goal = goal + npm->position;
+
+          if (vecs[1].size() != 0) {
+              goal = goal / vecs[1].size();
+          }
+          point_mass.cumulatedSpeed += (point_mass.position - goal) * separation_weight;
+      }
+      goal = Vector3D();
+      for (PointMass* npm : vecs[2]) {
+          goal = goal + npm->speed;
+
+          if (vecs[2].size() != 0) {
+              goal = goal / vecs[2].size();
+          }
+          point_mass.cumulatedSpeed += (goal - point_mass.speed) * alignment_weight;
+      }
+
 
   }
-  // separation 
-  for (PointMass &point_mass: point_masses) {
-    Vector3D goal = Vector3D();
-    vector<PointMass> neighbour = getNeighbours(point_mass, fp->separation);
-    for (PointMass &npm : neighbour) {
-      goal = goal + npm.position;
-    }
-    if (neighbour.size() != 0) {
-        goal = goal / neighbour.size();
-    }
-    
-     point_mass.cumulatedSpeed += (point_mass.position - goal) * separation_weight;
-    
-  }
-  // alignment 
-  //Todo:: why /100000???
-  for (PointMass &point_mass: point_masses) {
-    Vector3D speed = Vector3D();
-    double velocity = 0.;
-    vector<PointMass> neighbour = getNeighbours(point_mass, fp->alignment);
-    for (PointMass &npm : neighbour) {
-      speed += npm.speed ;
-    }
-
-    if (neighbour.size() != 0) {
-        speed = speed / neighbour.size();
-    }
-    point_mass.cumulatedSpeed += (speed - point_mass.speed) * alignment_weight;
-  }
+  
   
   if (following) {
       
@@ -148,22 +155,6 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
           p.cumulatedSpeed = dir * 100;
       }
   }
-
-  // avoid collision
-  //for (PointMass &p : point_masses) {
-  //    double x, y, z;
-  //    x = p.position.x;
-  //    y = p.position.y;
-  //    z = p.position.z;
-  //    p.cumulatedSpeed +=
-  //        accelerationAgainstWall(this->x - x, Vector3D(-1, 0, 0)) +
-  //        accelerationAgainstWall(this->y - y, Vector3D(0, -1, 0)) +
-  //        accelerationAgainstWall(this->z - z, Vector3D(0, 0, -1)) +
-  //        accelerationAgainstWall(0 - x, Vector3D(1, 0, 0)) +
-  //        accelerationAgainstWall(0 - y, Vector3D(0, 1, 0)) +
-  //          accelerationAgainstWall(0 - z, Vector3D(0, 0, 1));
-  //
-  //}
 
 
   for (PointMass &point_mass: point_masses) {
@@ -203,7 +194,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
      return Vector3D();
  }
 
- 
+
 
 void Flock::build_spatial_map()
 {
