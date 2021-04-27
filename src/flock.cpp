@@ -81,7 +81,7 @@ vector<PointMass> Flock::getNeighbours(PointMass pm, double range) {
   vector<PointMass> npms;
   for (PointMass &p : point_masses) {
     double dis = (p.position - pm.position).norm();
-    if (dis > 0 && dis < range) {
+    if (dis < range) {
       PointMass temp = PointMass(p.position, false);
       temp.speed = p.speed;
       npms.push_back(temp);
@@ -307,7 +307,7 @@ float Flock::hash_position(Vector3D pos)
 
 void Flock::follow(double x, double y) {
     for (PointMass p : point_masses) {
-        p.cumulatedSpeed += p.position - Vector3D(x, y, 0);
+        p.position += (p.position - Vector3D(x, y, 0)) * .000001;
     }
 }
 
