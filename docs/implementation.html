@@ -97,9 +97,10 @@
 					Presentation slides: <a href="https://docs.google.com/presentation/d/11QU8uQsCKbf2oT6ux9RuYUnxBdJdNBXTSHDoqfBYK5I/edit?usp=sharing" style="color:blue">
 						https://docs.google.com/presentation/d/11QU8uQsCKbf2oT6ux9RuYUnxBdJdNBXTSHDoqfBYK5I/edit?usp=sharing</a><br>
 					<br>
-					Presentation video: <a href="" style="color:blue">
-						To be added</a>
+					Presentation video: <a href="https://www.youtube.com/watch?v=xvowkBw1n2o" style="color:blue">
+						https://www.youtube.com/watch?v=xvowkBw1n2o</a>
 				</p>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/xvowkBw1n2o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 			</div>
 		</div>
 	</section>
@@ -113,7 +114,7 @@
 					To start with, we represent every bird as a point mass, and store its attributes position and speed. 
 					At the beginning of the simulation, every bird is put in a random position in the given 3D space. Once the simulation starts, 
 					all bird will move with an initial velocity in the designated direction set by x, y, z sliding bars. Once the bird reaches 
-					the edge of the space, which is defined as a (1,1,1)-size cube), the bird will "bounce" back. <br>
+					the edge of the space, which is defined as a (1,1,1)-size cube, the bird will "bounce" back. <br>
 					<br>
 					More interactive features include changing overall simulation speed by changing frames/s and steps/frame 
 					under simulation on the panel. You can also 
@@ -196,7 +197,9 @@
 						<p>
 							Of course birds try to avoid colliding with each other, therefore there's also a 
 							separation force between each pair of birds close to each other. The force is calculated 
-							by averaging displacement from neighboring birds to the bird. 
+							by averaging displacement from neighboring birds to the bird. Notice that the distance limit to define 
+							neighbors for separation should be smaller than the distance limit to define neighbors for cohesion. It 
+							means birds will only repel each other when they are very close. 
 						</p>
 						<table style="width: 100%">
 						<tr>
@@ -222,8 +225,10 @@
 			</div>
 			<div class="row text-center title">
 				<p style="font-size: 2rem; text-align: left; color:black">
-					there are also external forces. We implemented wind blowing to a random direction, although the effect may
+					There are also external forces. We implemented wind blowing to a random direction, although the effect may
 					not be significant. <br>
+					<br>
+					Of course there are speed limits for birds, so we also put speed limits in our model. <br>
 					<br>
 					With all these forces implemented, we can now see how the points move like real flocks.
 				</p>
@@ -249,7 +254,7 @@
 				<div class="text-left">
 					<ul style="font-size: 2rem;">
 						<li>Set designated direction (x, y, z).</li>
-						<li>Weights for Cohesion, Separation and Cohesionn.</li>
+						<li>Weights for Cohesion, Separation and Cohesion.</li>
 						<li>Set number of birds for simulation.</li>
 						<li>Set simulation speed of birds by number of frames/s and number of steps/frame.</li>
 						<li>Set a way to render birds (wireframe or ball).</li>
