@@ -81,7 +81,7 @@ vector<PointMass> Flock::getNeighbours(PointMass pm, double range) {
   vector<PointMass> npms;
   for (PointMass &p : point_masses) {
     double dis = (p.position - pm.position).norm();
-    if (dis > 0 && dis < range) {
+    if (dis < range) {
       PointMass temp = PointMass(p.position, false);
       temp.speed = p.speed;
       npms.push_back(temp);
@@ -97,18 +97,18 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
 {
   // need more birds
   if (fp->num_birds > point_masses.size()) {
-    int need = fp->num_birds - point_masses.size();
-    for (int i = 0; i < need; i += 1) {
+    int num = fp->num_birds;
+    for (int i = point_masses.size(); i < num; i += 1) {
       point_masses.emplace_back(PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false));
+      // a = &point_masses[i];
+      // birds.emplace_back(Bird(a));
     }
     PointMass *a;
-    for (int i = 0; i < point_masses.size(); i++) {
+    for (int i = point_masses.size(); i < num; i += 1) {
       a = &point_masses[i];
       birds.emplace_back(Bird(a));
     }
-  }
-  // remove extra birds
-  if (fp->num_birds < point_masses.size()) {
+  } else if (fp->num_birds < point_masses.size()) { // remove extra birds
     int extra = point_masses.size() - fp->num_birds;
     for (int i = 0; i < extra; i += 1) { 
       point_masses.pop_back();
@@ -307,7 +307,7 @@ float Flock::hash_position(Vector3D pos)
 
 void Flock::follow(double x, double y) {
     for (PointMass p : point_masses) {
-        p.cumulatedSpeed += p.position - Vector3D(x, y, 0);
+        p.position += (p.position - Vector3D(x, y, 0)) * .000001;
     }
 }
 
