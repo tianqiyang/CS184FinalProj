@@ -426,7 +426,7 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
       if (it_friction != object.end()) {
         friction = *it_friction;
       } else {
-        incompleteObjectError("plane", "friction");
+        incompleteObjectError("cylinder", "friction");
       }
 
       Cylinder *p = new Cylinder(point1, normal, radius, halfLength, slices, friction);
