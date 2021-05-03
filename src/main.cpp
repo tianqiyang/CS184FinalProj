@@ -326,15 +326,39 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
       Sphere *s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
       objects->push_back(s);
     } else { // PLANE
-      Vector3D point, normal;
+      Vector3D point1, point2, point3, point4, normal;
       double friction;
 
-      auto it_point = object.find("point");
-      if (it_point != object.end()) {
-        vector<double> vec_point = *it_point;
-        point = Vector3D(vec_point[0], vec_point[1], vec_point[2]);
+      auto it_point1 = object.find("point1");
+      if (it_point1 != object.end()) {
+        vector<double> vec_point1 = *it_point1;
+        point1 = Vector3D(vec_point1[0], vec_point1[1], vec_point1[2]);
       } else {
-        incompleteObjectError("plane", "point");
+        incompleteObjectError("plane", "point1");
+      }
+      
+      auto it_point2 = object.find("point2");
+      if (it_point2 != object.end()) {
+        vector<double> vec_point2 = *it_point2;
+        point2 = Vector3D(vec_point2[0], vec_point2[1], vec_point2[2]);
+      } else {
+        incompleteObjectError("plane", "point2");
+      }
+      
+      auto it_point3 = object.find("point3");
+      if (it_point3 != object.end()) {
+        vector<double> vec_point3 = *it_point3;
+        point3 = Vector3D(vec_point3[0], vec_point3[1], vec_point3[2]);
+      } else {
+        incompleteObjectError("plane", "point3");
+      }
+      
+      auto it_point4 = object.find("point4");
+      if (it_point4 != object.end()) {
+        vector<double> vec_point4 = *it_point4;
+        point4 = Vector3D(vec_point4[0], vec_point4[1], vec_point4[2]);
+      } else {
+        incompleteObjectError("plane", "point4");
       }
 
       auto it_normal = object.find("normal");
@@ -352,7 +376,7 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
         incompleteObjectError("plane", "friction");
       }
 
-      Plane *p = new Plane(point, normal, friction);
+      Plane *p = new Plane(point1, point2, point3, point4, normal, friction);
       objects->push_back(p);
     }
   }
