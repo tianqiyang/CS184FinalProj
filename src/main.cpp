@@ -14,6 +14,7 @@
 
 #include "CGL/CGL.h"
 #include "collision/plane.h"
+#include "collision/cylinder.h"
 #include "collision/sphere.h"
 #include "flock.h"
 #include "flockSimulator.h"
@@ -153,8 +154,9 @@ void incompleteObjectError(const char* object, const char* attribute) {
 const string SPHERE = "sphere";
 const string PLANE = "plane";
 const string CLOTH = "cloth";
+const string CYLINDER = "cylinder";
 
-const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, CLOTH};
+const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, CLOTH, CYLINDER};
 
 // TODO: may need later
 bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vector<CollisionObject*>* objects, int sphere_num_lat, int sphere_num_lon) {
@@ -325,7 +327,7 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
 
       Sphere *s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
       objects->push_back(s);
-    } else { // PLANE
+    } else if (key == PLANE) {
       Vector3D point1, point2, point3, point4, normal;
       double friction;
 
@@ -377,6 +379,57 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
       }
 
       Plane *p = new Plane(point1, point2, point3, point4, normal, friction);
+      objects->push_back(p);
+    } else if (key == CYLINDER) {
+      double radius, halfLength, friction;
+      int slices;
+      Vector3D point1, normal;
+
+      auto it_point1 = object.find("point1");
+      if (it_point1 != object.end()) {
+        vector<double> vec_point1 = *it_point1;
+        point1 = Vector3D(vec_point1[0], vec_point1[1], vec_point1[2]);
+      } else {
+        incompleteObjectError("cylinder", "point1");
+      }
+
+      auto it_normal = object.find("normal");
+      if (it_normal != object.end()) {
+        vector<double> vec_normal = *it_normal;
+        normal = Vector3D(vec_normal[0], vec_normal[1], vec_normal[2]);
+      } else {
+        incompleteObjectError("cylinder", "normal");
+      }
+
+      auto it_radius = object.find("radius");
+      if (it_radius != object.end()) {
+        radius = *it_radius;
+      } else {
+        incompleteObjectError("cylinder", "radius");
+      }
+
+      auto it_halfLength = object.find("halfLength");
+      if (it_halfLength != object.end()) {
+        halfLength = *it_halfLength;
+      } else {
+        incompleteObjectError("cylinder", "halfLength");
+      }
+
+      auto it_slices = object.find("slices");
+      if (it_slices != object.end()) {
+        slices = *it_slices;
+      } else {
+        incompleteObjectError("cylinder", "slices");
+      }
+
+      auto it_friction = object.find("friction");
+      if (it_friction != object.end()) {
+        friction = *it_friction;
+      } else {
+        incompleteObjectError("plane", "friction");
+      }
+
+      Cylinder *p = new Cylinder(point1, normal, radius, halfLength, slices, friction);
       objects->push_back(p);
     }
   }
@@ -485,7 +538,6 @@ else {
     std::cout << "Loading files starting from123: " << project_root << std::endl;
 
 }
-std::cout << "1";
 
 // TODO: write a json file and put its path in def_name
 if (!file_specified) { // No arguments, default initialization

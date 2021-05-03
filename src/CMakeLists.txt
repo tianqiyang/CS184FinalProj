@@ -9,6 +9,7 @@ set(FLOCK_VIEWER_SOURCE
     # Collision objects
     collision/sphere.cpp
     collision/plane.cpp
+    collision/cylinder.cpp
 
     # Application
     main.cpp
