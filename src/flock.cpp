@@ -150,13 +150,10 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
           goal = goal / vecs[2].size();
       }
       point_mass.cumulatedSpeed += (goal - point_mass.speed) * aw;
-
-
   }
   
   
   if (following) {
-      
       for (PointMass &p : point_masses) {
           Vector3D dir = (cursor.position - p.position);
           p.cumulatedSpeed += dir * fw;
@@ -171,13 +168,13 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);*/
     Vector3D decceleration = Vector3D(0,0,0); 
     
-    if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
+    if (point_mass.position.x > x  || point_mass.position.x < -x ) { // random bounce to -random, random, random
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
     }
-    if (point_mass.position.y > y || point_mass.position.y < 0) { // random bounce to random, -random, random
+    if (point_mass.position.y > y || point_mass.position.y < -y) { // random bounce to random, -random, random
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
     }
-    if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
+    if (point_mass.position.z > z || point_mass.position.z < 1 ) { // random bounce to random, random, -random
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
     }
 
@@ -193,16 +190,16 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     Vector3D dir = point_mass.speed;
     dir.normalize();
     point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);
-
     point_mass.cumulatedSpeed = 0;
+    for (CollisionObject *collision_object : *collision_objects) {
+        collision_object->collide(point_mass);
+    }
     point_mass.position += point_mass.speed ;
       // std::cout << isnan(point_mass.position.x) << endl;
     if (isnan(point_mass.position.x)) {
       point_mass = PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false);
-
     }
   }
-
 }
 
  Vector3D Flock::accelerationAgainstWall(double distance, Vector3D direction) {
