@@ -155,8 +155,9 @@ const string SPHERE = "sphere";
 const string PLANE = "plane";
 const string CLOTH = "cloth";
 const string CYLINDER = "cylinder";
+const string HCYLINDER = "hcylinder";
 
-const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, CLOTH, CYLINDER};
+const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, CLOTH, CYLINDER, HCYLINDER};
 
 // TODO: may need later
 bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vector<CollisionObject*>* objects, int sphere_num_lat, int sphere_num_lon) {
@@ -380,10 +381,10 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
 
       Plane *p = new Plane(point1, point2, point3, point4, normal, friction);
       objects->push_back(p);
-    } else if (key == CYLINDER) {
+    } else if (key == CYLINDER || key == HCYLINDER) {
       double radius, halfLength, friction;
-      int slices;
-      Vector3D point1, normal;
+      int slices, normal;
+      Vector3D point1;
 
       auto it_point1 = object.find("point1");
       if (it_point1 != object.end()) {
@@ -395,8 +396,7 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
 
       auto it_normal = object.find("normal");
       if (it_normal != object.end()) {
-        vector<double> vec_normal = *it_normal;
-        normal = Vector3D(vec_normal[0], vec_normal[1], vec_normal[2]);
+        normal = *it_normal;
       } else {
         incompleteObjectError("cylinder", "normal");
       }
