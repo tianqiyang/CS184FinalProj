@@ -24,19 +24,18 @@ void Cylinder::collide(PointMass &pm) {
 void Cylinder::render(GLShader &shader) {
   nanogui::Color color(0.7f, 0.7f, 0.0f, 1.0f);
   double halfLength = 1;
-  double radius = .5;
   int count = 6;
   for(int i=0; i < slices; i++) { 
     MatrixXf positions(3, count);
     MatrixXf normals(3, count);
     float theta = 2.0 * PI * ((float)i) / slices;
     float nextTheta = 2.0 * PI * ((float)i+1) / slices;
-    Vector3f p1 = Vector3f(0.0, halfLength, 0.0);
-    Vector3f p2 = Vector3f(radius*cos(theta), halfLength, radius*sin(theta));
-    Vector3f p3 = Vector3f (radius*cos(nextTheta), halfLength, radius*sin(nextTheta));
-    Vector3f p4 = Vector3f(radius*cos(nextTheta), -halfLength, radius*sin(nextTheta));
-    Vector3f p5= Vector3f(radius*cos(theta), -halfLength, radius*sin(theta));
-    Vector3f p6= Vector3f(0.0, -halfLength, 0.0);
+    Vector3f p1 = Vector3f(point1.x, halfLength, point1.z);
+    Vector3f p2 = Vector3f(point1.x+radius*cos(theta), halfLength, point1.z + radius*sin(theta));
+    Vector3f p3 = Vector3f (point1.x+radius*cos(nextTheta), halfLength, point1.z + radius*sin(nextTheta));
+    Vector3f p4 = Vector3f(point1.x+radius*cos(nextTheta), -halfLength, point1.z + radius*sin(nextTheta));
+    Vector3f p5= Vector3f(point1.x+radius*cos(theta), -halfLength, point1.z + radius*sin(theta));
+    Vector3f p6= Vector3f(point1.x, -halfLength, point1.z);
 
     Vector3f n1 = Vector3f(cos(theta), 0.0, sin(theta));
     Vector3f n2 = Vector3f(1.0, 0.0, 0.0);
