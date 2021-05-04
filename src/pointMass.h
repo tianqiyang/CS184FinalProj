@@ -36,8 +36,11 @@ struct PointMass {
     Vector3D speed;
     Vector3D cumulatedSpeed;
 
-    double maxSpeed = .01;
-    double maxAcc = 10.;
+
+    double minSpeed = .0002;
+    double maxSpeed = .0004;
+    double maxAcc = 1.;
+    double minAcc = 0.;
 };
 
 #endif /* POINTMASS_H */
