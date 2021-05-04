@@ -113,36 +113,43 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     }
   }
 
+
+  double cw, sw, aw, fw, dw;
+  double fweight = 30.;
+  double dweight = 10.;
+  double sum = coherence_weight + separation_weight + alignment_weight + fweight + dweight;
+  cw = coherence_weight / sum;
+  sw = separation_weight / sum;
+  aw = alignment_weight / sum;
+  fw = fweight / sum;
+  dw = dweight / sum;
   for (PointMass& point_mass : point_masses) {
       vector<double> pars = vector<double>({ fp->coherence, fp->separation, fp->alignment });
       vector<vector<PointMass*>> vecs = getNeighbours(point_mass, pars);
       Vector3D goal = Vector3D();
       for (PointMass* npm : vecs[0]) {
-          goal = goal + npm->position;
-      
-          if (vecs[0].size() != 0) {
-              goal = goal / vecs[0].size();
-          }
-          point_mass.cumulatedSpeed += (goal - point_mass.position) * coherence_weight;
+          goal = goal + npm->position;       
       }
+      if (vecs[0].size() != 0) {
+          goal = goal / vecs[0].size();
+      }
+      point_mass.cumulatedSpeed += (goal - point_mass.position) * cw;
       goal = Vector3D();
       for (PointMass* npm : vecs[1]) {
           goal = goal + npm->position;
-
-          if (vecs[1].size() != 0) {
-              goal = goal / vecs[1].size();
-          }
-          point_mass.cumulatedSpeed += (point_mass.position - goal) * separation_weight;
       }
+      if (vecs[1].size() != 0) {
+          goal = goal / vecs[1].size();
+      }
+      point_mass.cumulatedSpeed += (point_mass.position - goal) * sw;
       goal = Vector3D();
       for (PointMass* npm : vecs[2]) {
-          goal = goal + npm->speed;
-
-          if (vecs[2].size() != 0) {
-              goal = goal / vecs[2].size();
-          }
-          point_mass.cumulatedSpeed += (goal - point_mass.speed) * alignment_weight;
+          goal = goal + npm->speed; 
       }
+      if (vecs[2].size() != 0) {
+          goal = goal / vecs[2].size();
+      }
+      point_mass.cumulatedSpeed += (goal - point_mass.speed) * aw;
 
 
   }
@@ -152,17 +159,18 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       
       for (PointMass &p : point_masses) {
           Vector3D dir = (cursor.position - p.position);
-          p.cumulatedSpeed = dir * 100;
+          p.cumulatedSpeed += dir * fw;
       }
   }
 
 
   for (PointMass &point_mass: point_masses) {
     
-    Vector3D dir = point_mass.speed;
-    dir.normalize(); 
+    /*Vector3D dir = point_mass.speed;
+    dir.normalize();
+    point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);*/
     Vector3D decceleration = Vector3D(0,0,0); 
-    point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);
+    
     if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
     }
@@ -172,8 +180,20 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
     }
-    point_mass.cumulatedSpeed += decceleration * 10;
-    point_mass.speed += point_mass.cumulatedSpeed * .0000001;
+
+
+    point_mass.cumulatedSpeed += decceleration * dw;
+
+    Vector3D accDir = point_mass.cumulatedSpeed;
+    accDir.normalize();
+    point_mass.cumulatedSpeed = accDir * max(min(point_mass.cumulatedSpeed.norm(), point_mass.maxAcc), -point_mass.maxAcc);
+
+    point_mass.speed += point_mass.cumulatedSpeed * .00001;
+
+    Vector3D dir = point_mass.speed;
+    dir.normalize();
+    point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);
+
     point_mass.cumulatedSpeed = 0;
     point_mass.position += point_mass.speed ;
       // std::cout << isnan(point_mass.position.x) << endl;
