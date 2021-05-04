@@ -1,6 +1,8 @@
 #include <cmath>
 #include <glad/glad.h>
 
+
+#include <CGL/vector2D.h>
 #include <CGL/vector3D.h>
 #include <nanogui/nanogui.h>
 
@@ -44,6 +46,10 @@ Vector3D load_texture(int frame_idx, GLuint handle, const char* where) {
   return size_retval;
 }
 
+
+
+
+
 void load_cubemap(int frame_idx, GLuint handle, const std::vector<std::string>& file_locs) {
   glActiveTexture(GL_TEXTURE0 + frame_idx);
   glBindTexture(GL_TEXTURE_CUBE_MAP, handle);
@@ -63,6 +69,84 @@ void load_cubemap(int frame_idx, GLuint handle, const std::vector<std::string>& 
   }
 }
 
+bool FlockSimulator::loadOBJ(const char* path,
+    std::vector < Vector3D >& out_vertices,
+    std::vector < Vector2D >& out_uvs,
+    std::vector < Vector3D >& out_normals
+) {
+
+
+    std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
+    std::vector< Vector3D > temp_vertices;
+    std::vector< Vector2D > temp_uvs;
+    std::vector< Vector3D > temp_normals;
+
+    FILE* file = fopen(path, "r");
+    if (file == NULL) {
+        printf("Impossible to open the file !\n");
+        return false;
+    }
+
+
+    while (1) {
+
+        char lineHeader[128];
+        // read the first word of the line
+        int res = fscanf(file, "%s", lineHeader);
+        if (res == EOF)
+            break; // EOF = End Of File. Quit the loop.
+        // else : parse lineHeader
+        
+        if (strcmp(lineHeader, "v") == 0) {
+            
+            Vector3D vertex;
+            fscanf(file, " %lf %lf %lf\n", &vertex.x, &vertex.y, &vertex.z);
+            temp_vertices.push_back(vertex);
+            
+        }
+        else if (strcmp(lineHeader, "vt") == 0) {
+            Vector2D uv;
+            fscanf(file, "%lf %lf\n", &uv.x, &uv.y);
+            temp_uvs.push_back(uv);
+        }
+        else if (strcmp(lineHeader, "vn") == 0) {
+            Vector3D normal;
+            fscanf(file, "%lf %lf %lf\n", &normal.x, &normal.y, &normal.z);
+            temp_normals.push_back(normal);
+        }
+        else if (strcmp(lineHeader, "f") == 0) {
+            std::string vertex1, vertex2, vertex3;
+            unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
+            int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
+            if (matches != 9) {
+                printf("File can't be read by our simple parser : ( Try exporting with other options\n");
+                return false;
+            }
+            vertexIndices.push_back(vertexIndex[0]);
+            vertexIndices.push_back(vertexIndex[1]);
+            vertexIndices.push_back(vertexIndex[2]);
+            uvIndices.push_back(uvIndex[0]);
+            uvIndices.push_back(uvIndex[1]);
+            uvIndices.push_back(uvIndex[2]);
+            normalIndices.push_back(normalIndex[0]);
+            normalIndices.push_back(normalIndex[1]);
+            normalIndices.push_back(normalIndex[2]);
+        }
+    }
+
+    for (unsigned int i = 0; i < vertexIndices.size(); i++) {
+        unsigned int vertexIndex = vertexIndices[i];
+        Vector3D vertex = temp_vertices[vertexIndex - 1];
+        out_vertices.push_back(vertex);
+    }
+    for (unsigned int i = 0; i < normalIndices.size(); i++) {
+        std::cout << i << endl;
+        unsigned int normalIndex = normalIndices[i];
+        Vector3D normal = temp_normals[normalIndex - 1];
+        out_normals.push_back(normal);
+    }
+    std::cout << "end" << endl;
+}
 // TODO: change texture files and load them in this function.
 void FlockSimulator::load_textures() {
   glGenTextures(1, &m_gl_texture_1);
@@ -164,6 +248,14 @@ FlockSimulator::FlockSimulator(std::string project_root, Screen *screen)
   this->load_shaders();
   this->load_textures();
 
+  std::vector< Vector3D > vertices;
+  std::vector< Vector2D > uvs;
+  std::vector< Vector3D > normals; // Won't be used at the moment.
+  bool res = loadOBJ("../../../model/bird1.obj", vertices, uvs, normals);
+  this->bd_vertices = vertices;
+  this->bd_uvs = uvs;
+  this->bd_normals = normals;
+
   glEnable(GL_PROGRAM_POINT_SIZE);
   glEnable(GL_DEPTH_TEST);
 }
@@ -245,6 +337,8 @@ bool FlockSimulator::isAlive() { return is_alive; }
 void FlockSimulator::drawContents() {
   glEnable(GL_DEPTH_TEST);
 
+  
+
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
     Vector3D windDir = Vector3D(rand(), rand(), rand());
@@ -312,7 +406,30 @@ void FlockSimulator::drawContents() {
     co->render(shader);
   }
 }
+Matrix3x3 rotation_between_vectors_to_matrix(const Vector3D v1, const Vector3D v2)
+{
+    Matrix3x3 m1, m2;
 
+    Vector3D axis = cross(v1, v2);
+    axis.normalize();
+
+    /* construct 2 matrices */
+    m1[0] = v1;
+    m2[0] = v2;
+
+    m1[1] = axis;
+    m2[1] = axis;
+
+    m1[2] = cross(m1[1], m1[0]);
+    m2[2] = cross(m2[1], m2[0]);
+
+    /* calculate the difference between m1 and m2 */
+    m1 = m1.T();
+
+    Matrix3x3 matrix = m2 * m1;
+
+    return matrix;
+}
 void FlockSimulator::drawWireframe(GLShader &shader) {
   //Try to use triangle instead of line
   /*
@@ -434,12 +551,48 @@ void FlockSimulator::drawWireframe(GLShader &shader) {
   //  float r = pa.x;
   //  float g = pa.y;
   //  float b = pa.z;
-  //  shader.setUniform("u_color", nanogui::Color(r, g, b, 1.0f), false);
-  //  shader.uploadAttrib("in_position", positions, false);
+   //shader.setUniform("u_color", nanogui::Color(r, g, b, 1.0f), false);
+    //shader.uploadAttrib("in_position", positions, false);
   //  // Commented out: the wireframe shader does not have this attribute
   //  //shader.uploadAttrib("in_normal", normals);
-  //  shader.drawArray(GL_LINES, 0, num_springs);
+    //shader.drawArray(GL_LINES, 0, num_springs);
   //}
+
+    
+    int num_springs = bd_vertices.size();
+    int smaller = 0.1;
+
+    for (int i = 0; i < flock->point_masses.size(); i++) {
+        PointMass s = flock->point_masses[i];
+        MatrixXf positions(4, num_springs);
+        MatrixXf normalsmat(4, num_springs);
+        Vector3D pa = s.position;
+        Vector3D na = Vector3D();
+
+        Matrix3x3 rotate = rotation_between_vectors_to_matrix(Vector3D(0,0,-1), s.speed/ s.speed.norm());
+        for (int si = 0; si < num_springs; si++) {
+            Vector3D pos = pa + rotate * bd_vertices[si]/50.0;
+            Vector3D norm = na + rotate * bd_normals[si]/50.0;
+            positions.col(si) << pos.x, pos.y, pos.z, 1.0;
+            normalsmat.col(si) << norm.x, norm.y, norm.z, 0.0;
+        }
+
+        
+        shader.uploadAttrib("in_position", positions, false);
+        //shader.uploadAttrib("in_normal", normalsmat);
+        shader.drawArray(GL_LINES, 0, num_springs);
+    }
+
+
+    /*for (int i = 0; i += 1; i < vertices.size()) {
+
+    }
+    shader.uploadAttrib("in_position", vertices, false);*/
+
+    //shader.uploadAttrib("in_normal", normals, false);
+
+    //shader.drawArray(GL_TRIANGLES, 0, 10);
+
 }
 
 void FlockSimulator::drawNormals(GLShader &shader) {
