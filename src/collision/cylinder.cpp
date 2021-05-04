@@ -29,8 +29,8 @@ void Cylinder::render(GLShader &shader) {
   for(int i=0; i < slices; i++) { 
     MatrixXf positions(3, count);
     MatrixXf normals(3, count);
-    float theta = 2.0 * PI / ((float)i) ;
-    float nextTheta = 2.0 * PI / ((float)i+1);
+    float theta = 2.0 * PI * ((float)i) / slices;
+    float nextTheta = 2.0 * PI * ((float)i+1) / slices;
     Vector3f p1 = Vector3f(0.0, halfLength, 0.0);
     Vector3f p2 = Vector3f(radius*cos(theta), halfLength, radius*sin(theta));
     Vector3f p3 = Vector3f (radius*cos(nextTheta), halfLength, radius*sin(nextTheta));
@@ -65,7 +65,6 @@ void Cylinder::render(GLShader &shader) {
     if (shader.attrib("in_normal", false) != -1) {
       shader.uploadAttrib("in_normal", normals);
     }
-
     shader.drawArray(GL_TRIANGLE_STRIP, 0, count);
   }
   
