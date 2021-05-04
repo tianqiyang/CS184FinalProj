@@ -12,9 +12,10 @@ using namespace CGL;
 
 void Cylinder::collide(PointMass &pm) {
   // TODO (Part 3): Handle collisions with planes.
+  Vector3D normalv (1,1,1);
     if (dot(pm.last_position - point1, normal) * dot(pm.position - point1, normal) <= 0) {
-        Vector3D tangent_point1 = dot(point1 - pm.position, normal.unit()) * normal.unit() + pm.position;
-        double t = (dot(normal, point1) - dot(normal, pm.position)) / dot(normal, normal);
+        Vector3D tangent_point1 = dot(point1 - pm.position, normalv.unit()) * normalv.unit() + pm.position;
+        double t = (dot(normal, point1) - dot(normal, pm.position)) / dot(normalv, normalv);
         Vector3D tangent_point = pm.position + normal * t;
         Vector3D correction = (tangent_point + (SURFACE_OFFSET * normal)) - pm.last_position;
         pm.position = pm.last_position + correction * (1 - friction);
@@ -23,23 +24,31 @@ void Cylinder::collide(PointMass &pm) {
 
 void Cylinder::render(GLShader &shader) {
   nanogui::Color color(0.7f, 0.7f, 0.0f, 1.0f);
-  double halfLength = 1;
   int count = 6;
   for(int i=0; i < slices; i++) { 
     MatrixXf positions(3, count);
     MatrixXf normals(3, count);
     float theta = 2.0 * PI * ((float)i) / slices;
     float nextTheta = 2.0 * PI * ((float)i+1) / slices;
-    Vector3f p1 = Vector3f(point1.x, halfLength, point1.z);
-    Vector3f p2 = Vector3f(point1.x+radius*cos(theta), halfLength, point1.z + radius*sin(theta));
-    Vector3f p3 = Vector3f (point1.x+radius*cos(nextTheta), halfLength, point1.z + radius*sin(nextTheta));
-    Vector3f p4 = Vector3f(point1.x+radius*cos(nextTheta), -halfLength, point1.z + radius*sin(nextTheta));
+    Vector3f p1 = Vector3f(point1.x, halfLength + point1.y, point1.z);
+    Vector3f p2 = Vector3f(point1.x+radius*cos(theta), halfLength + point1.y, point1.z + radius*sin(theta));
+    Vector3f p3 = Vector3f (point1.x+radius*cos(nextTheta), halfLength + point1.y, point1.z + radius*sin(nextTheta));
+    Vector3f p4 = Vector3f(point1.x+radius*cos(nextTheta), -halfLength , point1.z + radius*sin(nextTheta));
     Vector3f p5= Vector3f(point1.x+radius*cos(theta), -halfLength, point1.z + radius*sin(theta));
     Vector3f p6= Vector3f(point1.x, -halfLength, point1.z);
 
     Vector3f n1 = Vector3f(cos(theta), 0.0, sin(theta));
     Vector3f n2 = Vector3f(1.0, 0.0, 0.0);
-
+    if (normal == 0) {
+      p1 = Vector3f(p1[0], -p1[2], p1[1]);
+      p2 = Vector3f(p2[0], -p2[2], p2[1]);
+      p3 = Vector3f(p3[0], -p3[2], p3[1]);
+      p4 = Vector3f(p4[0], -p4[2], p4[1]);
+      p5 = Vector3f(p5[0], -p5[2], p5[1]);
+      p6 = Vector3f(p6[0], -p6[2], p6[1]);
+      n1 = Vector3f(cos(theta), 1.0, sin(theta));
+      n2 = Vector3f(1.0, 0.0, 0.0);
+    }
     positions.col(0) << p1;
     positions.col(1) << p2;
     positions.col(2) << p3;

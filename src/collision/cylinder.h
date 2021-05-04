@@ -12,14 +12,14 @@ using namespace std;
 
 struct Cylinder : public CollisionObject {
 public:
-  Cylinder(const Vector3D &point1, const Vector3D &normal, double radius, double halfLength, int slices, double friction)
+  Cylinder(const Vector3D &point1, int normal, double radius, double halfLength, int slices, double friction)
       : point1(point1), normal(normal), radius(radius), halfLength(halfLength), slices(slices), friction(friction) {}
 
   void render(GLShader &shader);
   void collide(PointMass &pm);
 
   Vector3D point1;
-  Vector3D normal;
+  int normal;
   double radius;
   double halfLength;
   int slices;
