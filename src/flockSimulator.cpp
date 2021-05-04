@@ -952,7 +952,7 @@ void FlockSimulator::initGUI(Screen *screen) {
     ib->setValue(flock->num_birds);
     ib->setUnits(" ");
     ib->setSpinnable(true);
-    ib->setMinValue(0);
+    ib->setMinValue(2);
     ib->setCallback([this](int value) { fp->num_birds = value; });
   }
 

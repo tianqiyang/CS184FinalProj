@@ -85,6 +85,13 @@ vector<vector<PointMass*>> Flock::getNeighbours(PointMass pm, vector<double> ran
     }
     return vecs;
 }
+Vector3D normalizeForce(Vector3D acceleration) {
+    acceleration.normalize();
+    double clampAcc = CGL::clamp(acceleration.norm(), 0.0, .000001);
+ 
+    return acceleration * clampAcc;
+}
+
 
 void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParameters *fp,
                      vector<Vector3D> external_accelerations,
@@ -114,54 +121,60 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   }
 
 
-  double cw, sw, aw, fw, dw;
-  double fweight = 30.;
-  double dweight = 10.;
-  double sum = coherence_weight + separation_weight + alignment_weight + fweight + dweight;
+  double cw, sw, aw, dw;
+  double dweight = 5.;
+  double sum = coherence_weight + separation_weight + alignment_weight + dweight;
   cw = coherence_weight / sum;
   sw = separation_weight / sum;
   aw = alignment_weight / sum;
-  fw = fweight / sum;
   dw = dweight / sum;
   for (PointMass& point_mass : point_masses) {
       vector<double> pars = vector<double>({ fp->coherence, fp->separation, fp->alignment });
       vector<vector<PointMass*>> vecs = getNeighbours(point_mass, pars);
       Vector3D goal = Vector3D();
-      for (PointMass* npm : vecs[0]) {
-          goal = goal + npm->position;       
+
+      if (following) {
+
+        double newCenterX = cursor.position.x * point_masses.size() - point_mass.position.x;
+        double newCenterY = cursor.position.y * point_masses.size() - point_mass.position.y;
+        double newCenterZ = cursor.position.z * point_masses.size() - point_mass.position.z;
+        Vector3D newCenter = Vector3D(newCenterX, newCenterY, newCenterZ) / (point_masses.size() - 1);
+        Vector3D goal = (newCenter - point_mass.position);
+        point_mass.cumulatedSpeed += goal * cw;
+          
+
       }
-      if (vecs[0].size() != 0) {
-          goal = goal / vecs[0].size();
+      else {
+          for (PointMass* npm : vecs[0]) {
+              goal = goal + npm->position;
+          }
+          if (vecs[0].size() != 0) {
+              goal = goal / vecs[0].size();
+          }
+          point_mass.cumulatedSpeed += (goal - point_mass.position) * cw;
+
       }
-      point_mass.cumulatedSpeed += (goal - point_mass.position) * cw;
       goal = Vector3D();
       for (PointMass* npm : vecs[1]) {
-          goal = goal + npm->position;
+          Vector3D sep = (point_mass.position - npm->position);
+     
+          goal += sep;
       }
       if (vecs[1].size() != 0) {
           goal = goal / vecs[1].size();
       }
-      point_mass.cumulatedSpeed += (point_mass.position - goal) * sw;
+      point_mass.cumulatedSpeed += goal * sw;
       goal = Vector3D();
       for (PointMass* npm : vecs[2]) {
           goal = goal + npm->speed; 
       }
-      if (vecs[2].size() != 0) {
-          goal = goal / vecs[2].size();
-      }
-      point_mass.cumulatedSpeed += (goal - point_mass.speed) * aw;
 
+      point_mass.cumulatedSpeed += goal * aw;
 
   }
   
   
-  if (following) {
-      
-      for (PointMass &p : point_masses) {
-          Vector3D dir = (cursor.position - p.position);
-          p.cumulatedSpeed += dir * fw;
-      }
-  }
+  
 
 
   for (PointMass &point_mass: point_masses) {
@@ -182,17 +195,17 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     }
 
 
-    point_mass.cumulatedSpeed += decceleration * dw;
+    point_mass.cumulatedSpeed += (decceleration) * dw;
 
     Vector3D accDir = point_mass.cumulatedSpeed;
     accDir.normalize();
-    point_mass.cumulatedSpeed = accDir * max(min(point_mass.cumulatedSpeed.norm(), point_mass.maxAcc), -point_mass.maxAcc);
+    point_mass.cumulatedSpeed = accDir * CGL::clamp(point_mass.cumulatedSpeed.norm(), point_mass.minAcc, point_mass.maxAcc) * 0.00001;
 
-    point_mass.speed += point_mass.cumulatedSpeed * .00001;
+    point_mass.speed += point_mass.cumulatedSpeed;
 
     Vector3D dir = point_mass.speed;
     dir.normalize();
-    point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);
+    point_mass.speed = dir * CGL::clamp(point_mass.speed.norm(), point_mass.minSpeed, point_mass.maxSpeed);
 
     point_mass.cumulatedSpeed = 0;
     point_mass.position += point_mass.speed ;
