@@ -48,7 +48,7 @@ struct Flock {
 
   void simulate(double frames_per_sec, double simulation_steps, FlockParameters *fp,
                 vector<Vector3D> external_accelerations,
-                vector<CollisionObject *> *collision_objects, Vector3D windDir);
+                vector<CollisionObject *> *collision_objects, Vector3D windDir, bool is_stopped);
   vector<PointMass> getNeighbours(PointMass pm, double range);
   vector<vector<PointMass*>> getNeighbours(PointMass pm, vector<double> range);
   void reset();

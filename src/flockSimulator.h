@@ -136,6 +136,7 @@ private:
   // Simulation flags
 
   bool is_paused = true;
+  bool is_stopped = false;
 
   // Screen attributes
 
