@@ -44,6 +44,7 @@ struct PointMass {
     // position to stop on the bar if "S" is pressed
     Vector3D rand_stop_pos;
     bool able_stop;
+    int branch;
 };
 
 #endif /* POINTMASS_H */

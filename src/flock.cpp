@@ -63,6 +63,7 @@ void Flock::buildGrid()
   {
     PointMass pm = PointMass(generatePos(), false);
     pm.able_stop = (rand() % 10 / 10 < STOP_RATE);
+    pm.branch = rand() % 6;
     initializeSpeed(&pm);
     point_masses.emplace_back(pm);
   }
@@ -124,6 +125,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
 {
   // need more birds
   Cylinder *cylinder = dynamic_cast<Cylinder *>(collision_objects->at(0));
+  vector<vector<Vector3f> > stopLine = cylinder->stopLine;
   if (fp->num_birds > point_masses.size())
   {
     int num = fp->num_birds;
@@ -159,7 +161,11 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   {
     // if "S" is not pressed or bird is not within 0.5 distance from bar, not affected by
     // stopping behavior
-    if (!is_stopped)
+    vector<Vector3f> line = stopLine[point_mass.branch];
+    Vector3D a(line[0][0], line[0][1], line[0][2]);
+    Vector3D b(line[1][0], line[1][1], line[1][2]);
+    double dis = cylinder->computeDistance(point_mass.position, a, b);
+    if (!is_stopped || dis > 0.5)
     {
       vector<double> pars = vector<double>({fp->coherence, fp->separation, fp->alignment});
       vector<vector<PointMass *> > vecs = getNeighbours(point_mass, pars);
@@ -209,7 +215,11 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   {
     // if "S" is not pressed or bird is not within 0.5 distance from bar, not affected by
     // stopping behavior
-    if (!is_stopped)
+    vector<Vector3f> line = stopLine[point_mass.branch];
+    Vector3D a(line[0][0], line[0][1], line[0][2]);
+    Vector3D b(line[1][0], line[1][1], line[1][2]);
+    double dis = cylinder->computeDistance(point_mass.position, a, b);
+    if (!is_stopped || dis > 0.5)
     {
       /*Vector3D dir = point_mass.speed;
         dir.normalize();
@@ -254,18 +264,16 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       }
     }
   }
-  vector<vector<Vector3f> > stopLine = cylinder->stopLine;
 
   for (PointMass &point_mass : point_masses)
   {
     if (is_stopped)
     {
-      int index = rand() % stopLine.size();
-      vector<Vector3f> line = stopLine[index];
+      vector<Vector3f> line = stopLine[point_mass.branch];
       Vector3D a(line[0][0], line[0][1], line[0][2]);
       Vector3D b(line[1][0], line[1][1], line[1][2]);
       double dis = cylinder->computeDistance(point_mass.position, a, b);
-      if (true)
+      if (dis < 0.5)
       {
         if (point_mass.rand_stop_pos == NULL)
         {
