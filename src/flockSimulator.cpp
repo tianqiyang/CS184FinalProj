@@ -96,13 +96,13 @@ bool FlockSimulator::loadOBJ(const char* path,
         if (res == EOF)
             break; // EOF = End Of File. Quit the loop.
         // else : parse lineHeader
-        
+
         if (strcmp(lineHeader, "v") == 0) {
-            
+
             Vector3D vertex;
             fscanf(file, " %lf %lf %lf\n", &vertex.x, &vertex.y, &vertex.z);
             temp_vertices.push_back(vertex);
-            
+
         }
         else if (strcmp(lineHeader, "vt") == 0) {
             Vector2D uv;
@@ -140,6 +140,7 @@ bool FlockSimulator::loadOBJ(const char* path,
         out_vertices.push_back(vertex);
     }
     for (unsigned int i = 0; i < normalIndices.size(); i++) {
+
         unsigned int normalIndex = normalIndices[i];
         Vector3D normal = temp_normals[normalIndex - 1];
         out_normals.push_back(normal);
@@ -256,7 +257,7 @@ FlockSimulator::FlockSimulator(std::string project_root, Screen *screen)
   std::vector< Vector3D > vertices;
   std::vector< Vector2D > uvs;
   std::vector< Vector3D > normals; // Won't be used at the moment.
-  bool res = loadOBJ("../../../model/bird1.obj", vertices, uvs, normals);
+  bool res = loadOBJ("../../../model/bird2.obj", vertices, uvs, normals);
   this->bd_vertices = vertices;
   this->bd_uvs = uvs;
   this->bd_normals = normals;
@@ -342,7 +343,7 @@ bool FlockSimulator::isAlive() { return is_alive; }
 void FlockSimulator::drawContents() {
   glEnable(GL_DEPTH_TEST);
 
-  
+
 
   if (!is_paused) {
     vector<Vector3D> external_accelerations = {gravity};
@@ -356,7 +357,7 @@ void FlockSimulator::drawContents() {
   // Bind the active shader
 
   const UserShader& active_shader = shaders[active_shader_idx];
-  
+
   GLShader &shader = *active_shader.nanogui_shader;
   shader.bind();
 
@@ -441,7 +442,7 @@ void FlockSimulator::drawBird(PointMass &pm, GLShader &shader, ShaderTypeHint st
     int num_springs = bd_vertices.size();
     double smaller = 0.02;
 
-    
+
     MatrixXf positions(4, num_springs);
     MatrixXf normalsmat(4, num_springs);
     MatrixXf uvs(2, num_springs);
@@ -470,9 +471,9 @@ void FlockSimulator::drawBird(PointMass &pm, GLShader &shader, ShaderTypeHint st
         shader.uploadAttrib("in_uv", uvs, false);
         shader.uploadAttrib("in_tangent", tangents, false);
     }
-    
+
     shader.drawArray(GL_TRIANGLES, 0, num_springs);
-    
+
 }
 
 void FlockSimulator::drawWireframe(GLShader &shader) {
@@ -603,7 +604,7 @@ void FlockSimulator::drawWireframe(GLShader &shader) {
     //shader.drawArray(GL_LINES, 0, num_springs);
   //}
 
-    
+
     for (int i = 0; i < flock->point_masses.size(); i++) {
         PointMass pm = (flock->point_masses[i]);
         drawBird(pm, shader, WIREFRAME);
@@ -674,7 +675,7 @@ void FlockSimulator::drawNormals(GLShader &shader) {
 }
 
 void FlockSimulator::drawPhong(GLShader &shader) {
-    
+
     for (int i = 0; i < flock->point_masses.size(); i++) {
         PointMass pm = (flock->point_masses[i]);
         drawBird(pm, shader, PHONG);
@@ -853,7 +854,7 @@ bool FlockSimulator::keyCallbackEvent(int key, int scancode, int action,
     case 'e':
     case 'E':
       enable_following = !enable_following;
-      
+
       flock->following = !flock->following;
       break;
     case 'n':
@@ -932,7 +933,7 @@ void FlockSimulator::initGUI(Screen *screen) {
   new Label(window, "Flock Parameters", "sans-bold");
 
   {
-    
+
     Widget *panel = new Widget(window);
     GridLayout *layout =
         new GridLayout(Orientation::Horizontal, 2, Alignment::Middle, 5, 5);
@@ -1064,7 +1065,7 @@ void FlockSimulator::initGUI(Screen *screen) {
       fb->setMaxValue(flock->y);
       fb->setCallback([this](float value) { flock->cursor.position.y = value; });
 
-      
+
 
       new Label(panel, "z :", "sans-bold");
 
