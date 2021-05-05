@@ -233,7 +233,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
 
         point_mass.cumulatedSpeed = 0;
         for (CollisionObject *collision_object : *collision_objects) {
-        collision_object->collide(point_mass);
+          collision_object->collide(point_mass);
         }
         point_mass.position += point_mass.speed ;
           // std::cout << isnan(point_mass.position.x) << endl;

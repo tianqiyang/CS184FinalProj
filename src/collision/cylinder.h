@@ -24,6 +24,7 @@ public:
   vector<double> halfLength;
   int slices;
   double friction;
+  vector<vector<Vector3f> > stopLine;
 };
 
 #endif /* COLLISIONOBJECT_CYLINDER_H */

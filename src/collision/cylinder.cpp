@@ -90,6 +90,7 @@ void Cylinder::render(GLShader &shader)
     vector<double> rotate = rotates[index];
     double r = radius[index];
     double l = halfLength[index];
+    Vector3f top = Vector3f(0, 0, 0), bot = Vector3f(0, 0, 0);
     for (int i = 0; i < slices; i++)
     {
       MatrixXf positions(3, 6);
@@ -113,6 +114,14 @@ void Cylinder::render(GLShader &shader)
       Vector3f p6 = convert(m2, convert(m1, Vector3f(0.0, -l, 0.0))) + base;
       Vector3f n1 = convert(m2, convert(m1, Vector3f(cos(theta), 0.0, sin(theta))));
       Vector3f n2 = convert(m2, convert(m1, Vector3f(0.0, 1.0, 0.0)));
+      if (p2[1] > top[1]) {
+        top = p2;
+        bot = p5;
+      }
+      if (p3[1] > top[1]) {
+        top = p3;
+        bot = p4;
+      }
       positions.col(0) << p1;
       positions.col(1) << p2;
       positions.col(2) << p3;
@@ -141,5 +150,11 @@ void Cylinder::render(GLShader &shader)
       }
       shader.drawArray(GL_TRIANGLE_STRIP, 0, 6);
     }
+    if (index != 0) { // not add the first cylinder which is the body of the tree
+      vector<nanogui::Vector3f> temp2{top, bot};
+      stopLine.push_back(temp2);
+    }
+    // cout << "point " << index << " top: x: " << top[0] << " y: " << top[1] << " z: " << top[2] << endl;
+    // cout << "point " << index << " bot: x: " << bot[0] << " y: " << bot[1] << " z: " << bot[2] << endl;
   }
 }
