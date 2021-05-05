@@ -42,16 +42,31 @@ Vector3D Flock::generatePos() {
     return Vector3D(x, y, z);
 }
 
+void initializeSpeed(PointMass* pm) {
+    double sx, sy, sz;
+    sx = -pm->maxSpeed + rand() / (RAND_MAX / (pm->maxSpeed + pm->maxSpeed));
+    sy = -pm->maxSpeed + rand() / (RAND_MAX / (pm->maxSpeed + pm->maxSpeed));
+    sz = -pm->maxSpeed + rand() / (RAND_MAX / (pm->maxSpeed + pm->maxSpeed));
+    pm->speed = Vector3D(sx, sy, sz);
+    Vector3D dir = pm->speed;
+    dir.normalize();
+    pm->speed = dir * CGL::clamp(pm->speed.norm(), pm->minSpeed, pm->maxSpeed);
+}
+
 void Flock::buildGrid()
 {
 
   for (int i = 0; i < num_birds; i += 1) {
-      point_masses.emplace_back(PointMass(generatePos(), false));
+
+    PointMass pm = PointMass(generatePos(), false);
+    initializeSpeed(&pm);
+    point_masses.emplace_back(pm);
   }
 
   PointMass *a;
   for (int i = 0; i < point_masses.size(); i++) {
     a = &point_masses[i];
+    point_masses[i].rand_stop_pos=NULL;
     birds.emplace_back(Bird(a));
   }
   
@@ -96,127 +111,166 @@ Vector3D normalizeForce(Vector3D acceleration) {
 void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParameters *fp,
                      vector<Vector3D> external_accelerations,
                      vector<CollisionObject *> *collision_objects,
-                     Vector3D windDir)
+                     Vector3D windDir, bool is_stopped)
 {
-    
-  // need more birds
-  if (fp->num_birds > point_masses.size()) {
-    int num = fp->num_birds;
-    for (int i = point_masses.size(); i < num; i += 1) {
-      point_masses.emplace_back(PointMass(generatePos(), false));
-      // a = &point_masses[i];
-      // birds.emplace_back(Bird(a));
-    }
-    PointMass *a;
-    for (int i = point_masses.size(); i < num; i += 1) {
-      a = &point_masses[i];
-      birds.emplace_back(Bird(a));
-    }
-  } else if (fp->num_birds < point_masses.size()) { // remove extra birds
-    int extra = point_masses.size() - fp->num_birds;
-    for (int i = 0; i < extra; i += 1) { 
-      point_masses.pop_back();
-      birds.pop_back();
-    }
-  }
-
-
-  double cw, sw, aw, dw;
-  double dweight = 5.;
-  double sum = coherence_weight + separation_weight + alignment_weight + dweight;
-  cw = coherence_weight / sum;
-  sw = separation_weight / sum;
-  aw = alignment_weight / sum;
-  dw = dweight / sum;
-  for (PointMass& point_mass : point_masses) {
-      vector<double> pars = vector<double>({ fp->coherence, fp->separation, fp->alignment });
-      vector<vector<PointMass*>> vecs = getNeighbours(point_mass, pars);
-      Vector3D goal = Vector3D();
-
-      if (following) {
-
-        double newCenterX = cursor.position.x * point_masses.size() - point_mass.position.x;
-        double newCenterY = cursor.position.y * point_masses.size() - point_mass.position.y;
-        double newCenterZ = cursor.position.z * point_masses.size() - point_mass.position.z;
-        Vector3D newCenter = Vector3D(newCenterX, newCenterY, newCenterZ) / (point_masses.size() - 1);
-        Vector3D goal = (newCenter - point_mass.position);
-        point_mass.cumulatedSpeed += goal * cw;
-          
-
+    // need more birds
+    if (fp->num_birds > point_masses.size()) {
+      int num = fp->num_birds;
+      for (int i = point_masses.size(); i < num; i += 1) {
+        point_masses.emplace_back(PointMass(generatePos(), false));
+        // a = &point_masses[i];
+        // birds.emplace_back(Bird(a));
       }
-      else {
-          for (PointMass* npm : vecs[0]) {
-              goal = goal + npm->position;
+      PointMass *a;
+      for (int i = point_masses.size(); i < num; i += 1) {
+        a = &point_masses[i];
+        birds.emplace_back(Bird(a));
+      }
+    } else if (fp->num_birds < point_masses.size()) { // remove extra birds
+      int extra = point_masses.size() - fp->num_birds;
+      for (int i = 0; i < extra; i += 1) {
+        point_masses.pop_back();
+        birds.pop_back();
+      }
+    }
+
+    double cw, sw, aw, dw;
+    double dweight = 5.;
+    double sum = coherence_weight + separation_weight + alignment_weight + dweight;
+    cw = coherence_weight / sum;
+    sw = separation_weight / sum;
+    aw = alignment_weight / sum;
+    dw = dweight / sum;
+    for (PointMass& point_mass : point_masses) {
+      // check if bird is within 0.5 distance from bar
+      double z_diff = point_mass.position.z;
+      if (z_diff > 0.9) {
+        z_diff = point_mass.position.z-0.9;
+      } else if (z_diff < -0.5) {
+        z_diff = -1 * (point_mass.position.z+0.5);
+      }
+      double x_diff = point_mass.position.x - 1;
+      double y_diff = point_mass.position.y - 0.63;
+      // if "S" is not pressed or bird is not within 0.5 distance from bar, not affected by
+      // stopping behavior
+      if (!is_stopped || pow(pow(x_diff,2) + pow(y_diff,2) + pow(z_diff,2),2) > 0.05) {
+          vector<double> pars = vector<double>({ fp->coherence, fp->separation, fp->alignment });
+          vector<vector<PointMass*>> vecs = getNeighbours(point_mass, pars);
+          Vector3D goal = Vector3D();
+          if (following) {
+            double newCenterX = cursor.position.x * point_masses.size() - point_mass.position.x;
+            double newCenterY = cursor.position.y * point_masses.size() - point_mass.position.y;
+            double newCenterZ = cursor.position.z * point_masses.size() - point_mass.position.z;
+            Vector3D newCenter = Vector3D(newCenterX, newCenterY, newCenterZ) / (point_masses.size() - 1);
+            Vector3D goal = (newCenter - point_mass.position);
+            point_mass.cumulatedSpeed += goal * cw;
           }
-          if (vecs[0].size() != 0) {
-              goal = goal / vecs[0].size();
+          else {
+              for (PointMass* npm : vecs[0]) {
+                  goal = goal + npm->position;
+              }
+              if (vecs[0].size() != 0) {
+                  goal = goal / vecs[0].size();
+              }
+              point_mass.cumulatedSpeed += (goal - point_mass.position) * cw;
           }
-          point_mass.cumulatedSpeed += (goal - point_mass.position) * cw;
-
+          goal = Vector3D();
+          for (PointMass* npm : vecs[1]) {
+              Vector3D sep = (point_mass.position - npm->position);
+              goal += sep;
+          }
+          if (vecs[1].size() != 0) {
+              goal = goal / vecs[1].size();
+          }
+          point_mass.cumulatedSpeed += goal * sw;
+          goal = Vector3D();
+          for (PointMass* npm : vecs[2]) {
+              goal = goal + npm->speed;
+          }
+          point_mass.cumulatedSpeed += goal * aw;
       }
-      goal = Vector3D();
-      for (PointMass* npm : vecs[1]) {
-          Vector3D sep = (point_mass.position - npm->position);
-     
-          goal += sep;
-      }
-      if (vecs[1].size() != 0) {
-          goal = goal / vecs[1].size();
-      }
-      point_mass.cumulatedSpeed += goal * sw;
-      goal = Vector3D();
-      for (PointMass* npm : vecs[2]) {
-          goal = goal + npm->speed; 
-      }
-
-      point_mass.cumulatedSpeed += goal * aw;
-
-  }
-  
-  
-  
-
-
-  for (PointMass &point_mass: point_masses) {
-    
-    /*Vector3D dir = point_mass.speed;
-    dir.normalize();
-    point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);*/
-    Vector3D decceleration = Vector3D(0,0,0); 
-    
-    if (point_mass.position.x > x  || point_mass.position.x < -x ) { // random bounce to -random, random, random
-        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
-    }
-    if (point_mass.position.y > y || point_mass.position.y < -y) { // random bounce to random, -random, random
-        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
-    }
-    if (point_mass.position.z > z || point_mass.position.z < 1 ) { // random bounce to random, random, -random
-        decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
     }
 
+    for (PointMass &point_mass: point_masses) {
+      // check if bird is within 0.5 distance from bar
+      double z_diff = point_mass.position.z;
+      if (z_diff > 0.9) {
+        z_diff = point_mass.position.z-0.9;
+      } else if (z_diff < -0.5) {
+        z_diff = -1 * (point_mass.position.z+0.5);
+      }
+      double x_diff = point_mass.position.x - 1;
+      double y_diff = point_mass.position.y - 0.63;
+      // if "S" is not pressed or bird is not within 0.5 distance from bar, not affected by
+      // stopping behavior
+      if (!is_stopped || pow(pow(x_diff,2) + pow(y_diff,2) + pow(z_diff,2),2) > 0.05) {
+        /*Vector3D dir = point_mass.speed;
+        dir.normalize();
+        point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);*/
+        Vector3D decceleration = Vector3D(0,0,0);
+        
+        if (point_mass.position.x > x  || point_mass.position.x < 0 ) { // random bounce to -random, random, random
+            decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
+        }
+        if (point_mass.position.y > y || point_mass.position.y < 0) { // random bounce to random, -random, random
+            decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
+        }
+        if (point_mass.position.z > z || point_mass.position.z < 0 ) { // random bounce to random, random, -random
+            decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
+        }
 
-    point_mass.cumulatedSpeed += (decceleration) * dw;
+        point_mass.cumulatedSpeed += (decceleration) * dw;
 
-    Vector3D accDir = point_mass.cumulatedSpeed;
-    accDir.normalize();
-    point_mass.cumulatedSpeed = accDir * CGL::clamp(point_mass.cumulatedSpeed.norm(), point_mass.minAcc, point_mass.maxAcc) * 0.00001;
+        Vector3D accDir = point_mass.cumulatedSpeed;
+        accDir.normalize();
+        point_mass.cumulatedSpeed = accDir * CGL::clamp(point_mass.cumulatedSpeed.norm(), point_mass.minAcc, point_mass.maxAcc) * 0.00001;
 
-    point_mass.speed += point_mass.cumulatedSpeed;
+        point_mass.speed += point_mass.cumulatedSpeed;
 
-    Vector3D dir = point_mass.speed;
-    dir.normalize();
-    point_mass.speed = dir * CGL::clamp(point_mass.speed.norm(), point_mass.minSpeed, point_mass.maxSpeed);
+        Vector3D dir = point_mass.speed;
+        dir.normalize();
+        point_mass.speed = dir * CGL::clamp(point_mass.speed.norm(), point_mass.minSpeed, point_mass.maxSpeed);
 
-    point_mass.cumulatedSpeed = 0;
-    for (CollisionObject *collision_object : *collision_objects) {
+        point_mass.cumulatedSpeed = 0;
+        for (CollisionObject *collision_object : *collision_objects) {
         collision_object->collide(point_mass);
+        }
+        point_mass.position += point_mass.speed ;
+          // std::cout << isnan(point_mass.position.x) << endl;
+        if (isnan(point_mass.position.x)) {
+          point_mass = PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false);
+
+        }
+      }
     }
-    point_mass.position += point_mass.speed ;
-      // std::cout << isnan(point_mass.position.x) << endl;
-    if (isnan(point_mass.position.x)) {
-      point_mass = PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false);
+  
+    for (PointMass &point_mass : point_masses) {
+      if (is_stopped) {
+        // check if bird is within 0.5 distance from bar
+        double z_diff = point_mass.position.z;
+        if (z_diff > 0.9) {
+          z_diff = point_mass.position.z-0.9;
+        } else if (z_diff < -0.5) {
+          z_diff = -1 * (point_mass.position.z+0.5);
+        }
+        double x_diff = point_mass.position.x - 1;
+        double y_diff = point_mass.position.y - 0.63;
+        // if "S" is pressed and bird is within 0.5 distance from bar -> stop on the bar
+        if (pow(pow(x_diff,2) + pow(y_diff,2) + pow(z_diff,2),2) < 0.05) {
+          if (point_mass.rand_stop_pos==NULL) {
+            // one end: 1, 0.63, -0.5, another end: 1, 0.63, 0.9.
+            // random position on the bar.
+            double x = (double)(rand() % 100) / 100.;
+            Vector3D line = Vector3D(1, 0.63, x * 1.4 - 0.5);
+            point_mass.rand_stop_pos = line;
+          }
+          point_mass.position += 0.0005 * (point_mass.rand_stop_pos - point_mass.position);
+        }
+      } else {
+        // if "S" pressed for second time, clear random stop position
+        point_mass.rand_stop_pos = NULL;
+      }
     }
-  }
 }
 
  Vector3D Flock::accelerationAgainstWall(double distance, Vector3D direction) {
@@ -299,8 +353,8 @@ void Flock::reset()
   PointMass *pm = &point_masses[0];
   for (int i = 0; i < point_masses.size(); i++)
   {
-    pm->cumulatedSpeed = 0;
-    pm->speed = 0;
+    pm->cumulatedSpeed = Vector3D();
+    initializeSpeed(pm);
     pm->position = pm->start_position;
     pm->last_position = pm->start_position;
     pm++;
