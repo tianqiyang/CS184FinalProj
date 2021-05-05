@@ -39,21 +39,31 @@ void Cylinder::collide(PointMass &pm) {
   bz1 = nextP.z - .02;
   bz2 = nextP.z + .02;
 
-  if (ax2 > bx1 || ax1 < bx2) { // overlap in x plane
-    speed.x = 0;
+  // wrong boundary
+  // bx1 = min(pm.position.x, nextP.x) - birdRadius;
+  // bx2 = max(pm.position.x, nextP.x) + birdRadius;
+  // by1 = min(pm.position.y, nextP.y) - birdRadius;
+  // by2 = max(pm.position.y, nextP.y) + birdRadius;
+  // bz1 = min(pm.position.z, nextP.z) - birdRadius;
+  // bz2 = max(pm.position.z, nextP.z) + birdRadius;
+  // if (ax2 > bx1 || ax1 < bx2) { // overlap in x plane
+  //   speed.x = 0;
+  // }
+  // if (ay2 > by1 || ay1 < by2) {
+  //   speed.y = 0;
+  // }
+  // if (az2 > bz1 || az1 < bz2) {
+  //   speed.z = 0;
+  // }
+  if (ax2 > bx1 && ax1 < bx2 && ay2 > by1 && ay1 < by2 && az2 > bz1 || az1 < bz2) {
+    pm.speed *= -1.;
   }
-  if (ay2 > by1 || ay1 < by2) {
-    speed.y = 0;
-  }
-  if (az2 > bz1 || az1 < bz2) {
-    speed.z = 0;
-  }
-  double length = speed.norm();
-  if (length == 0) { // they are overlapped in 3d
-    pm.speed *= -1.;  
-  } else {
+  // double length = speed.norm();
+  // if (length == 0) { // they are overlapped in 3d
+    // TODO: find the perpendicular to c
+  // } else {
+  // }
     pm.speed = speed;
-  }
 }
 
 void Cylinder::render(GLShader &shader) {
