@@ -11,6 +11,7 @@
 
 using namespace std;
 
+double STOP_RATE = 0.8;
 Flock::Flock(double width, double height, int num_width_points,
              int num_height_points, float thickness)
 {
@@ -61,6 +62,7 @@ void Flock::buildGrid()
   for (int i = 0; i < num_birds; i += 1)
   {
     PointMass pm = PointMass(generatePos(), false);
+    pm.able_stop = (rand() % 10 / 10 < STOP_RATE);
     initializeSpeed(&pm);
     point_masses.emplace_back(pm);
   }
@@ -214,11 +216,11 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
         point_mass.speed = dir * max(min(point_mass.speed.norm(), point_mass.maxSpeed), -point_mass.maxSpeed);*/
       Vector3D decceleration = Vector3D(0, 0, 0);
 
-      if (point_mass.position.x > x || point_mass.position.x < 0)
+      if (point_mass.position.x > x || point_mass.position.x < -x)
       { // random bounce to -random, random, random
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
       }
-      if (point_mass.position.y > y || point_mass.position.y < 0)
+      if (point_mass.position.y > y || point_mass.position.y < -y)
       { // random bounce to random, -random, random
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
       }
@@ -259,7 +261,6 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     if (is_stopped)
     {
       int index = rand() % stopLine.size();
-      // index = 0;
       vector<Vector3f> line = stopLine[index];
       Vector3D a(line[0][0], line[0][1], line[0][2]);
       Vector3D b(line[1][0], line[1][1], line[1][2]);
@@ -272,7 +273,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
           point_mass.rand_stop_pos = a + (b - a) * x;
           point_mass.rand_stop_pos[1] += 0.02;
         }
-        point_mass.position += 0.001 * (point_mass.rand_stop_pos - point_mass.position);
+        point_mass.position += 0.00025 * (point_mass.rand_stop_pos - point_mass.position);
       }
     }
     else
