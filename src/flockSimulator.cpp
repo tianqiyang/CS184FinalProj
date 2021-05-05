@@ -140,7 +140,7 @@ bool FlockSimulator::loadOBJ(const char* path,
         out_vertices.push_back(vertex);
     }
     for (unsigned int i = 0; i < normalIndices.size(); i++) {
-        std::cout << i << endl;
+        
         unsigned int normalIndex = normalIndices[i];
         Vector3D normal = temp_normals[normalIndex - 1];
         out_normals.push_back(normal);
@@ -251,7 +251,7 @@ FlockSimulator::FlockSimulator(std::string project_root, Screen *screen)
   std::vector< Vector3D > vertices;
   std::vector< Vector2D > uvs;
   std::vector< Vector3D > normals; // Won't be used at the moment.
-  bool res = loadOBJ("../../../model/bird1.obj", vertices, uvs, normals);
+  bool res = loadOBJ("../../../model/bird2.obj", vertices, uvs, normals);
   this->bd_vertices = vertices;
   this->bd_uvs = uvs;
   this->bd_normals = normals;
