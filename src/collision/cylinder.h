@@ -12,6 +12,7 @@ using namespace std;
 
 struct Cylinder : public CollisionObject {
 public:
+  Cylinder();
   Cylinder(const vector<Vector3D> &points, const vector<vector<double> > &rotates, const vector<double> &radius, const vector<double> &halfLength, int slices, double friction)
       : points(points), rotates(rotates), radius(radius), halfLength(halfLength), slices(slices), friction(friction) {}
 
@@ -25,6 +26,9 @@ public:
   int slices;
   double friction;
   vector<vector<Vector3f> > stopLine;
+
+  Vector3D getProjected(Vector3D A, Vector3D B, Vector3D C);
+  double computeDistance(Vector3D A, Vector3D B, Vector3D C);
 };
 
 #endif /* COLLISIONOBJECT_CYLINDER_H */

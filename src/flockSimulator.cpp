@@ -152,6 +152,7 @@ bool FlockSimulator::loadOBJ(const char* path,
         out_uvs.push_back(uv);
     }
     std::cout << "end" << endl;
+    return true;
 }
 // TODO: change texture files and load them in this function.
 void FlockSimulator::load_textures() {

@@ -10,14 +10,14 @@ using namespace CGL;
 
 #define SURFACE_OFFSET 0.0001
 
-Vector3D getProjected(Vector3D A, Vector3D B, Vector3D C) {
+Vector3D Cylinder::getProjected(Vector3D A, Vector3D B, Vector3D C) {
   Vector3D d = (C - B) / (C - B).norm();
   Vector3D v = A - B;
   double t = dot(v, d);
   return B + t * d;
 }
 
-double computeDistance(Vector3D A, Vector3D B, Vector3D C) {
+double Cylinder::computeDistance(Vector3D A, Vector3D B, Vector3D C) {
   return (getProjected(A, B, C) - A).norm();
 }
 
@@ -29,9 +29,9 @@ Vector3f convert(Matrix3x3 m, Vector3f p1)
 
 void Cylinder::collide(PointMass &pm)
 {
-  /*
   Vector3D nextP = pm.position + pm.speed;
   Vector3D speed = pm.speed;
+  double birdR = 0.03;
   // normal == 0 pole range: x: 1 +- r, y: 0.6 +- r, z: -.5 to 1
   //       other pole range: x: 1 +- r, y: -1 to 1, z: 1 +- r
   double ax1, ax2, bx1, bx2, ay1, ay2, by1, by2, az1, az2, bz1, bz2;
@@ -49,35 +49,37 @@ void Cylinder::collide(PointMass &pm)
     double *data2 = dataArray2;
     CGL::Matrix3x3 m1 = CGL::Matrix3x3(data1);
     CGL::Matrix3x3 m2 = CGL::Matrix3x3(data2);
-    Vector3f p1 = convert(m2, convert(m1, Vector3f(0.0, l, point.z)));
-    Vector3f p6 = convert(m2, convert(m1, Vector3f(0.0, -l-point.y, point.z)));
+    Vector3f base = Vector3f(point.x, point.y, point.z);
+    Vector3f p1 = convert(m2, convert(m1, Vector3f(0.0, l, 0.0))) + base;
+    Vector3f p6 = convert(m2, convert(m1, Vector3f(0.0, -l, 0.0))) + base;
+    if (p1[1] < p6[1]) {
+      swap(p1, p6);
+    }
     ax1 = min(p1[0], p6[0]) - r;
     ax2 = max(p1[0], p6[0]) + r;
-    ay1 = min(p1[0], p6[0]);
-    ay2 = max(p1[0], p6[0]);
+    ay1 = min(p1[0], p6[0]) - r;
+    ay2 = max(p1[0], p6[0]) + r;
     az1 = min(p1[0], p6[0]) - r;
     az2 = max(p1[0], p6[0]) + r;
     // nextP: range +- 0.02
-    bx1 = nextP.x - .02;
-    bx2 = nextP.x + .02;
-    by1 = nextP.y - .02;
-    by2 = nextP.y + .02;
-    bz1 = nextP.z - .02;
-    bz2 = nextP.z + .02;
+    bx1 = nextP.x - birdR;
+    bx2 = nextP.x + birdR;
+    by1 = nextP.y - birdR;
+    by2 = nextP.y + birdR;
+    bz1 = nextP.z - birdR;
+    bz2 = nextP.z + birdR;
     Vector3D a = getProjected(pm.position, Vector3D(p1[0], p1[1], p1[2]), Vector3D(p6[0], p6[1], p6[2]));
     Vector3D b = getProjected(nextP, Vector3D(p1[0], p1[1], p1[2]), Vector3D(p6[0], p6[1], p6[2]));
 
-
-    if (ax2 > bx1 && ax1 < bx2 && ay2 > by1 && ay1 < by2 && az2 > bz1 || az1 < bz2)
+    if (ax2 > bx1 && ax1 < bx2 && ay2 > by1 && ay1 < by2 && az2 > bz1 && az1 < bz2)
     {
-      pm.speed *= -1.;
+      // pm.speed *= -1.;
+      // break;
     // } else if (computeDistance()) {
-      
     } else {
-      pm.speed = speed;
+      // pm.speed = speed;
     }
   }
-  */
 }
 
 
@@ -150,7 +152,7 @@ void Cylinder::render(GLShader &shader)
       }
       shader.drawArray(GL_TRIANGLE_STRIP, 0, 6);
     }
-    if (index != 0) { // not add the first cylinder which is the body of the tree
+    if (index != 0 && stopLine.size() < 6) { // not add the first cylinder which is the body of the tree
       vector<nanogui::Vector3f> temp2{top, bot};
       stopLine.push_back(temp2);
     }
