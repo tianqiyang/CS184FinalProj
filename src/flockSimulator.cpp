@@ -577,10 +577,10 @@ void FlockSimulator::drawWireframe(GLShader &shader) {
             normalsmat.col(si) << norm.x, norm.y, norm.z, 0.0;
         }
 
-        
+        shader.setUniform("u_color", nanogui::Color(165.0, 42.0, 42.0, 1.0f), false);
         shader.uploadAttrib("in_position", positions, false);
         //shader.uploadAttrib("in_normal", normalsmat);
-        shader.drawArray(GL_LINES, 0, num_springs);
+        shader.drawArray(GL_TRIANGLES, 0, num_springs);
     }
 
 
