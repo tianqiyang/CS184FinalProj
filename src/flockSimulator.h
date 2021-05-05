@@ -50,6 +50,8 @@ private:
       std::vector < Vector3D >& out_normals
   );
 
+  void drawBird(PointMass &pm, GLShader &shader, ShaderTypeHint stype);
+
   
   // File management
   
@@ -134,6 +136,7 @@ private:
   // Simulation flags
 
   bool is_paused = true;
+  bool is_stopped = false;
 
   // Screen attributes
 
