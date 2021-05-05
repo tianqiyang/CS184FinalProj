@@ -408,8 +408,15 @@ void FlockSimulator::drawContents() {
     break;
   }
 
+  const UserShader &active_shader2 = shaders[5]; // normal shader
+  GLShader &shabi = *active_shader2.nanogui_shader;
+  shabi.bind();
+  
+  shabi.setUniform("u_model", model);
+  shabi.setUniform("u_view_projection", viewProjection);
+  shabi.setUniform("u_color", color, false);
   for (CollisionObject *co : *collision_objects) {
-    co->render(shader);
+    co->render(shabi);
   }
 }
 Matrix3x3 rotation_between_vectors_to_matrix(const Vector3D v1, const Vector3D v2)
