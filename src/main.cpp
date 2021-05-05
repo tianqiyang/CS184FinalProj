@@ -382,10 +382,11 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
       Plane *p = new Plane(point1, point2, point3, point4, normal, friction);
       objects->push_back(p);
     } else if (key == CYLINDERS) {
-      vector<double> radius, halfLength, rotates;
+      vector<double> radius, halfLength;
       double friction;
       int slices;
       vector<Vector3D> points;
+      vector<vector<double> > rotates;
 
       auto it_point1 = object.find("points");
       if (it_point1 != object.end()) {
@@ -399,9 +400,10 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
 
       auto it_rotates = object.find("rotates");
       if (it_rotates != object.end()) {
-        vector<double> temp  = *it_rotates;
-        for(double d : temp) {
-          rotates.push_back(d);
+        vector<vector<double> > temp  = *it_rotates;
+        for (vector<double> v : temp) {
+          vector<double> temp2{ v[0], v[1] };
+          rotates.push_back(temp2);
         }
       } else {
         incompleteObjectError("cylinder", "rotates");
