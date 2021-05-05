@@ -42,11 +42,25 @@ Vector3D Flock::generatePos() {
     return Vector3D(x, y, z);
 }
 
+void initializeSpeed(PointMass* pm) {
+    double sx, sy, sz;
+    sx = -pm->maxSpeed + rand() / (RAND_MAX / (pm->maxSpeed + pm->maxSpeed));
+    sy = -pm->maxSpeed + rand() / (RAND_MAX / (pm->maxSpeed + pm->maxSpeed));
+    sz = -pm->maxSpeed + rand() / (RAND_MAX / (pm->maxSpeed + pm->maxSpeed));
+    pm->speed = Vector3D(sx, sy, sz);
+    Vector3D dir = pm->speed;
+    dir.normalize();
+    pm->speed = dir * CGL::clamp(pm->speed.norm(), pm->minSpeed, pm->maxSpeed);
+}
+
 void Flock::buildGrid()
 {
 
   for (int i = 0; i < num_birds; i += 1) {
-      point_masses.emplace_back(PointMass(generatePos(), false));
+
+    PointMass pm = PointMass(generatePos(), false);
+    initializeSpeed(&pm);
+    point_masses.emplace_back(pm);
   }
 
   PointMass *a;
@@ -306,8 +320,8 @@ void Flock::reset()
   PointMass *pm = &point_masses[0];
   for (int i = 0; i < point_masses.size(); i++)
   {
-    pm->cumulatedSpeed = 0;
-    pm->speed = 0;
+    pm->cumulatedSpeed = Vector3D();
+    initializeSpeed(pm);
     pm->position = pm->start_position;
     pm->last_position = pm->start_position;
     pm++;
