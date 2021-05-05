@@ -118,8 +118,6 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       int num = fp->num_birds;
       for (int i = point_masses.size(); i < num; i += 1) {
         point_masses.emplace_back(PointMass(generatePos(), false));
-        // a = &point_masses[i];
-        // birds.emplace_back(Bird(a));
       }
       PointMass *a;
       for (int i = point_masses.size(); i < num; i += 1) {
