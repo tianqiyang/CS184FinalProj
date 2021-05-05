@@ -33,10 +33,13 @@ struct PointMass {
     Halfedge* halfedge;
 
     // speed
-    Vector3D speed;
+    Vector3D speed = Vector3D();
     Vector3D cumulatedSpeed;
 
-    double maxSpeed = .1;
+    double minSpeed = .0002;
+    double maxSpeed = .0004;
+    double maxAcc = 1.;
+    double minAcc = 0.;
   
     Vector3D rand_stop_pos;
 };

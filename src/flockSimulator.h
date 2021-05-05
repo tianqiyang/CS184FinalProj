@@ -35,6 +35,7 @@ public:
   virtual bool scrollCallbackEvent(double x, double y);
   virtual bool resizeCallbackEvent(int width, int height);
 
+
 private:
   virtual void initGUI(Screen *screen);
   void drawWireframe(GLShader &shader);
@@ -43,6 +44,12 @@ private:
   
   void load_shaders();
   void load_textures();
+  bool loadOBJ(const char* path,
+      std::vector < Vector3D >& out_vertices,
+      std::vector < Vector2D >& out_uvs,
+      std::vector < Vector3D >& out_normals
+  );
+
   
   // File management
   
@@ -138,6 +145,10 @@ private:
   int screen_h;
 
   bool is_alive = true;
+
+  std::vector< Vector3D > bd_vertices;
+  std::vector< Vector2D > bd_uvs;
+  std::vector< Vector3D > bd_normals;
 
   Vector2i default_window_size = Vector2i(1024, 800);
 };
