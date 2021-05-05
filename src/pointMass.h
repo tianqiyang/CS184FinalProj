@@ -37,6 +37,8 @@ struct PointMass {
     Vector3D cumulatedSpeed;
 
     double maxSpeed = .1;
+  
+    Vector3D rand_stop_pos;
 };
 
 #endif /* POINTMASS_H */

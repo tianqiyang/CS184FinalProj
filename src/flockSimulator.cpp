@@ -250,7 +250,7 @@ void FlockSimulator::drawContents() {
     Vector3D windDir = Vector3D(rand(), rand(), rand());
     windDir.normalize();
     for (int i = 0; i < simulation_steps; i++) {
-      flock->simulate(frames_per_sec, simulation_steps, fp, external_accelerations, collision_objects, windDir);
+      flock->simulate(frames_per_sec, simulation_steps, fp, external_accelerations, collision_objects, windDir, is_stopped);
     }
   }
 
@@ -663,10 +663,10 @@ bool FlockSimulator::keyCallbackEvent(int key, int scancode, int action,
       break;
     case 'e':
     case 'E':
-        enable_following = !enable_following;
-        
-        flock->following = !flock->following;
-        break;
+      enable_following = !enable_following;
+      
+      flock->following = !flock->following;
+      break;
     case 'n':
     case 'N':
       if (is_paused) {
@@ -674,6 +674,10 @@ bool FlockSimulator::keyCallbackEvent(int key, int scancode, int action,
         drawContents();
         is_paused = true;
       }
+      break;
+    case 's':
+    case 'S':
+      is_stopped = !is_stopped;
       break;
     }
   }
