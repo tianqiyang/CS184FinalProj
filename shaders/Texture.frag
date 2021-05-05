@@ -39,5 +39,4 @@ void main() {
   res = vec3(1.0, 1.0, 1.0);
   // (Placeholder code. You will want to replace it.)
   out_color = vec4(texture(u_texture_1, v_uv).xyz * res, 1.0);
-  out_color.a = 1;
 }
