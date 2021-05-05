@@ -41,6 +41,7 @@ struct PointMass {
     double maxAcc = 1.;
     double minAcc = 0.;
   
+    // position to stop on the bar if "S" is pressed
     Vector3D rand_stop_pos;
 };
 
