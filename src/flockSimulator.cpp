@@ -140,10 +140,15 @@ bool FlockSimulator::loadOBJ(const char* path,
         out_vertices.push_back(vertex);
     }
     for (unsigned int i = 0; i < normalIndices.size(); i++) {
-        std::cout << i << endl;
         unsigned int normalIndex = normalIndices[i];
         Vector3D normal = temp_normals[normalIndex - 1];
         out_normals.push_back(normal);
+    }
+
+    for (unsigned int i = 0; i < uvIndices.size(); i++) {
+        unsigned int uvIndex = uvIndices[i];
+        Vector2D uv = temp_uvs[uvIndex - 1];
+        out_uvs.push_back(uv);
     }
     std::cout << "end" << endl;
 }
@@ -430,6 +435,46 @@ Matrix3x3 rotation_between_vectors_to_matrix(const Vector3D v1, const Vector3D v
 
     return matrix;
 }
+
+
+void FlockSimulator::drawBird(PointMass &pm, GLShader &shader, ShaderTypeHint stype) {
+    int num_springs = bd_vertices.size();
+    double smaller = 0.02;
+
+    
+    MatrixXf positions(4, num_springs);
+    MatrixXf normalsmat(4, num_springs);
+    MatrixXf uvs(2, num_springs);
+    MatrixXf tangents(4, num_springs);
+    Vector3D pa = pm.position;
+    Vector3D na = Vector3D();
+
+    Matrix3x3 rotate = rotation_between_vectors_to_matrix(Vector3D(0, 0, -1), pm.speed / pm.speed.norm());
+    for (int si = 0; si < num_springs; si++) {
+        Vector3D pos = pa + rotate * bd_vertices[si] * smaller;
+        Vector3D norm = na + rotate * bd_normals[si] * smaller;
+        Vector2D uv = bd_uvs[si] * smaller;
+        positions.col(si) << pos.x, pos.y, pos.z, 1.0;
+        normalsmat.col(si) << norm.x, norm.y, norm.z, 0.0;
+        uvs.col(si) << uv.x, uv.y;
+        tangents.col(si) << 1.0, 0.0, 0.0, 1.0;
+    }
+
+    shader.setUniform("u_color", nanogui::Color(165.0, 42.0, 42.0, 1.0f), false);
+    shader.uploadAttrib("in_position", positions, false);
+    if (stype == NORMALS) {
+        shader.uploadAttrib("in_normal", normalsmat, false);
+    }
+    else if (stype == PHONG) {
+        shader.uploadAttrib("in_normal", normalsmat, false);
+        shader.uploadAttrib("in_uv", uvs, false);
+        shader.uploadAttrib("in_tangent", tangents, false);
+    }
+    
+    shader.drawArray(GL_TRIANGLES, 0, num_springs);
+    
+}
+
 void FlockSimulator::drawWireframe(GLShader &shader) {
   //Try to use triangle instead of line
   /*
@@ -559,28 +604,9 @@ void FlockSimulator::drawWireframe(GLShader &shader) {
   //}
 
     
-    int num_springs = bd_vertices.size();
-    int smaller = 0.1;
-
     for (int i = 0; i < flock->point_masses.size(); i++) {
-        PointMass s = flock->point_masses[i];
-        MatrixXf positions(4, num_springs);
-        MatrixXf normalsmat(4, num_springs);
-        Vector3D pa = s.position;
-        Vector3D na = Vector3D();
-
-        Matrix3x3 rotate = rotation_between_vectors_to_matrix(Vector3D(0,0,-1), s.speed/ s.speed.norm());
-        for (int si = 0; si < num_springs; si++) {
-            Vector3D pos = pa + rotate * bd_vertices[si]/50.0;
-            Vector3D norm = na + rotate * bd_normals[si]/50.0;
-            positions.col(si) << pos.x, pos.y, pos.z, 1.0;
-            normalsmat.col(si) << norm.x, norm.y, norm.z, 0.0;
-        }
-
-        shader.setUniform("u_color", nanogui::Color(165.0, 42.0, 42.0, 1.0f), false);
-        shader.uploadAttrib("in_position", positions, false);
-        //shader.uploadAttrib("in_normal", normalsmat);
-        shader.drawArray(GL_TRIANGLES, 0, num_springs);
+        PointMass pm = (flock->point_masses[i]);
+        drawBird(pm, shader, WIREFRAME);
     }
 
 
@@ -620,17 +646,23 @@ void FlockSimulator::drawNormals(GLShader &shader) {
   //  normals.col(i * 3 + 1) << n2.x, n2.y, n2.z, 0.0;
   //  normals.col(i * 3 + 2) << n3.x, n3.y, n3.z, 0.0;
   //}
-    int sphere_num_lat = 10;
-    int sphere_num_lon = 10;
-    Vector3D origin;
-    double radius, friction;
-    for (auto& bd : flock->point_masses) {
-        origin = bd.position;
-        radius = 0.02;
-        friction = 0.3;
-        Sphere* s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
-        s->render(shader);
+
+    for (int i = 0; i < flock->point_masses.size(); i++) {
+        PointMass pm = (flock->point_masses[i]);
+        drawBird(pm, shader, NORMALS);
     }
+
+    //int sphere_num_lat = 10;
+    //int sphere_num_lon = 10;
+    //Vector3D origin;
+    //double radius, friction;
+    //for (auto& bd : flock->point_masses) {
+    //    origin = bd.position;
+    //    radius = 0.02;
+    //    friction = 0.3;
+    //    Sphere* s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
+    //    s->render(shader);
+    //}
 
 
 
@@ -642,19 +674,23 @@ void FlockSimulator::drawNormals(GLShader &shader) {
 }
 
 void FlockSimulator::drawPhong(GLShader &shader) {
-
-    int sphere_num_lat = 10;
-    int sphere_num_lon = 10;
-    Vector3D origin;
-    double radius, friction;
-    for (auto& bd : flock->point_masses) {
-        origin = bd.position;
-        radius = 0.02;
-        friction = 0.3;
-        Sphere* s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
-        s->render(shader);
+    
+    for (int i = 0; i < flock->point_masses.size(); i++) {
+        PointMass pm = (flock->point_masses[i]);
+        drawBird(pm, shader, PHONG);
     }
-  //shader.uploadAttrib("in_position", positions, false);
+  //  int sphere_num_lat = 10;
+  //  int sphere_num_lon = 10;
+  //  Vector3D origin;
+  //  double radius, friction;
+  //  for (auto& bd : flock->point_masses) {
+  //      origin = bd.position;
+  //      radius = 0.02;
+  //      friction = 0.3;
+  //      Sphere* s = new Sphere(origin, radius, friction, sphere_num_lat, sphere_num_lon);
+  //      s->render(shader);
+  //  }
+  ////shader.uploadAttrib("in_position", positions, false);
   //shader.uploadAttrib("in_normal", normals, false);
   //shader.uploadAttrib("in_uv", uvs, false);
   //shader.uploadAttrib("in_tangent", tangents, false);

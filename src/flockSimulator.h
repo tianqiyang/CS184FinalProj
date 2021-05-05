@@ -50,6 +50,8 @@ private:
       std::vector < Vector3D >& out_normals
   );
 
+  void drawBird(PointMass &pm, GLShader &shader, ShaderTypeHint stype);
+
   
   // File management
   
