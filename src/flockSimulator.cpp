@@ -257,7 +257,7 @@ FlockSimulator::FlockSimulator(std::string project_root, Screen *screen)
   std::vector< Vector3D > vertices;
   std::vector< Vector2D > uvs;
   std::vector< Vector3D > normals; // Won't be used at the moment.
-  bool res = loadOBJ("../../../model/bird2.obj", vertices, uvs, normals);
+  bool res = loadOBJ("../../../model/bird3.obj", vertices, uvs, normals);
   this->bd_vertices = vertices;
   this->bd_uvs = uvs;
   this->bd_normals = normals;
@@ -461,7 +461,7 @@ void FlockSimulator::drawBird(PointMass &pm, GLShader &shader, ShaderTypeHint st
     for (int si = 0; si < num_springs; si++) {
         Vector3D pos = pa + rotate * bd_vertices[si] * smaller;
         Vector3D norm = na + rotate * bd_normals[si] * smaller;
-        Vector2D uv = bd_uvs[si] * smaller;
+        Vector2D uv = bd_uvs[si];
         positions.col(si) << pos.x, pos.y, pos.z, 1.0;
         normalsmat.col(si) << norm.x, norm.y, norm.z, 0.0;
         uvs.col(si) << uv.x, uv.y;
