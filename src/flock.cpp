@@ -227,15 +227,15 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       Vector3D decceleration = Vector3D(0, 0, 0);
 
       if (point_mass.position.x > x || point_mass.position.x < -x)
-      { // random bounce to -random, random, random
+      {
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.x - x);
       }
-      if (point_mass.position.y > y || point_mass.position.y < -y)
-      { // random bounce to random, -random, random
+      if (point_mass.position.y > y || point_mass.position.y < 0)
+      {
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.y - y);
       }
-      if (point_mass.position.z > z || point_mass.position.z < 0)
-      { // random bounce to random, random, -random
+      if (point_mass.position.z > z || point_mass.position.z < -z)
+      {
         decceleration += (Vector3D(0.5, 0.5, 0.5) - point_mass.position) * abs(point_mass.position.z - z);
       }
 
@@ -281,7 +281,8 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
           point_mass.rand_stop_pos = a + (b - a) * x;
           point_mass.rand_stop_pos[1] += 0.02;
         }
-        point_mass.position += 0.00025 * (point_mass.rand_stop_pos - point_mass.position);
+        point_mass.speed = 0.00025 * (point_mass.rand_stop_pos - point_mass.position);
+        point_mass.position += point_mass.speed;
       }
     }
     else

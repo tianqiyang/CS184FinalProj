@@ -13,8 +13,8 @@ using namespace CGL;
 void Plane::collide(PointMass &pm) {
   // TODO (Part 3): Handle collisions with planes.
     Vector3D newPosition = pm.position + pm.speed;
-    if (newPosition.z < .5 ) {
-      pm.speed.z = .00000001;
+    if (newPosition.y < 0.0 ) {
+      pm.speed.y = pm.speed.y * -1;
     }
 }
 
