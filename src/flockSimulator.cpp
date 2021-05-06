@@ -1056,7 +1056,7 @@ void FlockSimulator::initGUI(Screen *screen) {
       fb->setValue(flock->cursor.position.x);
       fb->setUnits(" ");
       fb->setSpinnable(true);
-      fb->setMinValue(0);
+      fb->setMinValue(-flock->x);
       fb->setMaxValue(flock->x);
       fb->setCallback([this](float value) { flock->cursor.position.x = (double)(value); });
 
@@ -1069,7 +1069,7 @@ void FlockSimulator::initGUI(Screen *screen) {
       fb->setValue(flock->cursor.position.y);
       fb->setUnits(" ");
       fb->setSpinnable(true);
-      fb->setMinValue(0);
+      fb->setMinValue(-flock->y);
       fb->setMaxValue(flock->y);
       fb->setCallback([this](float value) { flock->cursor.position.y = value; });
 
@@ -1084,7 +1084,7 @@ void FlockSimulator::initGUI(Screen *screen) {
       fb->setValue(flock->cursor.position.z);
       fb->setUnits(" ");
       fb->setSpinnable(true);
-      fb->setMinValue(0);
+      fb->setMinValue(-flock->z);
       fb->setMaxValue(flock->z);
       fb->setCallback([this](float value) { flock->cursor.position.z = value; });
   }

@@ -161,7 +161,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     Vector3D a(line[0][0], line[0][1], line[0][2]);
     Vector3D b(line[1][0], line[1][1], line[1][2]);
     double dis = cylinder->computeDistance(point_mass.position, a, b);
-    if (!is_stopped || dis > 0.5)
+    if (!is_stopped || dis > 0.5) // || !(point_mass.position[1] > a[1] && point_mass.position[1] > b[1]))
     {
       vector<double> pars = vector<double>({fp->coherence, fp->separation, fp->alignment});
       vector<vector<PointMass *> > vecs = getNeighbours(point_mass, pars);
@@ -215,7 +215,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     Vector3D a(line[0][0], line[0][1], line[0][2]);
     Vector3D b(line[1][0], line[1][1], line[1][2]);
     double dis = cylinder->computeDistance(point_mass.position, a, b);
-    if (!is_stopped || dis > 0.5)
+    if (!is_stopped || dis > 0.5)//  || !(point_mass.position[1] > a[1] && point_mass.position[1] > b[1]))
     {
       /*Vector3D dir = point_mass.speed;
         dir.normalize();
@@ -269,7 +269,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       Vector3D a(line[0][0], line[0][1], line[0][2]);
       Vector3D b(line[1][0], line[1][1], line[1][2]);
       double dis = cylinder->computeDistance(point_mass.position, a, b);
-      if (dis < 0.5)
+      if (dis < 0.5)//  && point_mass.position[1] > a[1] && point_mass.position[1] > b[1])
       {
         if (point_mass.rand_stop_pos == NULL)
         {
@@ -286,6 +286,8 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       // if "S" pressed for second time, clear random stop position
       point_mass.rand_stop_pos = NULL;
     }
+
+    // rr point_mass.rand_stop_pos = NULL;
   }
 }
 
