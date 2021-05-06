@@ -29,7 +29,7 @@ public:
 
   Vector3D getProjected(Vector3D A, Vector3D B, Vector3D C);
   double computeDistance(Vector3D A, Vector3D B, Vector3D C);
-  int num_branch = 6;
+  int num_branch = 9;
 };
 
 #endif /* COLLISIONOBJECT_CYLINDER_H */

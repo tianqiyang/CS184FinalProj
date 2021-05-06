@@ -148,7 +148,7 @@ void Cylinder::render(GLShader &shader)
       }
       shader.drawArray(GL_TRIANGLE_STRIP, 0, 6);
     }
-    if (index != 0 && stopLine.size() < num_branch) { // not add the first cylinder which is the body of the tree
+    if (index > 1 && stopLine.size() < num_branch) { // not add the first cylinder which is the body of the tree
       vector<nanogui::Vector3f> temp2{top, bot};
       stopLine.push_back(temp2);
     }
