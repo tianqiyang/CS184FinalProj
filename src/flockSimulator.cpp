@@ -1100,7 +1100,7 @@ void FlockSimulator::initGUI(Screen *screen) {
     Slider *slider = new Slider(panel);
     slider->setValue(flock->alignment_weight);
     slider->setFixedWidth(105);
-    slider->setRange(pair<float, float>(0.0, 10.0));
+    slider->setRange(pair<float, float>(0.000001, 10.0));
 
     TextBox *percentage = new TextBox(panel);
     percentage->setFixedWidth(75);
@@ -1128,7 +1128,7 @@ void FlockSimulator::initGUI(Screen *screen) {
       Slider* slider = new Slider(panel);
       slider->setValue(flock->coherence_weight);
       slider->setFixedWidth(105);
-      slider->setRange(pair<float, float>(0.0, 10.0));
+      slider->setRange(pair<float, float>(0.000001, 10.0));
 
       TextBox* percentage = new TextBox(panel);
       percentage->setFixedWidth(75);
@@ -1156,7 +1156,7 @@ void FlockSimulator::initGUI(Screen *screen) {
       Slider* slider = new Slider(panel);
       slider->setValue(flock->separation_weight);
       slider->setFixedWidth(105);
-      slider->setRange(pair<float, float>(0.0, 10.0));
+      slider->setRange(pair<float, float>(0.000001, 10.0));
 
       TextBox* percentage = new TextBox(panel);
       percentage->setFixedWidth(75);
