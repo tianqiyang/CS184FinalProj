@@ -29,3 +29,8 @@ Features currently implemented:
 
 ## current bug
 1. When separation weight increased, can never go down again. 
+
+
+## env
+1. env has one tree
+2. env1 has three trees

@@ -91,8 +91,7 @@ struct Flock {
   double y = 5;
   double z = 5;
 
-  int num_birds = 50;//20 - 1000
-  int num_branch = 9;
+  int num_birds = 50; // 20 - 1000
 };
 
 #endif /* CLOTH_H */

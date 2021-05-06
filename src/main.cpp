@@ -384,7 +384,7 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
     } else if (key == CYLINDERS) {
       vector<double> radius, halfLength;
       double friction;
-      int slices;
+      int slices, branchNum, poleNum;
       vector<Vector3D> points;
       vector<vector<double> > rotates;
 
@@ -443,7 +443,21 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
         incompleteObjectError("cylinder", "friction");
       }
 
-      Cylinder *p = new Cylinder(points, rotates, radius, halfLength, slices, friction);
+      auto it_branchNum = object.find("branchNum");
+      if (it_branchNum != object.end()) {
+        branchNum = *it_branchNum;
+      } else {
+        incompleteObjectError("cylinder", "branchNum");
+      }
+
+      auto it_poleNum = object.find("poleNum");
+      if (it_poleNum != object.end()) {
+        poleNum = *it_poleNum;
+      } else {
+        incompleteObjectError("cylinder", "poleNum");
+      }
+
+      Cylinder *p = new Cylinder(points, rotates, radius, halfLength, slices, friction, branchNum, poleNum);
       objects->push_back(p);
     }
   }

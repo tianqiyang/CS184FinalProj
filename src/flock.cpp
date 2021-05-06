@@ -63,7 +63,6 @@ void Flock::buildGrid()
   {
     PointMass pm = PointMass(generatePos(), false);
     pm.able_stop = (rand() % 10 / 10 < STOP_RATE);
-    pm.branch = rand() % num_branch;
     initializeSpeed(&pm);
     point_masses.emplace_back(pm);
   }
@@ -155,6 +154,9 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   {
     // if "S" is not pressed or bird is not within 0.5 distance from bar, not affected by
     // stopping behavior
+    if (point_mass.branch == -1) {
+      point_mass.branch = rand() % cylinder->branchNum;
+    }
     vector<Vector3f> line = stopLine[point_mass.branch];
     Vector3D a(line[0][0], line[0][1], line[0][2]);
     Vector3D b(line[1][0], line[1][1], line[1][2]);
