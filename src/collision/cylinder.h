@@ -12,18 +12,25 @@ using namespace std;
 
 struct Cylinder : public CollisionObject {
 public:
-  Cylinder(const Vector3D &point1, int normal, double radius, double halfLength, int slices, double friction)
-      : point1(point1), normal(normal), radius(radius), halfLength(halfLength), slices(slices), friction(friction) {}
+  Cylinder();
+  Cylinder(const vector<Vector3D> &points, const vector<vector<double> > &rotates, const vector<double> &radius, const vector<double> &halfLength, int slices, double friction, int branchNum, int poleNum)
+      : points(points), rotates(rotates), radius(radius), halfLength(halfLength), slices(slices), friction(friction), branchNum(branchNum), poleNum(poleNum){}
 
   void render(GLShader &shader);
   void collide(PointMass &pm);
 
-  Vector3D point1;
-  int normal;
-  double radius;
-  double halfLength;
+  vector<Vector3D> points;
+  vector<vector<double> > rotates;
+  vector<double> radius;
+  vector<double> halfLength;
   int slices;
   double friction;
+  vector<vector<Vector3f> > stopLine;
+
+  Vector3D getProjected(Vector3D A, Vector3D B, Vector3D C);
+  double computeDistance(Vector3D A, Vector3D B, Vector3D C);
+  int branchNum;
+  int poleNum;
 };
 
 #endif /* COLLISIONOBJECT_CYLINDER_H */

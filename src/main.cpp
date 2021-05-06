@@ -154,10 +154,10 @@ void incompleteObjectError(const char* object, const char* attribute) {
 const string SPHERE = "sphere";
 const string PLANE = "plane";
 const string CLOTH = "cloth";
-const string CYLINDER = "cylinder";
+const string CYLINDERS = "cylinders";
 const string HCYLINDER = "hcylinder";
 
-const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, CLOTH, CYLINDER, HCYLINDER};
+const unordered_set<string> VALID_KEYS = {SPHERE, PLANE, CLOTH, CYLINDERS};
 
 // TODO: may need later
 bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vector<CollisionObject*>* objects, int sphere_num_lat, int sphere_num_lon) {
@@ -381,38 +381,52 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
 
       Plane *p = new Plane(point1, point2, point3, point4, normal, friction);
       objects->push_back(p);
-    } else if (key == CYLINDER || key == HCYLINDER) {
-      double radius, halfLength, friction;
-      int slices, normal;
-      Vector3D point1;
+    } else if (key == CYLINDERS) {
+      vector<double> radius, halfLength;
+      double friction;
+      int slices, branchNum, poleNum;
+      vector<Vector3D> points;
+      vector<vector<double> > rotates;
 
-      auto it_point1 = object.find("point1");
+      auto it_point1 = object.find("points");
       if (it_point1 != object.end()) {
-        vector<double> vec_point1 = *it_point1;
-        point1 = Vector3D(vec_point1[0], vec_point1[1], vec_point1[2]);
+        vector<vector<double> > vec_point1 = *it_point1;
+        for (vector<double> v : vec_point1) {
+          points.push_back(Vector3D(v[0], v[1], v[2]));
+        }
       } else {
-        incompleteObjectError("cylinder", "point1");
+        incompleteObjectError("cylinder", "points");
       }
 
-      auto it_normal = object.find("normal");
-      if (it_normal != object.end()) {
-        normal = *it_normal;
+      auto it_rotates = object.find("rotates");
+      if (it_rotates != object.end()) {
+        vector<vector<double> > temp  = *it_rotates;
+        for (vector<double> v : temp) {
+          vector<double> temp2{ v[0], v[1] };
+          rotates.push_back(temp2);
+        }
       } else {
-        incompleteObjectError("cylinder", "normal");
+        incompleteObjectError("cylinder", "rotates");
       }
 
       auto it_radius = object.find("radius");
       if (it_radius != object.end()) {
-        radius = *it_radius;
+        vector<double> temp  = *it_radius;
+        for(double d : temp) {
+          radius.push_back(d);
+        }
       } else {
         incompleteObjectError("cylinder", "radius");
       }
 
-      auto it_halfLength = object.find("halfLength");
+      auto it_halfLength = object.find("halfLengthes");
       if (it_halfLength != object.end()) {
-        halfLength = *it_halfLength;
+        vector<double> temp  = *it_halfLength;
+        for(double d : temp) {
+          halfLength.push_back(d);
+        }
       } else {
-        incompleteObjectError("cylinder", "halfLength");
+        incompleteObjectError("cylinder", "halfLengthes");
       }
 
       auto it_slices = object.find("slices");
@@ -429,7 +443,21 @@ bool loadObjectsFromFile(string filename, Flock* flock, FlockParameters* fp, vec
         incompleteObjectError("cylinder", "friction");
       }
 
-      Cylinder *p = new Cylinder(point1, normal, radius, halfLength, slices, friction);
+      auto it_branchNum = object.find("branchNum");
+      if (it_branchNum != object.end()) {
+        branchNum = *it_branchNum;
+      } else {
+        incompleteObjectError("cylinder", "branchNum");
+      }
+
+      auto it_poleNum = object.find("poleNum");
+      if (it_poleNum != object.end()) {
+        poleNum = *it_poleNum;
+      } else {
+        incompleteObjectError("cylinder", "poleNum");
+      }
+
+      Cylinder *p = new Cylinder(points, rotates, radius, halfLength, slices, friction, branchNum, poleNum);
       objects->push_back(p);
     }
   }
