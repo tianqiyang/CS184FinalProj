@@ -1039,7 +1039,88 @@ void FlockSimulator::initGUI(Screen *screen) {
     num_steps->setMinValue(0);
     num_steps->setCallback([this](int value) { simulation_steps = value; });
   }
+  new Label(window, "Leaderbird x", "sans-bold");
 
+  {
+      Widget* panel = new Widget(window);
+      panel->setLayout(
+          new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+
+      Slider* slider = new Slider(panel);
+      slider->setValue(flock->cursor.position.x);
+      slider->setFixedWidth(105);
+      slider->setRange(pair<float, float>(-flock->x, flock->x));
+
+      TextBox* percentage = new TextBox(panel);
+      percentage->setFixedWidth(75);
+      percentage->setValue(to_string(flock->cursor.position.x));
+      percentage->setUnits(" ");
+      percentage->setFontSize(14);
+
+      slider->setCallback([percentage](float value) {
+          percentage->setValue(std::to_string(value));
+          });
+      slider->setFinalCallback([&](float value) {
+          flock->cursor.position.x = (double)value;
+          cout << flock->cursor.position.x;
+          });
+
+  }
+  new Label(window, "Leaderbird y", "sans-bold");
+
+  {
+      Widget* panel = new Widget(window);
+      panel->setLayout(
+          new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+
+      Slider* slider = new Slider(panel);
+      slider->setValue(flock->cursor.position.y);
+      slider->setFixedWidth(105);
+      slider->setRange(pair<float, float>(-flock->y, flock->y));
+
+      TextBox* percentage = new TextBox(panel);
+      percentage->setFixedWidth(75);
+      percentage->setValue(to_string(flock->cursor.position.y));
+      percentage->setUnits(" ");
+      percentage->setFontSize(14);
+
+      slider->setCallback([percentage](float value) {
+          percentage->setValue(std::to_string(value));
+          });
+      slider->setFinalCallback([&](float value) {
+          flock->cursor.position.y = (double)value;
+          cout << flock->cursor.position.y;
+          });
+
+  }
+
+  new Label(window, "Leaderbird z", "sans-bold");
+
+  {
+      Widget* panel = new Widget(window);
+      panel->setLayout(
+          new BoxLayout(Orientation::Horizontal, Alignment::Middle, 0, 5));
+
+      Slider* slider = new Slider(panel);
+      slider->setValue(flock->cursor.position.z);
+      slider->setFixedWidth(105);
+      slider->setRange(pair<float, float>(-flock->z, flock->z));
+
+      TextBox* percentage = new TextBox(panel);
+      percentage->setFixedWidth(75);
+      percentage->setValue(to_string(flock->cursor.position.z));
+      percentage->setUnits(" ");
+      percentage->setFontSize(14);
+
+      slider->setCallback([percentage](float value) {
+          percentage->setValue(std::to_string(value));
+          });
+      slider->setFinalCallback([&](float value) {
+          flock->cursor.position.z = (double)value;
+          cout << flock->cursor.position.z;
+          });
+
+  }
   new Label(window, "Leader Coordinates", "sans-bold");
   {
       Widget* panel = new Widget(window);
@@ -1049,46 +1130,10 @@ void FlockSimulator::initGUI(Screen *screen) {
       layout->setSpacing(0, 10);
       panel->setLayout(layout);
 
-      new Label(panel, "x :", "sans-bold");
-      FloatBox<double>* fb = new FloatBox<double>(panel);
-      fb->setEditable(true);
-      fb->setFixedSize(Vector2i(100, 20));
-      fb->setFontSize(14);
-      fb->setValue(flock->cursor.position.x);
-      fb->setUnits(" ");
-      fb->setSpinnable(true);
-      fb->setMinValue(-flock->x);
-      fb->setMaxValue(flock->x);
-      fb->setCallback([this](float value) { flock->cursor.position.x = (double)(value); });
 
-      new Label(panel, "y :", "sans-bold");
-
-      fb = new FloatBox<double>(panel);
-      fb->setEditable(true);
-      fb->setFixedSize(Vector2i(100, 20));
-      fb->setFontSize(14);
-      fb->setValue(flock->cursor.position.y);
-      fb->setUnits(" ");
-      fb->setSpinnable(true);
-      fb->setMinValue(-flock->y);
-      fb->setMaxValue(flock->y);
-      fb->setCallback([this](float value) { flock->cursor.position.y = value; });
-
-
-
-      new Label(panel, "z :", "sans-bold");
-
-      fb = new FloatBox<double>(panel);
-      fb->setEditable(true);
-      fb->setFixedSize(Vector2i(100, 20));
-      fb->setFontSize(14);
-      fb->setValue(flock->cursor.position.z);
-      fb->setUnits(" ");
-      fb->setSpinnable(true);
-      fb->setMinValue(-flock->z);
-      fb->setMaxValue(flock->z);
-      fb->setCallback([this](float value) { flock->cursor.position.z = value; });
   }
+      
+
   //// Damping slider and textbox
 
   new Label(window, "Alignment weight", "sans-bold");
