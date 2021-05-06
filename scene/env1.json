@@ -28,7 +28,7 @@
     "halfLengthes": [1, 1, 1, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.6, 0.65, 0.7, 0.5, 0.55, 0.75],
     "slices": 720,
     "friction": 0.5,
-    "branchNum": 6,
-    "poleNum": 1
+    "branchNum": 12,
+    "poleNum": 3
   }
 }
