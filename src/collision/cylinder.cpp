@@ -32,8 +32,6 @@ void Cylinder::collide(PointMass &pm)
   Vector3D nextP = pm.position + pm.speed;
   Vector3D speed = pm.speed;
   double birdR = 0.03;
-  // normal == 0 pole range: x: 1 +- r, y: 0.6 +- r, z: -.5 to 1
-  //       other pole range: x: 1 +- r, y: -1 to 1, z: 1 +- r
   double ax1, ax2, bx1, bx2, ay1, ay2, by1, by2, az1, az2, bz1, bz2;
   for (int index = 0; index < points.size(); index++)
   {
@@ -61,7 +59,7 @@ void Cylinder::collide(PointMass &pm)
     ay2 = max(p1[0], p6[0]) + r;
     az1 = min(p1[0], p6[0]) - r;
     az2 = max(p1[0], p6[0]) + r;
-    // nextP: range +- 0.02
+
     bx1 = nextP.x - birdR;
     bx2 = nextP.x + birdR;
     by1 = nextP.y - birdR;
@@ -72,10 +70,8 @@ void Cylinder::collide(PointMass &pm)
     Vector3D b = getProjected(nextP, Vector3D(p1[0], p1[1], p1[2]), Vector3D(p6[0], p6[1], p6[2]));
 
     if (ax2 > bx1 && ax1 < bx2 && ay2 > by1 && ay1 < by2 && az2 > bz1 && az1 < bz2)
-    {
+    { // intersect
       // pm.speed *= -1.;
-      // break;
-    // } else if (computeDistance()) {
     } else {
       // pm.speed = speed;
     }
@@ -152,7 +148,7 @@ void Cylinder::render(GLShader &shader)
       }
       shader.drawArray(GL_TRIANGLE_STRIP, 0, 6);
     }
-    if (index != 0 && stopLine.size() < 6) { // not add the first cylinder which is the body of the tree
+    if (index != 0 && stopLine.size() < num_branch) { // not add the first cylinder which is the body of the tree
       vector<nanogui::Vector3f> temp2{top, bot};
       stopLine.push_back(temp2);
     }

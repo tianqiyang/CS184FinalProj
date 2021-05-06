@@ -63,7 +63,7 @@ void Flock::buildGrid()
   {
     PointMass pm = PointMass(generatePos(), false);
     pm.able_stop = (rand() % 10 / 10 < STOP_RATE);
-    pm.branch = rand() % 6;
+    pm.branch = rand() % num_branch;
     initializeSpeed(&pm);
     point_masses.emplace_back(pm);
   }
@@ -128,17 +128,6 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
   vector<vector<Vector3f> > stopLine = cylinder->stopLine;
   if (fp->num_birds > point_masses.size())
   {
-    // int num = fp->num_birds;
-    // for (int i = point_masses.size(); i < num; i += 1)
-    // {
-    //   point_masses.emplace_back(PointMass(generatePos(), false));
-    // }
-    // PointMass *a;
-    // for (int i = point_masses.size(); i < num; i += 1)
-    // {
-    //   a = &point_masses[i];
-    //   birds.emplace_back(Bird(a));
-    // }
     // only add one bird at one frame
     point_masses.emplace_back(PointMass(generatePos(), false));
     PointMass *a;
