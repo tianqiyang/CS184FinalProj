@@ -107,6 +107,7 @@ bool FlockSimulator::loadOBJ(const char* path,
         else if (strcmp(lineHeader, "vt") == 0) {
             Vector2D uv;
             fscanf(file, "%lf %lf\n", &uv.x, &uv.y);
+            uv.y = 1.0 - uv.y;
             temp_uvs.push_back(uv);
         }
         else if (strcmp(lineHeader, "vn") == 0) {
