@@ -62,7 +62,7 @@ void Flock::buildGrid()
   for (int i = 0; i < num_birds; i += 1)
   {
     PointMass pm = PointMass(generatePos(), false);
-    pm.able_stop = (rand() % 10 / 10 < STOP_RATE);
+    pm.able_stop = false;
     initializeSpeed(&pm);
     point_masses.emplace_back(pm);
   }
@@ -109,12 +109,31 @@ vector<vector<PointMass *> > Flock::getNeighbours(PointMass pm, vector<double> r
   }
   return vecs;
 }
-Vector3D normalizeForce(Vector3D acceleration)
+Vector3D normalizeForce(Vector3D acceleration, PointMass pm)
 {
-  acceleration.normalize();
-  double clampAcc = CGL::clamp(acceleration.norm(), 0.0, .000001);
 
-  return acceleration * clampAcc;
+    Vector3D accDir = Vector3D(acceleration.x, acceleration.y, acceleration.z);
+    if (accDir.norm() != 0) {
+        accDir.normalize();
+    }
+    return accDir * CGL::clamp(acceleration.norm(), pm.minAcc/3., pm.maxAcc/3.);
+
+}
+
+void change_state_random(PointMass& pm) {
+    double thresh;
+    if (pm.able_stop) {
+        thresh = 0.0001;
+    }
+    else {
+        thresh = 0.00001;
+    }
+    
+    double prob = rand() / (RAND_MAX);
+    if (prob < thresh) {
+        pm.able_stop = !pm.able_stop;
+        pm.rand_stop_pos = NULL;
+    }
 }
 
 void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParameters *fp,
@@ -161,7 +180,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     Vector3D a(line[0][0], line[0][1], line[0][2]);
     Vector3D b(line[1][0], line[1][1], line[1][2]);
     double dis = cylinder->computeDistance(point_mass.position, a, b);
-    if (!is_stopped || dis > 0.5) // || !(point_mass.position[1] > a[1] && point_mass.position[1] > b[1]))
+    if (!is_stopped || !point_mass.able_stop || dis > 0.5) // || !(point_mass.position[1] > a[1] && point_mass.position[1] > b[1]))
     {
       vector<double> pars = vector<double>({fp->coherence, fp->separation, fp->alignment});
       vector<vector<PointMass *> > vecs = getNeighbours(point_mass, pars);
@@ -173,7 +192,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
         double newCenterZ = cursor.position.z * point_masses.size() - point_mass.position.z;
         Vector3D newCenter = Vector3D(newCenterX, newCenterY, newCenterZ) / (point_masses.size() - 1);
         Vector3D goal = (newCenter - point_mass.position);
-        point_mass.cumulatedSpeed += goal * cw;
+        point_mass.cumulatedSpeed += normalizeForce(goal, point_mass) * cw;
       }
       else
       {
@@ -185,7 +204,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
         {
           goal = goal / vecs[0].size();
         }
-        point_mass.cumulatedSpeed += (goal - point_mass.position) * cw;
+        point_mass.cumulatedSpeed += normalizeForce(goal - point_mass.position, point_mass) * cw;
       }
       goal = Vector3D();
       for (PointMass *npm : vecs[1])
@@ -197,13 +216,14 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       {
         goal = goal / vecs[1].size();
       }
-      point_mass.cumulatedSpeed += goal * sw;
+      point_mass.cumulatedSpeed += normalizeForce(goal, point_mass) * sw;
       goal = Vector3D();
       for (PointMass *npm : vecs[2])
       {
         goal = goal + npm->speed;
       }
-      point_mass.cumulatedSpeed += goal * aw;
+      point_mass.cumulatedSpeed += normalizeForce(goal, point_mass) * aw;
+
     }
   }
 
@@ -215,7 +235,7 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
     Vector3D a(line[0][0], line[0][1], line[0][2]);
     Vector3D b(line[1][0], line[1][1], line[1][2]);
     double dis = cylinder->computeDistance(point_mass.position, a, b);
-    if (!is_stopped || dis > 0.5)//  || !(point_mass.position[1] > a[1] && point_mass.position[1] > b[1]))
+    if (!is_stopped || !point_mass.able_stop || dis > 0.5)//  || !(point_mass.position[1] > a[1] && point_mass.position[1] > b[1]))
     {
       /*Vector3D dir = point_mass.speed;
         dir.normalize();
@@ -258,38 +278,41 @@ void Flock::simulate(double frames_per_sec, double simulation_steps, FlockParame
       {
         point_mass = PointMass(Vector3D(rand() % 100 / 100., rand() % 100 / 100., rand() % 100 / 100.), false);
       }
-    }
-  }
 
-  for (PointMass &point_mass : point_masses)
-  {
-    if (is_stopped)
-    {
-      vector<Vector3f> line = stopLine[point_mass.branch];
-      Vector3D a(line[0][0], line[0][1], line[0][2]);
-      Vector3D b(line[1][0], line[1][1], line[1][2]);
-      double dis = cylinder->computeDistance(point_mass.position, a, b);
-      if (dis < 0.5)//  && point_mass.position[1] > a[1] && point_mass.position[1] > b[1])
-      {
+      if (!is_stopped) {
+          point_mass.rand_stop_pos = NULL;
+      }
+      if (is_stopped && dis >= 1) {
+          change_state_random(point_mass);
+          
+      }
+
+
+    }
+    else {
         if (point_mass.rand_stop_pos == NULL)
         {
-          double x = (double)(rand() % 74) / 100. + .13; // cut first and last 13%
-          point_mass.rand_stop_pos = a + (b - a) * x;
-          point_mass.rand_stop_pos[1] += 0.02;
+            double x = (double)(rand() % 74) / 100. + .13; // cut first and last 13%
+            point_mass.rand_stop_pos = a + (b - a) * x;
+            point_mass.rand_stop_pos[1] += 0.02;
         }
+
+        /* Vector3D dir = point_mass.rand_stop_pos - point_mass.position;
+         dir.normalize();
+         point_mass.speed = dir * CGL::clamp(point_mass.speed.norm(), point_mass.minSpeed, point_mass.maxSpeed);*/
+
         point_mass.speed = 0.00025 * (point_mass.rand_stop_pos - point_mass.position);
         point_mass.position += point_mass.speed;
-      }
+        if (dis <= 0.02) {
+            
+            change_state_random(point_mass);
+        }
     }
-    else
-    {
-      // if "S" pressed for second time, clear random stop position
-      point_mass.rand_stop_pos = NULL;
-    }
-
-    // rr point_mass.rand_stop_pos = NULL;
   }
 }
+
+
+
 
 Vector3D Flock::accelerationAgainstWall(double distance, Vector3D direction)
 {
@@ -320,6 +343,13 @@ void Flock::build_spatial_map()
     }
     map[hashed]->push_back(&point_mass);
   }
+}
+
+void Flock::set_stop(bool is_stopped) {
+    for (PointMass& point_mass : point_masses)
+    {
+        point_mass.able_stop = is_stopped;
+    }
 }
 
 void Flock::self_collide(PointMass &pm, double simulation_steps)

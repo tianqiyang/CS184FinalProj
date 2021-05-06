@@ -62,6 +62,7 @@ struct Flock {
   Vector3D accelerationAgainstWall(double distance, Vector3D direction);
   void follow();
   Vector3D generatePos();
+  void set_stop(bool is_stopped);
 
   // flock properties
   double width;

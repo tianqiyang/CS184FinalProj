@@ -877,6 +877,7 @@ bool FlockSimulator::keyCallbackEvent(int key, int scancode, int action,
     case 's':
     case 'S':
       is_stopped = !is_stopped;
+      flock->set_stop(is_stopped);
       break;
     }
   }
