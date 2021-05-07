@@ -45,6 +45,8 @@ struct PointMass {
     Vector3D rand_stop_pos;
     bool able_stop;
     int branch = -1;
+
+    int timer = 100;
 };
 
 #endif /* POINTMASS_H */

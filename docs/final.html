@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Interactive Flocking Simulation</title>
+	<!-- Favicons (created with http://realfavicongenerator.net/)-->
+	<link rel="apple-touch-icon" sizes="57x57" href="./img/apple-touch-icon-57x57.png" />
+	<link rel="apple-touch-icon" sizes="60x60" href="./img/apple-touch-icon-60x60.png" />
+	<link rel="icon" type="image/png" href="./img/favicon-32x32.png" sizes="32x32" />
+	<link rel="icon" type="image/png" href="./img/favicon-16x16.png" sizes="16x16" />
+	<link rel="manifest" href="./img/manifest.json" />
+	<link rel="shortcut icon" href="./img/favicon.ico" />
+	<meta name="msapplication-TileColor" content="#00a8ff" />
+	<meta name="msapplication-config" content="./img/browserconfig.xml" />
+	<meta name="theme-color" content="#ffffff" />
+	<!-- Normalize -->
+	<link rel="stylesheet" type="text/css" href="./css/normalize.css" />
+	<!-- Bootstrap -->
+	<link rel="stylesheet" type="text/css" href="./css/bootstrap.css" />
+	<!-- Owl -->
+	<link rel="stylesheet" type="text/css" href="./css/owl.css" />
+	<!-- Animate.css -->
+	<link rel="stylesheet" type="text/css" href="./css/animate.css" />
+	<!-- Font Awesome -->
+	<link rel="stylesheet" type="text/css" href="./fonts/font-awesome.min.css" />
+	<!-- Elegant Icons -->
+	<link rel="stylesheet" type="text/css" href="./fonts/eleganticons/et-icons.css" />
+	<!-- Main style -->
+	<link rel="stylesheet" type="text/css" href="./css/cardio.css" />
+</head>
+
+<body>
+	<div class="preloader">
+		<img src="./img/loader.gif" alt="Preloader image" />
+	</div>
+	<nav class="navbar">
+		<div class="container">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"><img src="./img/logo.png" style="float: left;" width="50" alt="" /><p>Interactive Flocking Simulation</p></a>
+			</div>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav navbar-right main-nav">
+					<li><a href="index.html">Overview</a></li>
+					<li><a href="proposal.html">Proposal</a></li>
+					<li><a href="implementation.html">Implementation</a></li>
+				</ul>
+			</div>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav navbar-right main-nav">
+					<li><a href="#summary">Abstract</a></li>
+					<li><a href="#tech_approach">Technical approach</a></li>
+					<li><a href="#schedule">Results</a></li>
+					<li><a href="#resource">Referencess</a></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+
+	<section class="section section-padded">
+		<div class="container">
+			<div class="row text-center title">
+				<h2>Final Report</h2>
+			</div>
+		</div>
+	</section>
+
+	<section id="summary" class="section gray-bg">
+		<div class="container">
+			<div class="row text-center title">
+				<h3>Abstract</h3>
+				<br>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					In this project, we try to implement a 3D flocking simulation.
+					All birds will move generally towards a designated dirction but with 
+					some variation according to forces on them. The forces include internal forces like 
+					separation, alignment and cohesion, and external forces like wind. 
+					We adapt the nanoGUI from our last course project, and user can change the number of birds to 
+					simulate, the weight of
+					each of the force as well as the designated direction using the sliding barw on the GUI.<br>
+					<br>
+					Presentation slides: <a href="https://docs.google.com/presentation/d/11QU8uQsCKbf2oT6ux9RuYUnxBdJdNBXTSHDoqfBYK5I/edit?usp=sharing" style="color:blue">
+						https://docs.google.com/presentation/d/11QU8uQsCKbf2oT6ux9RuYUnxBdJdNBXTSHDoqfBYK5I/edit?usp=sharing</a><br>
+					<br>
+					Presentation video: <a href="https://www.youtube.com/watch?v=xvowkBw1n2o" style="color:blue">
+						https://www.youtube.com/watch?v=xvowkBw1n2o</a>
+				</p>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/xvowkBw1n2o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+			</div>
+		</div>
+	</section>
+
+	<section id="tech_approach" class="section gray-bg">
+		<div class="container">
+			<div class="row text-center title">
+				<h3>Technical approach</h3>
+				<br>
+                <h4>Separation, Alignment and Cohesion</h4>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					To make sure our point masses behave just like real birds, we need to further implement forces 
+					between birds. According to <a href="http://www.csc.kth.se/utbildning/kth/kurser/DD143X/dkand11/Group5Lars/carl-oscar_erneholm.pdf" style="color:blue">Boids Paper</a>, there are mainly three forces: Separation, Alignment and Cohesion. 
+					According to Newton's Second Law F=ma, these force will produce acceleration, therefore cause on 
+					velocity(speed and direction) and position of birds. We apply a weight for each of the force and it can be 
+					adjusted by the sliding bar on the GUI.
+				</p>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="tech_approach text-left" style="padding: 0rem 15rem;">
+						<h4 style="padding-top: 3rem" align="middle">Cohesion</h4>
+						<p>
+							We often see a large flock of birds flying together. That's reasonable, because birds want to stay 
+							together for attack protection and support. For each bird, the cohesion is calculated by average 
+							position of all the neighboring birds. Neighboring birds are defined as other birds within a given 
+							distance away from the bird.
+						</p>
+						<table style="width: 100%">
+						<tr>
+							<iframe src="https://drive.google.com/file/d/1izX-GEl49AGaJ3hbMzWPW23KpPSFGOMe/preview" width="640" height="480"></iframe>
+						</tr>
+						</table>
+
+						<h4 style="padding-top: 3rem" align="middle">Separation</h4>
+						<p>
+							Of course birds try to avoid colliding with each other, therefore there's also a 
+							separation force between each pair of birds close to each other. The force is calculated 
+							by averaging displacement from neighboring birds to the bird. Notice that the distance limit to define 
+							neighbors for separation should be smaller than the distance limit to define neighbors for cohesion. It 
+							means birds will only repel each other when they are very close. 
+						</p>
+						<table style="width: 100%">
+						<tr>
+							<iframe src="https://drive.google.com/file/d/1NQIaRw5SN5pJvolPqs7HlGgY-HXg02yl/preview" width="640" height="480"></iframe>
+						</tr>
+						</table>
+
+						<h4 style="padding-top: 3rem" align="middle">Alignment</h4>
+						<p>
+							For birds to reach their destination, they need to have an overall heading direction instead of 
+							attracting and repelling each other without moving forward. The alignment is average of 
+							velocity difference between neighbor birds and the bird. The average of the velocity difference
+							will be added to velocity of the bird directly.
+
+						</p>
+						<table style="width: 100%">
+						<tr>
+							<iframe src="https://drive.google.com/file/d/1FdG2uVxCxo8SS3B-067MPwcWTZ1DxQKK/preview" width="640" height="480"></iframe>
+						</tr>
+						</table>
+				    </div>
+				</div>
+			</div>
+			<div class="row text-center title">
+				<p style="font-size: 2rem; text-align: left; color:black">
+					There are also external forces. We implemented wind blowing to a random direction, although the effect may
+					not be significant. <br>
+					<br>
+					Of course there are speed limits for birds, so we also put speed limits in our model. <br>
+					<br>
+					With all these forces implemented, we can now see how the points move like real flocks.
+				</p>
+				<div align="middle">
+					<table style="width: 100%">
+					<tr>
+						<iframe src="https://drive.google.com/file/d/1Ejcw-6qQxQoWKFHKxLSYEDX3rHxACGqV/preview" width="640" height="480"></iframe>
+					</tr>
+					</table>
+					</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="schedule" class="section">
+		<div class="container">
+			<div class="row text-center title">
+				<h3>Results</h3>
+				<br>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					GUI
+					</p> 
+                <div class="text-left">
+                    <ul style="font-size: 2rem;">
+                        <li>P: pause/continue</li>
+                        <li>N: next time frame</li>
+                        <li>R: reset</li>
+                        <li>S: turn on/off stop mode</li>
+                    </ul>
+                </div>
+                <p style="font-size: 2rem; text-align: left; color:black">Point mass</p> 
+                <div class="text-left">
+                    <ul style="font-size: 2rem;">
+                        <li>coherence</li>
+                        <li>separation</li>
+                        <li>alignment</li>
+                        <li>Interactive features:
+                            <ul>
+                                <li>Change weight</li>
+                                <li>Change neighborhood size</li>
+                                <li>Change flock size</li>
+                                <li>Change heading position</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <p style="font-size: 2rem; text-align: left; color:black">
+					Display: Bird model
+					</p> 
+                <div class="text-left">
+                    <ul style="font-size: 2rem;">
+                        <li>Draw model via Blender</li>
+                        <li>Add Texture</li>
+                    </ul>
+                </div>
+                <p style="font-size: 2rem; text-align: left; color:black">
+					Display: Bird model
+					</p> 
+                <div class="text-left">
+                    <ul style="font-size: 2rem;">
+                        <li>Draw model via Blender</li>
+                        <li>Add Texture</li>
+                    </ul>
+                </div>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					Display: Tree
+					</p> 
+                <div class="text-left">
+                    <ul style="font-size: 2rem;">
+                        <li>Draw cylinder as body and branch of the tree via rotation and scale.</li>
+                    </ul>
+                </div>
+                <p style="font-size: 2rem; text-align: left; color:black">
+                    Stop mode
+                </p> 
+                <div class="text-left">
+                    <ul style="font-size: 2rem;">
+                        <li>Stop when close to branches</li>
+                        <li>Stop with deceleration</li>
+                        <li>Random position on pole</li>
+                        <li>Will fly away when relaxed</li>
+                    </ul>
+                </div>
+			</div>
+		</div>
+	</section>
+
+	<section id="resource" class="section gray-bg">
+		<div class="container">
+			<div class="row text-center title">
+				<h3>References</h3>
+				<br>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					</p>
+				<div class="text-left">
+                    <ul style="font-size: 2rem;">
+                        <li>https://www.csc.kth.se/utbildning/kth/kurser/DD143X/dkand11/Group5Lars/carl-oscar_erneholm.pdf</li>
+                        <li>https://cs184.eecs.berkeley.edu/sp21/docs/proj4</li>
+                    </ul>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<footer>
+		<div class="container">
+			<div class="row"></div>
+			<div class="row bottom-footer text-center-mobile">
+				<div class="col-sm-8">
+					<p>&copy; Created by Sainan Chen, Tianqi Yang, Yizhou Chi, Huibo Yang.</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- Holder for mobile navigation -->
+	<div class="mobile-nav">
+		<ul></ul>
+		<a href="#" class="close-link"><i class="arrow_up"></i></a>
+	</div>
+	<!-- Scripts -->
+	<script src="js/jquery-1.11.1.min.js"></script>
+	<script src="js/owl.carousel.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/wow.min.js"></script>
+	<script src="js/typewriter.js"></script>
+	<script src="js/jquery.onepagenav.js"></script>
+	<script src="js/main.js"></script>
+</body>
+
+</html>

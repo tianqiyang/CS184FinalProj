@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Interactive Flocking Simulation</title>
+	<!-- Favicons (created with http://realfavicongenerator.net/)-->
+	<link rel="apple-touch-icon" sizes="57x57" href="./img/apple-touch-icon-57x57.png" />
+	<link rel="apple-touch-icon" sizes="60x60" href="./img/apple-touch-icon-60x60.png" />
+	<link rel="icon" type="image/png" href="./img/favicon-32x32.png" sizes="32x32" />
+	<link rel="icon" type="image/png" href="./img/favicon-16x16.png" sizes="16x16" />
+	<link rel="manifest" href="./img/manifest.json" />
+	<link rel="shortcut icon" href="./img/favicon.ico" />
+	<meta name="msapplication-TileColor" content="#00a8ff" />
+	<meta name="msapplication-config" content="./img/browserconfig.xml" />
+	<meta name="theme-color" content="#ffffff" />
+	<!-- Normalize -->
+	<link rel="stylesheet" type="text/css" href="./css/normalize.css" />
+	<!-- Bootstrap -->
+	<link rel="stylesheet" type="text/css" href="./css/bootstrap.css" />
+	<!-- Owl -->
+	<link rel="stylesheet" type="text/css" href="./css/owl.css" />
+	<!-- Animate.css -->
+	<link rel="stylesheet" type="text/css" href="./css/animate.css" />
+	<!-- Font Awesome -->
+	<link rel="stylesheet" type="text/css" href="./fonts/font-awesome.min.css" />
+	<!-- Elegant Icons -->
+	<link rel="stylesheet" type="text/css" href="./fonts/eleganticons/et-icons.css" />
+	<!-- Main style -->
+	<link rel="stylesheet" type="text/css" href="./css/cardio.css" />
+</head>
+
+<body>
+	<div class="preloader">
+		<img src="./img/loader.gif" alt="Preloader image" />
+	</div>
+	<nav class="navbar">
+		<div class="container">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"><img src="./img/logo.png" style="float: left;" width="50" alt="" /><p>Interactive Flocking Simulation</p></a>
+			</div>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav navbar-right main-nav">
+					<li><a href="index.html">Overview</a></li>
+					<li><a href="proposal.html">Proposal</a></li>
+					<li><a href="milestone.html">Milestone</a></li>
+					<li><a href="final_implementation.html">Final implementation</a></li>
+				</ul>
+			</div>
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav navbar-right main-nav">
+					<li><a href="#abstract">Abstract & Demo</a></li>
+					<li><a href="#approaches">Technical approaches</a></li>
+					<li><a href="#results">Results</a></li>
+					<li><a href="#references">References</a></li>
+					<li><a href="#contributions">Contributions</a></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+
+	<section class="section section-padded">
+		<div class="container">
+			<div class="row text-center title">
+				<h2>Final implementation</h2>
+			</div>
+		</div>
+	</section>
+
+	<section id="abstract" class="section gray-bg">
+		<div class="container">
+			<div class="row text-center title">
+				<h3>Abstract</h3>
+				<br>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					In this project, we try to improve the common existing 2D boid models by implementing it in 3D 
+					with more delicate bird models and more verisimilar behaviors. All birds will move generally towards 
+					a designated direction but with some variation according to forces on them. The forces include separation, 
+					alignment and cohesion. There is also a stop mode that the birds will rest on a branch when it's close enough
+					to that branch and take off again after some time. We adapt the nanoGUI 
+					from our last course project, and user can change the number of birds to simulate, the weight of 
+					each of the force, the neighborhood size for determining the forces, as well as the designated
+					direction using the sliding bars on the GUI.<br>
+					<br>
+				</p>
+				<h3>Demo</h3>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					Overview video: <a href="https://youtu.be/nn_YtP_6YQI" style="color:blue">
+					https://youtu.be/nn_YtP_6YQI</a>
+				</p>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/nn_YtP_6YQI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					Demo video: <a href="https://youtu.be/7BwFCAx3YVU" style="color:blue">
+					https://youtu.be/7BwFCAx3YVU</a>
+				</p>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/7BwFCAx3YVU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+			</div>
+		</div>
+	</section>
+
+	<section id="approaches" class="section">
+		<div class="container">
+			<div class="row text-center title">
+				<h3 style="text-align: center">Technical approaches</h3>
+				<h4 style="padding-top: 3rem">GUI</h4>
+				<div class="icon-holder" align="middle">
+					<img src="./img/final_gui.png" alt="" class="icon" width="80%">
+				</div>
+				<p style="font-size: 2rem; text-align: left; color:black"> 
+					The nanoGUI we used in this project is adapted from last course project. Besides the commands P/N/R 
+					implemented already, we add command S for turning on/off the stop mode.
+				</p>
+				<ul style="font-size: 2rem; text-align: left">
+					<li>P: pause/continue</li>
+					<li>N: next time frame</li>
+					<li>R: reset</li>
+					<li>S: turn on/off stop mode</li>
+				</ul>
+
+				<h4 style="padding-top: 3rem">Point mass model</h4>
+				<div class="icon-holder" align="middle">
+					<img src="./img/final_pointmass.png" alt="" class="icon" width="30%">
+				</div>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					We represent every bird as a point mass, and there are three forces coherence, separation, and alignment 
+					between them. The implementation is based on <a href="https://arxiv.org/pdf/1909.12330.pdf" style="color:blue">
+						boids algorithm</a>. However, with this implementation, the speed of birds will go crazy when we
+						increase the weights of the forces and then decrease it back to the original value. Therefore, we added 
+						a maximum speed for the birds to make sure the speed is always reasonable.
+				</p>
+				<ul style="font-size: 2rem; text-align: left">
+					<li>Coherence force cause acceleration in the direction of average position of nerghbor birds. </li>
+					<li>Separation force cause acceleration in the opposite direction of average position difference between 
+						the bird and its neighbor birds.
+					</li>
+					<li>Alignment cause the velocity of the bird increase by the average velocity difference between its neighbor birds'
+						and itself.
+					</li>
+				</ul>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					Then we add some interative features, so user can use sliding bars on GUI to change:
+				</p>
+				<ul style="font-size: 2rem; text-align: left">
+					<li>Weights for the three forces (the larger the weight, the more obvious the behavior is)</li>
+					<li>Neighborhood size for the three forces (radius for the circle)</li>
+					<li>flock size (number of point masses)</li>
+					<li>heading position (general direction birds will fly to)</li>
+				</ul>
+
+				<h4 style="padding-top: 3rem">Bird model</h4>
+				<div align="middle">
+					<table style="width: 100%">
+					  <tr>
+						<td>
+						  <img src="img/final_model.png" align="middle" width="80%" />
+						</td>
+						<td>
+						  <img src="img/final_bird_model.png" align="middle" width="120%" />
+						</td>
+						<td>
+						  <img src="img/final_texture.png" align="right" width="55%" />
+						</td>
+						<td>
+						  <img src="img/final_bird_texture.png" align="right" width="80%" />
+						</td>
+					  </tr>
+					</table>
+				  </div>
+				</div>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					<br>To further picture the details of birds, we build a 3D build model using Blender. By aligning the 
+					model axis with the velocity direction, we can make sure birds fly with their head facing the front. 
+					We also manually painted a texture to add more details like feathers beak, and claws.
+				</p>
+
+				<h4 style="padding-top: 3rem" align="middle">Stop mode & Tree model</h4>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					To include more realistic and interesting behaviors, we also added stop mode that the birds can stop at 
+					a random position on the nearest branch if it's close enough to the branch.
+				</p>
+				<div align="middle">
+					<table style="width: 100%">
+					<tr>
+						<td>
+							<img src="img/final_stop_bar.png" align="middle" width="80%" />
+						</td>
+						<td>
+							<img src="img/final_stop_tree.png" align="middle" width="100%" />
+						</td>
+					</tr>
+					</table>
+				</div>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					<br>We start by adding ground and a single pole to the scene. Every time when the distance between a 
+					bird and the pole is within a fixed value, the bird will fly towards a random position on the pole 
+					calculated by implicit equation with deceleration until it rests on the pole. According to probability 
+					theory, the birds should have even spacing between them. After some fixed time, birds will take off again 
+					randomly with a probability according to Russian Roulette. After we see everything works well on the single 
+					pole, we added more branches and make a tree via rotation and scale. The birds now will stop on the nearest branch.
+				</p>
+
+				<h4 style="padding-top: 3rem" align="middle">Lessons learned</h4>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					To conclude, what we learned from lectures and put in this project includes:
+				</p>
+				<ul style="font-size: 2rem; text-align: left">
+					<li>How to use particle system to represent flocks as point masses. </li>
+					<li>How to simulate the movements and interaction between birds using forces according to Newton’s Law and Euler’s Method. </li>
+					<li>How to use polygon mesh to make models.</li>
+				</ul>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					Besides, it's always important to set restrictions according to physical conditions. For example, we know the bird speed 
+					must has an upper bound, and the speed change is continous and smooth, so there must be deceleration when birds try to 
+					stop on the branch. 
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<section id="results" class="section gray-bg">
+		<div class="container">
+			<div class="row text-center title">
+				<h3>Results</h3>
+				<br>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					Following are demonstrations of the three forces respectively. 
+				</p>
+				<div align="middle">
+					<table style="width: 100%">
+					<tr>
+						<td>
+						<img src="img/final_coherence.gif" align="middle" width="100%" />
+						<p>coherence</p>
+						</td>
+						<td>
+							<img src="img/final_separation.gif" align="middle" width="100%" />
+							<p>separation</p>
+						</td>
+						<td>
+							<img src="img/final_alignment.gif" align="middle" width="100%" />
+							<p>alignment</p>
+						</td>
+					</tr>
+					</table>
+				</div>
+				<p style="font-size: 2rem; text-align: left; color:black">
+					<br>
+					There are two additional behaviors: interaction with the tree, and leading direction.   
+				</p>
+				<div align="middle">
+					<table style="width: 100%">
+					<tr>
+						<td>
+							<img src="img/final_land.gif" align="middle" width="100%" />
+							<p>Birds will try to stop on the closest branch when it's close enough to the branch.</p>
+						</td>
+						<td>
+							<img src="img/final_takeoff.gif" align="middle" width="100%" />
+							<p>The bird will take off again after resting for some time.</p>
+						</td>
+						<td>
+							<img src="img/final_lead.gif" align="middle" width="100%" />
+							<p>Birds will fly to the coordinate set by user.</p>
+						</td>
+					</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="references" class="section">
+		<div class="container">
+			<div class="row text-center title">
+				<h3>References</h3>
+				<br>
+				<ul style="font-size: 2rem;" align="left">
+					<li>Boids algorithm from: <a href="https://arxiv.org/pdf/1909.12330.pdf" style="color:blue">
+						https://arxiv.org/pdf/1909.12330.pdf</a></li>
+					<li>NanoGUI adapted from: <a href="https://cs184.eecs.berkeley.edu/sp21/docs/proj4" style="color:blue">
+						https://cs184.eecs.berkeley.edu/sp21/docs/proj4</a></li>
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section id="contributions" class="section gray-bg">
+		<div class="container">
+			<div class="row text-center title">
+				<h3>Contributions</h3>
+				<br>
+				<div class="text-left">
+					<ul style="font-size: 2rem;">
+						<li><b>Huibo Yang</b>: adapt nanoGUI and add sliding bars to change variables, develope three forces with speed limit to avoid weird behaviors, build bird model using blender, create bird texture, add takeoff behavior, create demo video</li>
+						<li><b>Sainan Chen</b>: build point mass models and implement three forces, add ground to the space, build stop mode and enable birds to stop on a branch, create webpages</li>
+						<li><b>Tianqi Yang</b>: build point mass models and implement three forces, add poles and assembles them into a tree in the space, create overview video</li>
+						<li><b>Yizhou Chi</b>: adapt nanoGUI and add sliding bars to change variables, develope three forces with speed limit to avoid weird behaviors, build bird model using blender, create bird texture, add takeoff behavior</li>
+						<li><b>Everyone</b>: create slides and did wonderful presentations!</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<footer>
+		<div class="container">
+			<div class="row"></div>
+			<div class="row bottom-footer text-center-mobile">
+				<div class="col-sm-8">
+					<p>&copy; Created by Sainan Chen, Tianqi Yang, Yizhou Chi, Huibo Yang.</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- Holder for mobile navigation -->
+	<div class="mobile-nav">
+		<ul></ul>
+		<a href="#" class="close-link"><i class="arrow_up"></i></a>
+	</div>
+	<!-- Scripts -->
+	<script src="js/jquery-1.11.1.min.js"></script>
+	<script src="js/owl.carousel.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/wow.min.js"></script>
+	<script src="js/typewriter.js"></script>
+	<script src="js/jquery.onepagenav.js"></script>
+	<script src="js/main.js"></script>
+</body>
+
+</html>
