@@ -8,7 +8,7 @@ To do simulation,
 - `cd build`
 - `cmake ..`
 - `make`
-3. Finally run `./clothsim -f ../scene/env.json`.
+3. Finally run `./clothsim -f ../scene/env.json` or `./clothsim -f ../../../scene/env.json`. 
 ## usage
 1. Press "P" to pause or continue.
 2. Press "N" when paused for next timeframe.
